@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ตรวจนับสต็อกยาและเวชภัณฑ์ – CPF</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>MediTrack – CPF</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -23,17 +23,20 @@ html,body{height:100%;background:var(--bg)}
 body{font-family:'Sarabun',-apple-system,sans-serif;font-size:16px;color:var(--ink);-webkit-font-smoothing:antialiased}
 .app{display:flex;flex-direction:column;height:100vh;max-width:520px;margin:0 auto;background:var(--bg)}
 .ab{flex:none;height:58px;display:flex;align-items:center;padding:0 14px;gap:10px;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
-.ab .logo{width:38px;height:38px;border-radius:9px;background:#fff;padding:2px;object-fit:contain;flex:none}
-.ab h1{font-size:15.5px;font-weight:700;color:#fff;line-height:1.2}
-.ab .sub{font-size:11px;color:var(--mut)}
-.ab .ibtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,.08);color:#dfe;border:none;font-size:18px;cursor:pointer;flex:none;font-family:inherit;position:relative}
-.ab .bdg{position:absolute;top:-3px;right:-4px;background:var(--bad);color:#1a0f0f;font-size:9px;font-weight:700;padding:0 4px;border-radius:99px;min-width:15px;text-align:center}
-.scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--nh) + 12px)}
+.ab .logo{width:36px;height:36px;border-radius:8px;background:#fff;padding:2px;object-fit:contain;flex:none}
+.ab h1{font-size:15px;font-weight:700;color:#fff;line-height:1.2}
+.ab .sub{font-size:10.5px;color:var(--mut)}
+.ibtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,.08);color:#dfe;border:none;font-size:18px;cursor:pointer;flex:none;font-family:inherit;position:relative}
+.bdg{position:absolute;top:-3px;right:-4px;background:var(--bad);color:#1a0f0f;font-size:9px;font-weight:700;padding:0 4px;border-radius:99px;min-width:15px;text-align:center;line-height:15px}
+.scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 80px}
 .bnav{flex:none;height:var(--nh);background:var(--bg2);border-top:1px solid var(--line);display:flex;z-index:20}
-.bnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--hint);cursor:pointer;gap:3px;border:none;background:none;font-family:inherit;position:relative}
-.bnav a .ic{font-size:21px;line-height:1}
+.bnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--hint);cursor:pointer;gap:2px;border:none;background:none;font-family:inherit;position:relative;padding-bottom:4px}
+.bnav a .ic{font-size:20px;line-height:1}
 .bnav a.on{color:var(--fc);font-weight:700}
-.bnav a .nb{position:absolute;top:8px;right:calc(50% - 18px);background:var(--bad);color:#1a0f0f;font-size:8px;font-weight:700;padding:0 4px;border-radius:99px;min-width:14px;text-align:center}
+.bnav a .nb{position:absolute;top:7px;right:calc(50% - 20px);background:var(--bad);color:#1a0f0f;font-size:8px;font-weight:700;padding:0 4px;border-radius:99px;min-width:14px;text-align:center;line-height:14px}
+/* footer credit */
+.cred{text-align:center;padding:10px 14px 4px;font-size:11px;color:var(--hint);border-top:1px solid var(--line);margin-top:6px}
+.cred strong{color:var(--mut);font-weight:600}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;margin-bottom:11px}
 .chip{font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
 .c-ok{background:var(--ok-bg);color:var(--ok)}.c-near{background:var(--near-bg);color:var(--near)}
@@ -50,7 +53,7 @@ select:focus,input:focus{outline:none;border-color:var(--fc);box-shadow:0 0 0 3p
 .btn.prim{background:var(--fc);color:#08130d}
 .btn.sec{background:var(--card2);color:var(--ink);border:1px solid var(--line2)}
 .btn.sm{font-size:13px;font-weight:600;padding:8px 13px;width:auto;border-radius:9px}
-.btn.cta{font-size:17px;padding:16px;border-radius:13px;box-shadow:0 0 0 1px rgba(95,191,142,.3)}
+.btn.cta{font-size:17px;padding:16px;border-radius:13px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sec-h{font-size:12.5px;font-weight:700;color:var(--mut);padding:12px 2px 7px;letter-spacing:.3px}
 .prog{height:9px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
@@ -68,7 +71,6 @@ select:focus,input:focus{outline:none;border-color:var(--fc);box-shadow:0 0 0 3p
 .kpi{border-radius:12px;padding:12px 13px;border:1px solid}
 .kpi .top{display:flex;align-items:center;gap:7px}
 .kpi .n{font-size:25px;font-weight:700;line-height:1}
-.kpi .ic{font-size:17px}
 .kpi .l{font-size:11.5px;color:var(--mut);margin-top:3px}
 .k-ok{background:var(--ok-bg);border-color:var(--ok-bd)}
 .k-near{background:var(--near-bg);border-color:var(--near-bd)}
@@ -106,9 +108,9 @@ select:focus,input:focus{outline:none;border-color:var(--fc);box-shadow:0 0 0 3p
 .rk{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line)}
 .rk:last-child{border-bottom:none}
 .rk .pos{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none}
-.search-wrap{position:relative;margin-bottom:12px}
-.search-wrap .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--hint);font-size:16px;pointer-events:none}
-.search-wrap input{padding-left:36px}
+.sw{display:flex;align-items:center;gap:10px;position:relative;margin-bottom:12px}
+.sw .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--hint);font-size:16px;pointer-events:none}
+.sw input{padding-left:36px}
 .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#05201a;border:1px solid var(--ok-bd);color:#dfffef;padding:11px 18px;border-radius:11px;font-size:13.5px;z-index:99;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 .empty{text-align:center;padding:40px 16px;color:var(--hint);font-size:14px}
@@ -117,115 +119,137 @@ table.rep th,table.rep td{border:1px solid var(--line2);padding:7px 8px;text-ali
 table.rep th{font-weight:700;font-size:12px;color:var(--mut)}
 table.rep td.l{text-align:left}
 .canvas-wrap{position:relative;height:175px}
-@media print{
-  body,.app{background:#fff!important}
-  .bnav,.ab .ibtn,.noprint{display:none!important}
-  .scr{padding:0;overflow:visible}
-  #prt{display:block!important;color:#111}
-}
+@media print{body,.app{background:#fff!important}.bnav,.ibtn,.noprint{display:none!important}.scr{padding:0;overflow:visible}#prt{display:block!important;color:#111}.cred{display:none}}
 #prt{display:none}
+
+.tgl{width:42px;height:24px;border-radius:99px;border:none;cursor:pointer;position:relative;flex:none;transition:background .2s}
+.tgl.on{background:var(--fc)}.tgl.off{background:var(--line2)}
+.tgl::after{content:"";position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
+.tgl.on::after{left:21px}.tgl.off::after{left:3px}
+.btn.danger{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-bd)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;display:flex;align-items:flex-end}
+.modal{background:var(--card);border-radius:18px 18px 0 0;padding:20px 18px 34px;width:100%;max-width:520px;margin:0 auto}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--ink)}
+.footer-dev{text-align:center;padding:14px 0 4px;font-size:10.5px;color:var(--hint);border-top:1px solid var(--line);margin-top:8px}
+.sw-wrap{position:relative;margin-bottom:12px}
+.sw-wrap .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--hint);font-size:16px;pointer-events:none}
+.sw-wrap input{padding-left:36px}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="ab" id="ab">
-    <img class="logo" src="data:image/jpeg;base64,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" alt="CPF">
-    <div style="flex:1;min-width:0"><h1 id="abt">ตรวจนับสต็อกยาและเวชภัณฑ์</h1><div class="sub" id="abs">ธุรกิจพันธุ์กุ้งทะเล 2</div></div>
+    <img class="logo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCAC0ALIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5Uqa1tLi+nS3tYJbiZzhY4kLMx9gOTT9N0+51bULbT7OJprm5lWGKNerMxwB+Zr6u+GPwwS0VdG0NYg6KDfakVw0x7knrtzwqDjHJ5ya4sZjFh0klzSlsl1KjG583f8K08Z9/DOrD627VbtvhB46u4vMj8N3gXOPnKIfyZga+20+CthtG/Vbkt3IiQCl/4Uppv/QUuv8Av2n+Fcv1jMP+fK/8CKtDufDc/wALvGtvK0T+GtSLLwdkW4fmMg0+L4U+NpoZJl8Nahtj67kCn8ATk/hX3D/wpTTv+gpdf9+0/wAKP+FKab/0FLr/AL9p/hR9YzD/AJ8r/wACFaHc+GB8M/GROP8AhGdV/wC/Bqeb4UeN4JzC/hrUC4GflQMv5gkfrX3B/wAKU07/AKCt1/37T/Cj/hSmm/8AQUuv+/af4UfWMw/58r/wILQ7nw3D8LvGk8qxJ4a1MMxwN0W0fmeBV7/hS3j7/oXLj/v7F/8AFV9rf8KU07/oK3X/AH7T/Cj/AIUppv8A0FLr/v0n+FH1jMP+fK/8CHaHc+Kf+FLePv8AoXLj/v7F/wDFUf8AClvH3/QuXH/f2L/4qvtb/hSmm/8AQUuv+/Sf4Uf8KU03/oKXX/fpP8KPrGYf8+V/4EK0O58U/wDClvH3/QuXH/f2L/4qj/hS3j7/AKFy4/7+xf8AxVfa3/ClNN/6Cl1/36T/AApP+FKab/0FLr/v0n+FH1jMP+fK/wDAh2h3PihPgz49kUMvhy5wfWSMH8i1OPwX8fAZ/wCEcuP+/sX/AMVX2r/wpXTf+gpdf9+k/wAKP+FKab/0FLr/AL9J/hR9YzD/AJ8r/wACFaHc+Gf+FaeMv+hZ1X/wHapbb4V+NruXyo/DWohsZ/eR7B+bECvuL/hSum/9BS6/79pR/wAKV03/AKCl1/37T/Cj6xmH/Plf+BBaHc+Kf+FLePv+hcuP+/sX/wAVR/wpbx9/0Llx/wB/Yv8A4qvtX/hSmm/9BS6/79J/hR/wpTTf+gpdf9+k/wAKPrGYf8+V/wCBBaHc+CdY8J6/4fVX1bR7+yRsbXngZVP0bGKya+6/Fnw5uvDVhNc20yahprDbcQTRAqVP99DlXX+VfJ/xd8GW3hXXornTIfJ0vUkM0EO4t5Dg4kiySSQDggn+FlrbC46VSo6NaHLNa23TXkwlGyujhKKKK9Eg6n4YXktj4/0KeEgOLtVyRnhsqf0Jr7m+C0SDR7+QKNxuFUnvgIMD9TXwt8NYJLnx5oaRLuYXaNjIHC8n9Aa+6/gv/wAgO+/6+R/6AK8jEf8AIwo+kjRfAz0OiignFeuZgTiuNuPHUOpeMoPCmjyCWeP99fTrysEY/hH+0entXPfHP4mv4L0hNO05sapfqQrf88k7t9fSqv7PXg6fRdCm1zUg32/VT5g8z7wi7H8TzXFVqOc1Tg+uv6mXtb1PZx+fkeuClo4FcX8Rfidpnw+gsjdDzZ7qZVEQ6iPPzP8AgK6alRU480jRyUVdnaUVW0/ULfU7KC8tZVlgnQPG69GBqzVxkpK6GBNQ2t5b3sZe2mSZQzIWQ5AYHBH4GvOPjX8TU8EaGbKylU6teqViA6xL3c/0ryP4G/FWXw1rR0nV7lm06/kz5khz5UpP3voe9c08RaWi0W/9eXU5p4qnCqqTerPqk0lIriRQykEHkEd6U8c11HSFFcB4q+L+jeGPGOneHp3DeecXMo6W+fu5/HrXeo6yKGUggjII71lCrGbaXQSkndJ7HL+OfFcngqK01idGl0vzfJuwoyYw33ZB9DnP1rodP1C21SzivLSZJ7eVQySIchhVPxTodv4k0C90m6x5d1EY8ns3Y/nivnv4UeNtS+G/i6XwZr5dbJ5/JAf/AJYv2Yf7JrnlUlSqu791/h/XUzqVeSST2f5/8E+maKQGlrtNSlrcaS6NfRuoZWt5AQf9018T/HcA+GNFYgFhezgHHIzFHn+Qr7a1f/kFXn/XCT/0E18RfHeeIeHdFty4803c8gTuV8uMZ/OvIxH/ACMKPpL8i18LPFKKKK9cg6L4ef8AI8aH/wBfsX86+7/gv/yA77/r5H/oAr4Q+Hn/ACPGh/8AX7F/Ovu/4L/8gO+/6+R/6AK8jEf8jCl6SNF8DPQ68u+IPxM/sD4geG/D8EmEkmD3ZB7MCqg/nmvUT0r46+KepTS/F7UJ2Lb4L2NE9gpGK68ZJ8vLH1+7/g2OLFV3RgpLq0jtfibb2w8aah4t8RKZdOsZBaafaE4N3Kg5/wCAA9TXofwOuNV17RbvxNrEm6a/l2QIBhYoU6Ko7DJryb4j/wBofFD4pweH9P3NDahIQB92PgGRz+Zr6W0HR7bw/o9nplooWG2iWNffA6/jXLhKXNU9o3fr/l/mKjd1ZuPwr8X1+7Yk1fVLbRtOudQvJBHb28Zkdj2Ar4o8e+MLvxv4ludWuGIRm2wR54jjHQCvbP2mvGhtbG18L2suHuf31zg/wD7q/j1r5xrqk+ebfRf0/wDL7zzM1xLuqMfme6/s8/E/7FOvhLVZsQStmzkc/cb+59DXuXjPxdY+DNBuNXvnAWJcJHnmR+yivhqGWS3lSaJikiMGVh1BHeuq8bfEjWPHUOnQ6hJ+7soVTaOjv3c+5qE5w9yOz/D+ugYfMuSi4z3W3n/wxk+KfE1/4t1y51bUZC0s7ZC54Reyj2FZI4Oau6Lo93r+qW2mWMZkuLlwiAep7123xX+FNz8PXsp4iZ7K4iVWlHRJgPmB+p6Uc0YWgv6/4c8/2VWrGVftuetfAD4o/wBv6ePDeqzZ1C1T9w7HmaMdvqK7f4nePrXwD4bmvnZWu5QUtYs/ff1+gr420rVbvQ9St9RsZWiubdxIjg9CK3fiD4+1H4gawt/enZHGipFCPupxyfxOaLzivZrbv2X9bf8AAPSp5pah73xL+rmDqWpXWrahPf3kzS3E7mR3J5JJr6e/Z9+IZ8TaC2i3826/05QFZjzJF2P4dK+V66HwB4qn8GeKrHV4mOyOQLKvZozwwokuS0o9PyOLA4p0615PR7/5n2pr+nf2tot7YhirTwsisD91scH88V8tSTT/ABDmOkaiVi8X6aSltcn5TehD/q3/ANvjg96+rbO6ivrKG5gcPFMgkRh3BGRXzZ8efBt14S8WQ+MNMRkt7iQSMyceVMP8ajGUlO01/Xb79vme9i7qHNa6W68v80dt4o+Ks/hhvA7Sll+1IGvkJ5242HP0Oa9hhkWaNZEYMrAMCO4PSvkb43+IR4j1nRr9DhZNLilwOzNkt+ua+mfhzeSX/gXQrmYku9nHkn2GP6U8FNt6u91+Wn4jpV+erOHRW/FGxq//ACCrz/rhJ/6Ca+JfjsB/wi+jHAz9um/9FR19tav/AMgq8/64Sf8AoJr4k+Ow/wCKY0Y5P/H7Nx2/1UdY4j/f6PpL8jsXws8Sooor1yDovh5/yPGh/wDX7F/Ovu/4L/8AIDvv+vkf+gCvhP4byeV470NtiP8A6Wgw4yOeM/UZyPcV92fBf/kB33/XyP8A0AV5GI/5GFL0kaL4Gd5c3tvbPFHNMkbTtsjDHG9sZwPfAr5a+NHhqa1+LsflxkrqkkMseP4mJAI/MV69+0JFcr4Aa9tJHjmsrqKcOhwVwcZrlPBGt2vxcj0W71Exrrvh2fzZcnm4i2n5h6nIHFaYqcm3G3p81/X3HDiFGrJUXvo/x1KXgPVrXwp8Xv7BUxz3F5vjvrjr+/PIRT6LjHvX0HIwWIsThQMk+gr5B+Grzap8ZLO6mfDfbpJ5GY9ACepr6m8Z3p07whq90hw0VnIw9jtNGDSo0pJdFf8AAeFqupGUmtLu3ofHfxI8RSeKfGuq6kzEo0xSIeiLwP5V1HwO+HNv461LUZNQUmxtrdoyR/z0cYGPp1rzIsWYsepOTX1V+zVp8Vr8P2ulA8y6upGc/wC7gCr5LqNN9dzxsDH2+Jc5ebPnPxv4N1DwP4gn0m+Q/Id0UvaVOzCsCvsv4sfDi2+IGgPEgVNRtwXtZcd/7p9jXx5qFhc6XezWV5C0NxA5R0YYIIq43i+SX/DmWPwfsZc0fhZ9E/s3+Aba10xvFdyY5rq4zHbgEHyVHU+xNet+LPDNj4t0K60i/QGKdcBsco3Zh9K+ZPgZ8TD4N1saZfyn+yr5grZ6Qv2b6etey/Gn4nR+DNA+y2EyNql+mIdpz5aEcv8A4VMZRjCUZb/nfb+ulj2MJWpfV01olv8A15ny14h0WTw9rV5pcskcrWspjLxtuDY75rOClmCqCSTgAdTTpJHmkaSRi7uSzMepJ717R8AvhV/bl2nifV4D9ggb/Ro3H+ucfxfQUXlGKjuzwqND6xV5YKy/JFnQvgTIfhhqWoX8ZXWbmEXFvGesSr8wB9zXhjAqxVhgjgiv0CMashQjKkYI9q+FfGVkmneLNXtI8bIruRVx6bjR7P2c0r7r8v8Ah/wO/M8NCnTg4LbQ+nv2fPEja94Bgt5nLT6e5t2yedvVf0qL9oPxNFoXhe0tJbeO4S/uQkkbDrGvLY9DXE/srXri712xJOwpHMB75xWp+1RAZNI0WdWB8qZwwzyNwGD+lTNXoOD72+V/8jvhWk8J7Rb2PKfHnhs203h6GylNza3tsBZyZyWQvwD7gkj8K+svD8Nt4f0fSdGklRJkgWFEJ5cquWx9Oa8O+H9rp03gHQPFWuSKLXw5PcnDHl+hRR6/NUnwm8V6r8RPi1cazeMwt7a2k8qEH5YlJwB9a5sNKVK0UttPvev/AAPQKThCal1nay7WR73q/wDyCrz/AK4Sf+gmviX47f8AIr6N/wBf03/oqOvtrV/+QVef9cJP/QTXxL8dv+RX0b/r+m/9FR1eI/3+j6S/I9FfCzxGiiivXIOq+F7Wy+P9EN2paP7SAAP72Dt/8e219z/Bf/kB33/XyP8A0AV8IfDz/keND/6/Yv5193/Bf/kB33/XyP8A0AV5GI/5GFL0kaL4Gdd4p0OLxJ4fv9Imxsu4WjyexxwfzxXx3oWoal8MPHiPOrRS2U5iuIz0eMnBH0I5r7XkYIhY5wBk4FeK/Fr4e6b8SrI6/wCF7m2uNUt12yRRsMzKOxHUMPeunFRV79/6v8jz8ZQlNKpT+KOx59D4Xl0bQvGviqIkRBxBYyjuHcMWH0GK9L8C+OT8Tfhtq2lXLg6vBZvFKO8o2/K/+Ncr4Vu7rxJ8FvEXhW5idNS0lSwidcOUByMj2wa8y+F3iuXwh4z0+9ViIJJBDOvZkbg5rgowtFu93bX01X/Df8E53XVGpTS+GX53OUdGjdkYEMpKkH1FfQX7Nfjyyt7OfwrfTLDMZDNalzgPnqv1rkfjf8Mbjw1rM2uadA0mkXr+ZuQZELHkg+x7V5ZHI8MiyRuyOpyrKcEH1Brti3JJrSSPNjKeCru60/NH6A8EV4r8ffhT/bdm/ibSIc39uubmNRzMg7/UV5f4Z+P3jLw9ClvJcxalAgwFulywH+8Oa7KD9qidk23fhqF8jnZOcH8DV1KnOrNNP7z1JY3DV4OM3a54Jyp6YIq1qeq3urzRzXtw87xxrEpc5wqjAFaHi3VtM1zWZ9R0vTn02Odi7W5cMqsf7p9PasUYyM9O9KC5kptanz8/cbhGV1+Z2/wo+HNz8QNfWJ1ZNNtyHupscAf3R7mvsTT7C20qyhs7SJYbeBAiIo4UCvmDwf8AHiDwPokek6T4Xh2r8zyyTndK395sCnat+0x4svY2SxtbGwBH3lUuw+maVKdnzOLv8tPx+89vC18Nh6dua767n0N428Z6b4K0SfUr+ZFZUPlRZ+aV+wA+tfEmp30mqajc30xzJcStK31JzVnXfEmreJbs3Wr3895KTwZGyB9B2o8P+HdS8T6pDpml2zz3ErAAKOFHqfQU3J355nFjMW8VJQprT8z179nWaDw7pfiXxPft5dlbxJGWP8R64Hv2rP07U9R+M954wSfJkNms9nF2j8t8hR9Rmk+LkMfgHwro3gKxkyxX7ZfSL/y1c9M+1Wv2enXQbDxP4quRtt7O2CBj0LdcfyrkmueN56a/19y/J9zupycakML0Sd/mjjPFWuTWHg7RfCETlFhDXl2oPWRzwD9BXt37OXguXQPDU2s3cZS51MgoG6rEOn515z8OfhreePddm8V+JF+yaOZjOxl+QTHOQoz0FfS2i6lpuo2mdLmimtoT5QaL7gwOinoce1aYSK0Unrv6v/Jf1sbYWi3N1pbbR9CXV/8AkFXn/XCT/wBBNfEvx2/5FbRv+v6b/wBFR19tav8A8gq8/wCuEn/oJr4l+O3/ACK2jf8AX9N/6KjqcR/v9H0l+R6a+FniNFFFeuQdX8LLVLz4gaJFI5RRcb8jHVVLAc+pAH419zfBf/kB33/XyP8A0AV8I/DmNpPHOhqiM5+2RnAGeAck/kM193fBf/kB33/XyP8A0AV5GI/5GFL0kaL4GehkZFfM3xt8Lar4C8UHxV4fuLi0tL1tztAxAil7g+xr6ZqhrmiWPiHTLjTdRgWe2nXa6N/Mehr0K9H2i80c1el7SHLez6PsfOngL45WI1RX8W6fEZ5YzBJqMC7WdD2lUcMPfrXEfELwivhzxKk+mSLc6VfuJrG4jOVYE/dz6g9q1/iX8FNZ8FXEt5Yxvf6QSSsqDLRD0Yf1rnfB3i2PSbiCw1mJr3RvPWVoT96FgQd6Z6H1HevNlFxTdJeq66/1/keNUqTbVDFadpH06fiB4Zgul8J+InS1ufs8QK3a5inUoOQen51yPi39m7RNb3X3hu+/s9pPmEZ+eFvoeoFU/j54Wg8W+HLHxpoeLhYIwJGjGd0J6H8DxXmPw9+MWveBZ0hMz32mkjfaytnA9VPY1pG/XW3VaO3T1O3E4imqns68dHsy5qv7PfjnTWbybGG/QfxW8oJP4HmuduPhf40tSRL4a1IY9Isj9K+vvB3jPSPG2kpqOlTiRTxJGfvxN6MK366o05SV4T081/wxLyuhLVX+8+CtU8Pavoixtqem3VkJDhDPGV3H2zVK3glup47eFC8sjBEUdWJ6Cvfv2qv+YB/21/pXiHhfnxJpf/X3F/6EKyc5KMm91c8jE4aNOuqSemn4mvH8LvGsrBV8M6lk+sWK1rH4FePr5gP7Ea3U/wAU8ipj9a+xBTLieG1heed0jijBZnY4Cj1NbOlK15S/A9eOU0Fvd/16Hzt4c/ZevZJFk1/V4oY+pitRuY+2TxXoi3vw9+DFl9lhkhhuG4KJ+8uJT7+n6V558Uf2hJ55ZtI8JP5USkpJf4+Z/UJ6D3rivhD4PvPH/jWK4vDJNaWrie6lkJO7B4XJ7k1yydvehr2b/RfqKNWjSqKlh43l3ND44w3uv/Ee1ENrL519aW7QwnlhuXpxXUah4r8K/C7wZB4RW3i1vVFYT3cQb9yJvRyPvAentUPx18d6bZ+I/I0JVOrwQfZprxefIUnO1P8Aa7Zryjwt4N13xvqIttLtJbh2b55m+4nqWasVFu/O/d1+d/6t99jKtV9nWkqKvOX4G9Hrvi/4t6/baN9qfypWCi3gGyGCMdTgcYAr618NaFa+GtDs9Js1Cw2sYQH+8e5/E1zPwv8Ahbp/w604hStzqM4/f3JHX/ZX0FdzXfh6HL7zVv6/M78LRlCN6jvJ/wBWKmr/APIKvP8ArhJ/6Ca+Jfjt/wAito3/AF/Tf+io6+2tX/5BV5/1wk/9BNfEvx2/5FbRv+v6b/0VHXHiP9/o+kvyO1fCzxGiiivXIOz+D3/JR9F/66Sf+inr7e+C3/IDvf8Ar4H/AKAK+Ifg9/yUfRf+uj/+inr7e+C3/IDvf+vgf+gCvIxH/IwpekjRfAz0OiiivXMxrxo6lXUMpGCDyCK8b8c+CfhLrE8j3OrWGk3mfme1nA5916V7MRmvIfix8C7XxhJJq2imKz1Uj50IxHP9fQ+9cmKg2k0v8/laxlXTcHaPN5MT4aP4d8J2lzon/Cb6Tq+kz58uGZgrxk8Ec8EEV5v8VPgxJpbza94V23+kuS8kUDB2t/y6rXnOv+Edc8L3TW2rabcWzqeCyHafcHpUej+J9a0CUS6Zqd1bMOySHafqOlckYSt+7advX7up41bFwlH2Vam1b8DQ8B+OdT8A65HqFk7GPO2eAn5ZV7gj1r7K8LeJbHxXoltq2nyh4J1zjPKN3U+4r49/4SDQ/Es//FR2P2O5brqFgoUk+rx9D+Fe2fBPR5vCryyWfibStU0C8Gceb5ckTjodrfkRTp4hwqWkmr79vVf1sdOXOS9yL5o/ivkZv7UVpcXR0FbeCWZlEpIjQtgceleLeG9K1CLxDpkj2N0irdRks0TAAbh7V9xo0NwA6mOQdmGCPzpWiiUf6tP++RXRKhKSlZ6Py/4JvWwEalX2rfb8BSwUEk8da+Zfjr8XZNdvJfDeizldPgbbcSof9e47Z/uivb/iBLe6h4euNN0TU9Os7u4Bjea4uAvlIRyQOua+XNS07wn4UuWjkvm8S36HlIQY7ZW926t+FZYiuubkSv5Lr/wEGOlNQ5Yuye7f9XKfgb4e6z481AQWEJS1U/vrpxiOIfX19q+kbW08M/D7wjJoOj+IdK0+8dcPdTzAsWPBcgd+uBXzRqnj/X9StxZJdmxsF+5aWf7qJR9B1+prEt7W71GcRwQy3MzHACKXJNRabTlOy/T8vvPMw+KpUNKUXJvqe6aB8Ovhal39p1jxpb6vcMxd1aYRozH19a918OWmiWumRpoMdmll0U2uChx7jrXzv8N/2eNR1aaHUPFEZsrEEMLb/lrL7H+6K+ldP0+20uzis7OFILeFQqRoMBQK2wsHzXtp31/C7eh6+ET5buHL/XUsYoxRRXedRT1j/kFXn/XCT/0E18S/Hb/kVtG/6/pv/RUdfbWsf8gq8/64Sf8AoJr4l+O3/IraN/1/Tf8AoqOvIxH+/wBH0l+Ra+FniNFFFeuQdf8ACWeO2+ImiPIwVTMy5J7sjAfqRX3F8F/+QHe/9fA/9AFfCHw8/wCR40P/AK/Yv5193/Bf/kB33/XyP/QBXkYj/kYUvSRovgZ6HRRRXrmYUYoqC5v7Sz2/aLmGHd08yQLn8zQAXVja30RiuraGeM/wyoGH5GuR1b4O+CNYJafQLVHPVoQYz+ldR/bml/8AQRs/+/6f40f25pf/AEEbL/v+n+NZyoQlrKJLUZKzPPF/Zz8BiTebS8Iz9w3Bx/Kti2+DHga2iMSaDDg9y7E/XrXZW97bXalreeKZRwTG4YD8qfNPFbxtLLIkaKMszMAAPcmoeFpvRxJjShHWMUvkeJeL/Dcfw5vLaTwhr+sW2oXTfutJQG5WUZ5+UngfWq1/f+Lde1y00fxrq174bsroARraRbUlb+60oPBP5V6omreD49Tl1Iaxo32yVQjSteRlgo6AfNwPpTtS1rwhq9o9pfaxos8D9Ua7j/MfNwfeuKWXVHfldl21t8/60C0e5kWXwY8F21v5UmlG7Y/eluJmd2P1zWdefs9+A7t966dcW/tDOQP1rsoPFPhxFSGPXtKbACqPtkZJ7D+LmthXVlDAggjIIrsWFpxXw2BwhLRpM88074C+A9OcONHNwR/z8Slq7HSvDWjaIAunaXZ2mO8UQB/PrTrzxFo+nTGC81WwtZQM7JrhEb8ic1B/wmHh3/oP6R/4GR//ABVXHDwTuojioQ0jZGxgUVj/APCYeHf+g/pH/gZH/wDFVasNc0vVHaOw1Kyu3QZZbedZCo9TtJxWtmuhV0XqKKKBlPWP+QVef9cJP/QTXw/8d7uNdD0S0w3mNczyg9sBIx+ea+4NY/5BV5/1wk/9BNfDnx4t5jpGh3AkHkieeMpk8tsjOfyryMR/v9H0l+Ra+FnjVFFFeuQdF8PP+R40P/r9i/nX3f8ABf8A5Ad9/wBfI/8AQBXwh8PP+R40P/r9i/nX3f8ABf8A5Al9/wBfI/8AQBXkYj/kYUvSRovgZ6HRRRXrmZR12/8A7K0W/wBQwrfZLaSfDHAO1S39K/PnWtb1DxJqM2p6rdS3d3cMXeSVtxyew9AOgAr718f/APIi+Iv+wZc/+imr8/AcJn0X+lepl0V7zPOx7fuoXYPQce1JtHotfe/w30HTNO8BaBBbWVuifYIHP7sEszIGZie5JJNJ8RPAdr418IajokUNlBcXMeIZ5IQRC4IIbjnt2p/2guaziT9Rdr3PibwX4q1Hwd4jsdV0y5kt3imTzFVsLKm4bkYdCCM9a9j/AGsPFF5LrOkeHobh1sVtPtkkSsQJHZiFLeuAvH1NRP8AsjeI0kBj8SaQyjBy0UoP9ayP2pYzF8QrGMnJXSYFz9HetOenUrRcddyOWpToyUjyfTtD1LVy403S7u98vG/7NbtJt+u0HFXv+EH8T/8AQsaz/wCAEv8A8TXqPwD+L3hv4a6Tq1rri35ku7lJY/s0IcbQmDnkY5r1T/hqnwB/zz1z/wABB/8AF06lerGTUYXQqdCnKKbnZnyVf6VeaTMINQsLizlI3CO4hMbEeuGAr3z4M/EDWNO+DvjT/SJJX0KHzLF3O4xeYhwoz2DDIHvXFfHr4k6L8Stc0u70RLxYbS1eJ2uYwhLM+eBk8YFXvhUP+LP/ABQ/69YP5PRW9+knNWd1+YUrQqtRd1Znk7/aNRvCz+bd3U78swLySuT+ZJJrT/4QfxP/ANCxrP8A4AS//E0eDtWt9B8XaLq135htrK+huJfLGW2o4JwO5wK+pf8AhqnwB/zz1z/wEH/xdXXqzg0oRuRRpwmm5ysfLX/CD+J/+hY1n/wAl/8Aia9x/ZT8P6to/iPXZNR0m+sUks4lRri2eIMfMPALAZrtP+GqfAH/ADz1z/wEH/xddV8P/jB4b+JV9d2ehrqAltIllk+0whBtJwMcnJzXHXr1ZQalCyOqjRpxmmpXO5ooorzj0CnrH/IKvP8ArhJ/6Ca+Jvjt/wAito3/AF/Tf+io6+2dY/5BV5/1wk/9BNfEfx2cjw3oqbH5vJm34+X/AFcfGfWvIxH+/wBH0l+Ra+FnidFFFeuQdF8PP+R40P8A6/Yv5193/Bf/AJAd9/18j/0AV8P/AAiMa/EXRTIUC+aw+bGM+W2OvfOK+4Pgsf8AiR3v/XwP/QBXkYj/AJGFL0kaL4Geh0UUV65mYHxA/wCRF8Rf9gy5/wDRTV+fgGUx7Y/Sv0X1ewXVdKvLBm2rdQSQlvQMpGf1r4G8SeBvEXhHUZtO1XSbyGSFigk8ljHKB0ZWAwQetenl0kuZM87HRbs0fW/gD4u+CD4K0RLnxLpdnPFZQwywXE6pJG6IFIIPuKrfEv43+HNJ8G6hP4c8UaZcayUC2aW8izNvLDkryMAZPNfHf2G7/wCfW4/79N/hR9iu/wDn1uP+/Tf4Vf1GHNfmM/rk7Wsejf8ADR/xMJx/b0P/AIBQ/wDxNaf7T8jTePNOkc5Z9IgYn1JZ64vwJ8Odf8ba9Z2Nnpl2LdpV8+6eJlihjz8xLEY6ZwOpNd5+1JZyn4iWawQSsiaXCo2oTjDv6VpanGtFRstyL1JUpOXkcj8Ovg9r/wATbO8utGuNOiSzlWKQXUjKSSuRjCniuu/4ZQ8c/wDP9oP/AIESf/EV3f7I0MkOg+IRJG6E3kXDqRn937179XNXxlSFRxi9Doo4SnKCkz5HX9k/xwWAOoaCoJ5PnyHH/jlej3/wwg+F3wG8V2AuReXt1atNdXAXarMMAKo7KB6+pNe41xPxrVn+FXiZVUsxsXwAMk8isHialRpSelzdYeFNNxR8RaJpE+v61Y6RatGtxfXCW0ZkOFDOwAyfTJr1r/hlDxz/AM/2g/8AgRJ/8RXBfDazuV+InhlmtpwBqtsSTGwA/eD2r72rtxeJnTklA5MLh41E3I+Rv+GUPHP/AD/aD/4ESf8AxFen/Af4OeIfhnrOq3ms3GnSxXdskUYtZGYghyTnKjjFe1UVw1MXUnHllsdkMLCEuZBRRRXMdBT1j/kFXn/XCT/0E18S/Hb/AJFbRv8Ar+m/9FR19tax/wAgq8/64Sf+gmviX47f8ito3/X9N/6KjryMR/v9H0l+Ra+FniNFFFeuQa/hHVoNC8UaVqlzGZILW6jlkUdSoYZx74zX2r8N/Ftp4bupbS7uEbT7wJNDdJyhBHyv/uspBzXwnXe+C/i/q3hWwj0q6tYdV0yIkxQzMUkt8nJEcg5AJOdpDDOSACTXnY7C1Kko1qDtOPfZp9C4yS0Z+hUet6XKgdNRs2UjIImXn9ad/bGnf8/9p/3+X/GviFPjvoZti0nh7UBc5HyLdxlMY55KZ/So/wDhfGk/9C5ef+Bqf/G6x+s4/wD58r/wJBaPc+4v7Y07/n/tP+/y/wCNIdW03vf2mPTzl/xr4VufjzB5g+zeG22Y/wCWt2Cc/gnSov8AhfJ/6FuP/wACz/8AEU/rOP8A+fK/8CQWj3Pu7+1dL/5/bP8A7+p/jR/aml/8/tn/AN/U/wAa+DpPjxKYyIvD1ur8YL3JYD14Cj+dQf8AC9dR/wCgLp//AH2/+NCxGP8A+fK/8CQWj3Pvkatpv/P/AGn/AH+X/GkOq6Yet9Zn/tqv+NfA/wDwvXUf+gLp/wD32/8AjVr/AIXyf+hbi/8AAs//ABFH1jHf8+V/4EgtHufdw1bTF6X1oP8Atsv+NO/tjTv+f+0/7/L/AI18NRfHnTvKXzfDlz5n8Wy8Xb+GY80//hfGk/8AQuXn/gan/wAbpfWcf/z5X/gSC0e59xf2xp3/AD/2n/f5f8aQ6vppGDf2n/f5f8a+Hv8AhfGk/wDQuXv/AIGp/wDG6P8AhfOk/wDQuXn/AIGp/wDG6PrOP/58r/wJBaPc+4P7U0v/AJ/rP/v6n+NO/tjTv+f+0/7/AC/418O/8L40n/oXL3/wNT/43Utt8d9BaUC58P6kkfOWiuo2b8ig/nR9Zx//AD5X/gSC0e59u/2xp3/P/af9/l/xo/tjTv8An/tP+/y/418W/wDC8/CH/QH13/v7B/hR/wALz8If9AfXf+/sH+FH1nH/APPlf+BILR7n2l/bGnf8/wDaf9/l/wAaP7Y07/n/ALT/AL/L/jXxb/wvPwh/0B9d/wC/sH+FH/C8/CH/AEB9d/7+Qf4UfWcf/wA+V/4EgtHufUnjvx5p1hpdxY2V1Hc3s6GMCJgyxAjBZj06dBXyP+0DqUUC6J4fDD7VCsl7cpjmLzAojU+h2Lux/til1f4/xQ28ieHNBNvdEny7y/mWYxDsViChd3u24D0ryK+vrrU72e9vbiW5uriRpZZpWLPI5OSxJ6kmqw2Grzr/AFnE2TSskunzBySVkQUUUV6pAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//Z" alt="MediTrack">
+    <div style="flex:1;min-width:0">
+      <h1 id="abt">MediTrack</h1>
+      <div class="sub" id="abs">ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</div>
+    </div>
     <button class="ibtn" id="bb" onclick="goBack()" style="display:none">‹</button>
-    <button class="ibtn" id="nbtn" onclick="go('alerts')"><i style="font-style:normal">🔔</i><span class="bdg" id="abBdg" style="display:none">0</span></button>
+    <button class="ibtn" id="nbtn" onclick="go('alerts')">🔔<span class="bdg" id="abBdg" style="display:none"></span></button>
   </div>
   <div class="scr" id="scr"></div>
   <nav class="bnav" id="nav">
-    <a data-v="home" onclick="go('home')"><span class="ic">⌂</span>หน้าหลัก</a>
+    <a data-v="home"         onclick="go('home')">        <span class="ic">⌂</span>หน้าหลัก</a>
     <a data-v="pick-inspect" onclick="go('pick-inspect')"><span class="ic">📦</span>ตรวจนับ</a>
-    <a data-v="pick-report" onclick="go('pick-report')"><span class="ic">📊</span>รายงาน</a>
-    <a data-v="alerts" onclick="go('alerts')"><span class="ic">🔔</span>แจ้งเตือน<span class="nb" id="navBdg" style="display:none">0</span></a>
-    <a data-v="settings" onclick="go('settings')"><span class="ic">⚙</span>ตั้งค่า</a>
+    <a data-v="pick-report"  onclick="go('pick-report')"> <span class="ic">📊</span>รายงาน</a>
+    <a data-v="alerts"       onclick="go('alerts')">      <span class="ic">🔔</span>แจ้งเตือน<span class="nb" id="navBdg" style="display:none"></span></a>
+    <a data-v="settings"     onclick="go('settings')">    <span class="ic">⚙</span>ตั้งค่า</a>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
 <div id="prt"></div>
+
 <script>
 const LSRC='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCAC0ALIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5Uqa1tLi+nS3tYJbiZzhY4kLMx9gOTT9N0+51bULbT7OJprm5lWGKNerMxwB+Zr6u+GPwwS0VdG0NYg6KDfakVw0x7knrtzwqDjHJ5ya4sZjFh0klzSlsl1KjG583f8K08Z9/DOrD627VbtvhB46u4vMj8N3gXOPnKIfyZga+20+CthtG/Vbkt3IiQCl/4Uppv/QUuv8Av2n+Fcv1jMP+fK/8CKtDufDc/wALvGtvK0T+GtSLLwdkW4fmMg0+L4U+NpoZJl8Nahtj67kCn8ATk/hX3D/wpTTv+gpdf9+0/wAKP+FKab/0FLr/AL9p/hR9YzD/AJ8r/wACFaHc+GB8M/GROP8AhGdV/wC/Bqeb4UeN4JzC/hrUC4GflQMv5gkfrX3B/wAKU07/AKCt1/37T/Cj/hSmm/8AQUuv+/af4UfWMw/58r/wILQ7nw3D8LvGk8qxJ4a1MMxwN0W0fmeBV7/hS3j7/oXLj/v7F/8AFV9rf8KU07/oK3X/AH7T/Cj/AIUppv8A0FLr/v0n+FH1jMP+fK/8CHaHc+Kf+FLePv8AoXLj/v7F/wDFUf8AClvH3/QuXH/f2L/4qvtb/hSmm/8AQUuv+/Sf4Uf8KU03/oKXX/fpP8KPrGYf8+V/4EK0O58U/wDClvH3/QuXH/f2L/4qj/hS3j7/AKFy4/7+xf8AxVfa3/ClNN/6Cl1/36T/AApP+FKab/0FLr/v0n+FH1jMP+fK/wDAh2h3PihPgz49kUMvhy5wfWSMH8i1OPwX8fAZ/wCEcuP+/sX/AMVX2r/wpXTf+gpdf9+k/wAKP+FKab/0FLr/AL9J/hR9YzD/AJ8r/wACFaHc+Gf+FaeMv+hZ1X/wHapbb4V+NruXyo/DWohsZ/eR7B+bECvuL/hSum/9BS6/79pR/wAKV03/AKCl1/37T/Cj6xmH/Plf+BBaHc+Kf+FLePv+hcuP+/sX/wAVR/wpbx9/0Llx/wB/Yv8A4qvtX/hSmm/9BS6/79J/hR/wpTTf+gpdf9+k/wAKPrGYf8+V/wCBBaHc+CdY8J6/4fVX1bR7+yRsbXngZVP0bGKya+6/Fnw5uvDVhNc20yahprDbcQTRAqVP99DlXX+VfJ/xd8GW3hXXornTIfJ0vUkM0EO4t5Dg4kiySSQDggn+FlrbC46VSo6NaHLNa23TXkwlGyujhKKKK9Eg6n4YXktj4/0KeEgOLtVyRnhsqf0Jr7m+C0SDR7+QKNxuFUnvgIMD9TXwt8NYJLnx5oaRLuYXaNjIHC8n9Aa+6/gv/wAgO+/6+R/6AK8jEf8AIwo+kjRfAz0OiignFeuZgTiuNuPHUOpeMoPCmjyCWeP99fTrysEY/hH+0entXPfHP4mv4L0hNO05sapfqQrf88k7t9fSqv7PXg6fRdCm1zUg32/VT5g8z7wi7H8TzXFVqOc1Tg+uv6mXtb1PZx+fkeuClo4FcX8Rfidpnw+gsjdDzZ7qZVEQ6iPPzP8AgK6alRU480jRyUVdnaUVW0/ULfU7KC8tZVlgnQPG69GBqzVxkpK6GBNQ2t5b3sZe2mSZQzIWQ5AYHBH4GvOPjX8TU8EaGbKylU6teqViA6xL3c/0ryP4G/FWXw1rR0nV7lm06/kz5khz5UpP3voe9c08RaWi0W/9eXU5p4qnCqqTerPqk0lIriRQykEHkEd6U8c11HSFFcB4q+L+jeGPGOneHp3DeecXMo6W+fu5/HrXeo6yKGUggjII71lCrGbaXQSkndJ7HL+OfFcngqK01idGl0vzfJuwoyYw33ZB9DnP1rodP1C21SzivLSZJ7eVQySIchhVPxTodv4k0C90m6x5d1EY8ns3Y/nivnv4UeNtS+G/i6XwZr5dbJ5/JAf/AJYv2Yf7JrnlUlSqu791/h/XUzqVeSST2f5/8E+maKQGlrtNSlrcaS6NfRuoZWt5AQf9018T/HcA+GNFYgFhezgHHIzFHn+Qr7a1f/kFXn/XCT/0E18RfHeeIeHdFty4803c8gTuV8uMZ/OvIxH/ACMKPpL8i18LPFKKKK9cg6L4ef8AI8aH/wBfsX86+7/gv/yA77/r5H/oAr4Q+Hn/ACPGh/8AX7F/Ovu/4L/8gO+/6+R/6AK8jEf8jCl6SNF8DPQ68u+IPxM/sD4geG/D8EmEkmD3ZB7MCqg/nmvUT0r46+KepTS/F7UJ2Lb4L2NE9gpGK68ZJ8vLH1+7/g2OLFV3RgpLq0jtfibb2w8aah4t8RKZdOsZBaafaE4N3Kg5/wCAA9TXofwOuNV17RbvxNrEm6a/l2QIBhYoU6Ko7DJryb4j/wBofFD4pweH9P3NDahIQB92PgGRz+Zr6W0HR7bw/o9nplooWG2iWNffA6/jXLhKXNU9o3fr/l/mKjd1ZuPwr8X1+7Yk1fVLbRtOudQvJBHb28Zkdj2Ar4o8e+MLvxv4ludWuGIRm2wR54jjHQCvbP2mvGhtbG18L2suHuf31zg/wD7q/j1r5xrqk+ebfRf0/wDL7zzM1xLuqMfme6/s8/E/7FOvhLVZsQStmzkc/cb+59DXuXjPxdY+DNBuNXvnAWJcJHnmR+yivhqGWS3lSaJikiMGVh1BHeuq8bfEjWPHUOnQ6hJ+7soVTaOjv3c+5qE5w9yOz/D+ugYfMuSi4z3W3n/wxk+KfE1/4t1y51bUZC0s7ZC54Reyj2FZI4Oau6Lo93r+qW2mWMZkuLlwiAep7123xX+FNz8PXsp4iZ7K4iVWlHRJgPmB+p6Uc0YWgv6/4c8/2VWrGVftuetfAD4o/wBv6ePDeqzZ1C1T9w7HmaMdvqK7f4nePrXwD4bmvnZWu5QUtYs/ff1+gr420rVbvQ9St9RsZWiubdxIjg9CK3fiD4+1H4gawt/enZHGipFCPupxyfxOaLzivZrbv2X9bf8AAPSp5pah73xL+rmDqWpXWrahPf3kzS3E7mR3J5JJr6e/Z9+IZ8TaC2i3826/05QFZjzJF2P4dK+V66HwB4qn8GeKrHV4mOyOQLKvZozwwokuS0o9PyOLA4p0615PR7/5n2pr+nf2tot7YhirTwsisD91scH88V8tSTT/ABDmOkaiVi8X6aSltcn5TehD/q3/ANvjg96+rbO6ivrKG5gcPFMgkRh3BGRXzZ8efBt14S8WQ+MNMRkt7iQSMyceVMP8ajGUlO01/Xb79vme9i7qHNa6W68v80dt4o+Ks/hhvA7Sll+1IGvkJ5242HP0Oa9hhkWaNZEYMrAMCO4PSvkb43+IR4j1nRr9DhZNLilwOzNkt+ua+mfhzeSX/gXQrmYku9nHkn2GP6U8FNt6u91+Wn4jpV+erOHRW/FGxq//ACCrz/rhJ/6Ca+JfjsB/wi+jHAz9um/9FR19tav/AMgq8/64Sf8AoJr4k+Ow/wCKY0Y5P/H7Nx2/1UdY4j/f6PpL8jsXws8Sooor1yDovh5/yPGh/wDX7F/Ovu/4L/8AIDvv+vkf+gCvhP4byeV470NtiP8A6Wgw4yOeM/UZyPcV92fBf/kB33/XyP8A0AV5GI/5GFL0kaL4Gd5c3tvbPFHNMkbTtsjDHG9sZwPfAr5a+NHhqa1+LsflxkrqkkMseP4mJAI/MV69+0JFcr4Aa9tJHjmsrqKcOhwVwcZrlPBGt2vxcj0W71Exrrvh2fzZcnm4i2n5h6nIHFaYqcm3G3p81/X3HDiFGrJUXvo/x1KXgPVrXwp8Xv7BUxz3F5vjvrjr+/PIRT6LjHvX0HIwWIsThQMk+gr5B+Grzap8ZLO6mfDfbpJ5GY9ACepr6m8Z3p07whq90hw0VnIw9jtNGDSo0pJdFf8AAeFqupGUmtLu3ofHfxI8RSeKfGuq6kzEo0xSIeiLwP5V1HwO+HNv461LUZNQUmxtrdoyR/z0cYGPp1rzIsWYsepOTX1V+zVp8Vr8P2ulA8y6upGc/wC7gCr5LqNN9dzxsDH2+Jc5ebPnPxv4N1DwP4gn0m+Q/Id0UvaVOzCsCvsv4sfDi2+IGgPEgVNRtwXtZcd/7p9jXx5qFhc6XezWV5C0NxA5R0YYIIq43i+SX/DmWPwfsZc0fhZ9E/s3+Aba10xvFdyY5rq4zHbgEHyVHU+xNet+LPDNj4t0K60i/QGKdcBsco3Zh9K+ZPgZ8TD4N1saZfyn+yr5grZ6Qv2b6etey/Gn4nR+DNA+y2EyNql+mIdpz5aEcv8A4VMZRjCUZb/nfb+ulj2MJWpfV01olv8A15ny14h0WTw9rV5pcskcrWspjLxtuDY75rOClmCqCSTgAdTTpJHmkaSRi7uSzMepJ717R8AvhV/bl2nifV4D9ggb/Ro3H+ucfxfQUXlGKjuzwqND6xV5YKy/JFnQvgTIfhhqWoX8ZXWbmEXFvGesSr8wB9zXhjAqxVhgjgiv0CMashQjKkYI9q+FfGVkmneLNXtI8bIruRVx6bjR7P2c0r7r8v8Ah/wO/M8NCnTg4LbQ+nv2fPEja94Bgt5nLT6e5t2yedvVf0qL9oPxNFoXhe0tJbeO4S/uQkkbDrGvLY9DXE/srXri712xJOwpHMB75xWp+1RAZNI0WdWB8qZwwzyNwGD+lTNXoOD72+V/8jvhWk8J7Rb2PKfHnhs203h6GylNza3tsBZyZyWQvwD7gkj8K+svD8Nt4f0fSdGklRJkgWFEJ5cquWx9Oa8O+H9rp03gHQPFWuSKLXw5PcnDHl+hRR6/NUnwm8V6r8RPi1cazeMwt7a2k8qEH5YlJwB9a5sNKVK0UttPvev/AAPQKThCal1nay7WR73q/wDyCrz/AK4Sf+gmviX47f8AIr6N/wBf03/oqOvtrV/+QVef9cJP/QTXxL8dv+RX0b/r+m/9FR1eI/3+j6S/I9FfCzxGiiivXIOq+F7Wy+P9EN2paP7SAAP72Dt/8e219z/Bf/kB33/XyP8A0AV8IfDz/keND/6/Yv5193/Bf/kB33/XyP8A0AV5GI/5GFL0kaL4Gdd4p0OLxJ4fv9Imxsu4WjyexxwfzxXx3oWoal8MPHiPOrRS2U5iuIz0eMnBH0I5r7XkYIhY5wBk4FeK/Fr4e6b8SrI6/wCF7m2uNUt12yRRsMzKOxHUMPeunFRV79/6v8jz8ZQlNKpT+KOx59D4Xl0bQvGviqIkRBxBYyjuHcMWH0GK9L8C+OT8Tfhtq2lXLg6vBZvFKO8o2/K/+Ncr4Vu7rxJ8FvEXhW5idNS0lSwidcOUByMj2wa8y+F3iuXwh4z0+9ViIJJBDOvZkbg5rgowtFu93bX01X/Df8E53XVGpTS+GX53OUdGjdkYEMpKkH1FfQX7Nfjyyt7OfwrfTLDMZDNalzgPnqv1rkfjf8Mbjw1rM2uadA0mkXr+ZuQZELHkg+x7V5ZHI8MiyRuyOpyrKcEH1Brti3JJrSSPNjKeCru60/NH6A8EV4r8ffhT/bdm/ibSIc39uubmNRzMg7/UV5f4Z+P3jLw9ClvJcxalAgwFulywH+8Oa7KD9qidk23fhqF8jnZOcH8DV1KnOrNNP7z1JY3DV4OM3a54Jyp6YIq1qeq3urzRzXtw87xxrEpc5wqjAFaHi3VtM1zWZ9R0vTn02Odi7W5cMqsf7p9PasUYyM9O9KC5kptanz8/cbhGV1+Z2/wo+HNz8QNfWJ1ZNNtyHupscAf3R7mvsTT7C20qyhs7SJYbeBAiIo4UCvmDwf8AHiDwPokek6T4Xh2r8zyyTndK395sCnat+0x4svY2SxtbGwBH3lUuw+maVKdnzOLv8tPx+89vC18Nh6dua767n0N428Z6b4K0SfUr+ZFZUPlRZ+aV+wA+tfEmp30mqajc30xzJcStK31JzVnXfEmreJbs3Wr3895KTwZGyB9B2o8P+HdS8T6pDpml2zz3ErAAKOFHqfQU3J355nFjMW8VJQprT8z179nWaDw7pfiXxPft5dlbxJGWP8R64Hv2rP07U9R+M954wSfJkNms9nF2j8t8hR9Rmk+LkMfgHwro3gKxkyxX7ZfSL/y1c9M+1Wv2enXQbDxP4quRtt7O2CBj0LdcfyrkmueN56a/19y/J9zupycakML0Sd/mjjPFWuTWHg7RfCETlFhDXl2oPWRzwD9BXt37OXguXQPDU2s3cZS51MgoG6rEOn515z8OfhreePddm8V+JF+yaOZjOxl+QTHOQoz0FfS2i6lpuo2mdLmimtoT5QaL7gwOinoce1aYSK0Unrv6v/Jf1sbYWi3N1pbbR9CXV/8AkFXn/XCT/wBBNfEvx2/5FbRv+v6b/wBFR19tav8A8gq8/wCuEn/oJr4l+O3/ACK2jf8AX9N/6KjqcR/v9H0l+R6a+FniNFFFeuQdX8LLVLz4gaJFI5RRcb8jHVVLAc+pAH419zfBf/kB33/XyP8A0AV8I/DmNpPHOhqiM5+2RnAGeAck/kM193fBf/kB33/XyP8A0AV5GI/5GFL0kaL4GehkZFfM3xt8Lar4C8UHxV4fuLi0tL1tztAxAil7g+xr6ZqhrmiWPiHTLjTdRgWe2nXa6N/Mehr0K9H2i80c1el7SHLez6PsfOngL45WI1RX8W6fEZ5YzBJqMC7WdD2lUcMPfrXEfELwivhzxKk+mSLc6VfuJrG4jOVYE/dz6g9q1/iX8FNZ8FXEt5Yxvf6QSSsqDLRD0Yf1rnfB3i2PSbiCw1mJr3RvPWVoT96FgQd6Z6H1HevNlFxTdJeq66/1/keNUqTbVDFadpH06fiB4Zgul8J+InS1ufs8QK3a5inUoOQen51yPi39m7RNb3X3hu+/s9pPmEZ+eFvoeoFU/j54Wg8W+HLHxpoeLhYIwJGjGd0J6H8DxXmPw9+MWveBZ0hMz32mkjfaytnA9VPY1pG/XW3VaO3T1O3E4imqns68dHsy5qv7PfjnTWbybGG/QfxW8oJP4HmuduPhf40tSRL4a1IY9Isj9K+vvB3jPSPG2kpqOlTiRTxJGfvxN6MK366o05SV4T081/wxLyuhLVX+8+CtU8Pavoixtqem3VkJDhDPGV3H2zVK3glup47eFC8sjBEUdWJ6Cvfv2qv+YB/21/pXiHhfnxJpf/X3F/6EKyc5KMm91c8jE4aNOuqSemn4mvH8LvGsrBV8M6lk+sWK1rH4FePr5gP7Ea3U/wAU8ipj9a+xBTLieG1heed0jijBZnY4Cj1NbOlK15S/A9eOU0Fvd/16Hzt4c/ZevZJFk1/V4oY+pitRuY+2TxXoi3vw9+DFl9lhkhhuG4KJ+8uJT7+n6V558Uf2hJ55ZtI8JP5USkpJf4+Z/UJ6D3rivhD4PvPH/jWK4vDJNaWrie6lkJO7B4XJ7k1yydvehr2b/RfqKNWjSqKlh43l3ND44w3uv/Ee1ENrL519aW7QwnlhuXpxXUah4r8K/C7wZB4RW3i1vVFYT3cQb9yJvRyPvAentUPx18d6bZ+I/I0JVOrwQfZprxefIUnO1P8Aa7Zryjwt4N13xvqIttLtJbh2b55m+4nqWasVFu/O/d1+d/6t99jKtV9nWkqKvOX4G9Hrvi/4t6/baN9qfypWCi3gGyGCMdTgcYAr618NaFa+GtDs9Js1Cw2sYQH+8e5/E1zPwv8Ahbp/w604hStzqM4/f3JHX/ZX0FdzXfh6HL7zVv6/M78LRlCN6jvJ/wBWKmr/APIKvP8ArhJ/6Ca+Jfjt/wAito3/AF/Tf+io6+2tX/5BV5/1wk/9BNfEvx2/5FbRv+v6b/0VHXHiP9/o+kvyO1fCzxGiiivXIOz+D3/JR9F/66Sf+inr7e+C3/IDvf8Ar4H/AKAK+Ifg9/yUfRf+uj/+inr7e+C3/IDvf+vgf+gCvIxH/IwpekjRfAz0OiiivXMxrxo6lXUMpGCDyCK8b8c+CfhLrE8j3OrWGk3mfme1nA5916V7MRmvIfix8C7XxhJJq2imKz1Uj50IxHP9fQ+9cmKg2k0v8/laxlXTcHaPN5MT4aP4d8J2lzon/Cb6Tq+kz58uGZgrxk8Ec8EEV5v8VPgxJpbza94V23+kuS8kUDB2t/y6rXnOv+Edc8L3TW2rabcWzqeCyHafcHpUej+J9a0CUS6Zqd1bMOySHafqOlckYSt+7advX7up41bFwlH2Vam1b8DQ8B+OdT8A65HqFk7GPO2eAn5ZV7gj1r7K8LeJbHxXoltq2nyh4J1zjPKN3U+4r49/4SDQ/Es//FR2P2O5brqFgoUk+rx9D+Fe2fBPR5vCryyWfibStU0C8Gceb5ckTjodrfkRTp4hwqWkmr79vVf1sdOXOS9yL5o/ivkZv7UVpcXR0FbeCWZlEpIjQtgceleLeG9K1CLxDpkj2N0irdRks0TAAbh7V9xo0NwA6mOQdmGCPzpWiiUf6tP++RXRKhKSlZ6Py/4JvWwEalX2rfb8BSwUEk8da+Zfjr8XZNdvJfDeizldPgbbcSof9e47Z/uivb/iBLe6h4euNN0TU9Os7u4Bjea4uAvlIRyQOua+XNS07wn4UuWjkvm8S36HlIQY7ZW926t+FZYiuubkSv5Lr/wEGOlNQ5Yuye7f9XKfgb4e6z481AQWEJS1U/vrpxiOIfX19q+kbW08M/D7wjJoOj+IdK0+8dcPdTzAsWPBcgd+uBXzRqnj/X9StxZJdmxsF+5aWf7qJR9B1+prEt7W71GcRwQy3MzHACKXJNRabTlOy/T8vvPMw+KpUNKUXJvqe6aB8Ovhal39p1jxpb6vcMxd1aYRozH19a918OWmiWumRpoMdmll0U2uChx7jrXzv8N/2eNR1aaHUPFEZsrEEMLb/lrL7H+6K+ldP0+20uzis7OFILeFQqRoMBQK2wsHzXtp31/C7eh6+ET5buHL/XUsYoxRRXedRT1j/kFXn/XCT/0E18S/Hb/kVtG/6/pv/RUdfbWsf8gq8/64Sf8AoJr4l+O3/IraN/1/Tf8AoqOvIxH+/wBH0l+Ra+FniNFFFeuQdf8ACWeO2+ImiPIwVTMy5J7sjAfqRX3F8F/+QHe/9fA/9AFfCHw8/wCR40P/AK/Yv5193/Bf/kB33/XyP/QBXkYj/kYUvSRovgZ6HRRRXrmYUYoqC5v7Sz2/aLmGHd08yQLn8zQAXVja30RiuraGeM/wyoGH5GuR1b4O+CNYJafQLVHPVoQYz+ldR/bml/8AQRs/+/6f40f25pf/AEEbL/v+n+NZyoQlrKJLUZKzPPF/Zz8BiTebS8Iz9w3Bx/Kti2+DHga2iMSaDDg9y7E/XrXZW97bXalreeKZRwTG4YD8qfNPFbxtLLIkaKMszMAAPcmoeFpvRxJjShHWMUvkeJeL/Dcfw5vLaTwhr+sW2oXTfutJQG5WUZ5+UngfWq1/f+Lde1y00fxrq174bsroARraRbUlb+60oPBP5V6omreD49Tl1Iaxo32yVQjSteRlgo6AfNwPpTtS1rwhq9o9pfaxos8D9Ua7j/MfNwfeuKWXVHfldl21t8/60C0e5kWXwY8F21v5UmlG7Y/eluJmd2P1zWdefs9+A7t966dcW/tDOQP1rsoPFPhxFSGPXtKbACqPtkZJ7D+LmthXVlDAggjIIrsWFpxXw2BwhLRpM88074C+A9OcONHNwR/z8Slq7HSvDWjaIAunaXZ2mO8UQB/PrTrzxFo+nTGC81WwtZQM7JrhEb8ic1B/wmHh3/oP6R/4GR//ABVXHDwTuojioQ0jZGxgUVj/APCYeHf+g/pH/gZH/wDFVasNc0vVHaOw1Kyu3QZZbedZCo9TtJxWtmuhV0XqKKKBlPWP+QVef9cJP/QTXw/8d7uNdD0S0w3mNczyg9sBIx+ea+4NY/5BV5/1wk/9BNfDnx4t5jpGh3AkHkieeMpk8tsjOfyryMR/v9H0l+Ra+FnjVFFFeuQdF8PP+R40P/r9i/nX3f8ABf8A5Ad9/wBfI/8AQBXwh8PP+R40P/r9i/nX3f8ABf8A5Al9/wBfI/8AQBXkYj/kYUvSRovgZ6HRRRXrmZR12/8A7K0W/wBQwrfZLaSfDHAO1S39K/PnWtb1DxJqM2p6rdS3d3cMXeSVtxyew9AOgAr718f/APIi+Iv+wZc/+imr8/AcJn0X+lepl0V7zPOx7fuoXYPQce1JtHotfe/w30HTNO8BaBBbWVuifYIHP7sEszIGZie5JJNJ8RPAdr418IajokUNlBcXMeIZ5IQRC4IIbjnt2p/2guaziT9Rdr3PibwX4q1Hwd4jsdV0y5kt3imTzFVsLKm4bkYdCCM9a9j/AGsPFF5LrOkeHobh1sVtPtkkSsQJHZiFLeuAvH1NRP8AsjeI0kBj8SaQyjBy0UoP9ayP2pYzF8QrGMnJXSYFz9HetOenUrRcddyOWpToyUjyfTtD1LVy403S7u98vG/7NbtJt+u0HFXv+EH8T/8AQsaz/wCAEv8A8TXqPwD+L3hv4a6Tq1rri35ku7lJY/s0IcbQmDnkY5r1T/hqnwB/zz1z/wABB/8AF06lerGTUYXQqdCnKKbnZnyVf6VeaTMINQsLizlI3CO4hMbEeuGAr3z4M/EDWNO+DvjT/SJJX0KHzLF3O4xeYhwoz2DDIHvXFfHr4k6L8Stc0u70RLxYbS1eJ2uYwhLM+eBk8YFXvhUP+LP/ABQ/69YP5PRW9+knNWd1+YUrQqtRd1Znk7/aNRvCz+bd3U78swLySuT+ZJJrT/4QfxP/ANCxrP8A4AS//E0eDtWt9B8XaLq135htrK+huJfLGW2o4JwO5wK+pf8AhqnwB/zz1z/wEH/xdXXqzg0oRuRRpwmm5ysfLX/CD+J/+hY1n/wAl/8Aia9x/ZT8P6to/iPXZNR0m+sUks4lRri2eIMfMPALAZrtP+GqfAH/ADz1z/wEH/xddV8P/jB4b+JV9d2ehrqAltIllk+0whBtJwMcnJzXHXr1ZQalCyOqjRpxmmpXO5ooorzj0CnrH/IKvP8ArhJ/6Ca+Jvjt/wAito3/AF/Tf+io6+2dY/5BV5/1wk/9BNfEfx2cjw3oqbH5vJm34+X/AFcfGfWvIxH+/wBH0l+Ra+FnidFFFeuQdF8PP+R40P8A6/Yv5193/Bf/AJAd9/18j/0AV8P/AAiMa/EXRTIUC+aw+bGM+W2OvfOK+4Pgsf8AiR3v/XwP/QBXkYj/AJGFL0kaL4Geh0UUV65mYHxA/wCRF8Rf9gy5/wDRTV+fgGUx7Y/Sv0X1ewXVdKvLBm2rdQSQlvQMpGf1r4G8SeBvEXhHUZtO1XSbyGSFigk8ljHKB0ZWAwQetenl0kuZM87HRbs0fW/gD4u+CD4K0RLnxLpdnPFZQwywXE6pJG6IFIIPuKrfEv43+HNJ8G6hP4c8UaZcayUC2aW8izNvLDkryMAZPNfHf2G7/wCfW4/79N/hR9iu/wDn1uP+/Tf4Vf1GHNfmM/rk7Wsejf8ADR/xMJx/b0P/AIBQ/wDxNaf7T8jTePNOkc5Z9IgYn1JZ64vwJ8Odf8ba9Z2Nnpl2LdpV8+6eJlihjz8xLEY6ZwOpNd5+1JZyn4iWawQSsiaXCo2oTjDv6VpanGtFRstyL1JUpOXkcj8Ovg9r/wATbO8utGuNOiSzlWKQXUjKSSuRjCniuu/4ZQ8c/wDP9oP/AIESf/EV3f7I0MkOg+IRJG6E3kXDqRn937179XNXxlSFRxi9Doo4SnKCkz5HX9k/xwWAOoaCoJ5PnyHH/jlej3/wwg+F3wG8V2AuReXt1atNdXAXarMMAKo7KB6+pNe41xPxrVn+FXiZVUsxsXwAMk8isHialRpSelzdYeFNNxR8RaJpE+v61Y6RatGtxfXCW0ZkOFDOwAyfTJr1r/hlDxz/AM/2g/8AgRJ/8RXBfDazuV+InhlmtpwBqtsSTGwA/eD2r72rtxeJnTklA5MLh41E3I+Rv+GUPHP/AD/aD/4ESf8AxFen/Af4OeIfhnrOq3ms3GnSxXdskUYtZGYghyTnKjjFe1UVw1MXUnHllsdkMLCEuZBRRRXMdBT1j/kFXn/XCT/0E18S/Hb/AJFbRv8Ar+m/9FR19tax/wAgq8/64Sf+gmviX47f8ito3/X9N/6KjryMR/v9H0l+Ra+FniNFFFeuQa/hHVoNC8UaVqlzGZILW6jlkUdSoYZx74zX2r8N/Ftp4bupbS7uEbT7wJNDdJyhBHyv/uspBzXwnXe+C/i/q3hWwj0q6tYdV0yIkxQzMUkt8nJEcg5AJOdpDDOSACTXnY7C1Kko1qDtOPfZp9C4yS0Z+hUet6XKgdNRs2UjIImXn9ad/bGnf8/9p/3+X/GviFPjvoZti0nh7UBc5HyLdxlMY55KZ/So/wDhfGk/9C5ef+Bqf/G6x+s4/wD58r/wJBaPc+4v7Y07/n/tP+/y/wCNIdW03vf2mPTzl/xr4VufjzB5g+zeG22Y/wCWt2Cc/gnSov8AhfJ/6FuP/wACz/8AEU/rOP8A+fK/8CQWj3Pu7+1dL/5/bP8A7+p/jR/aml/8/tn/AN/U/wAa+DpPjxKYyIvD1ur8YL3JYD14Cj+dQf8AC9dR/wCgLp//AH2/+NCxGP8A+fK/8CQWj3Pvkatpv/P/AGn/AH+X/GkOq6Yet9Zn/tqv+NfA/wDwvXUf+gLp/wD32/8AjVr/AIXyf+hbi/8AAs//ABFH1jHf8+V/4EgtHufdw1bTF6X1oP8Atsv+NO/tjTv+f+0/7/L/AI18NRfHnTvKXzfDlz5n8Wy8Xb+GY80//hfGk/8AQuXn/gan/wAbpfWcf/z5X/gSC0e59xf2xp3/AD/2n/f5f8aQ6vppGDf2n/f5f8a+Hv8AhfGk/wDQuXv/AIGp/wDG6P8AhfOk/wDQuXn/AIGp/wDG6PrOP/58r/wJBaPc+4P7U0v/AJ/rP/v6n+NO/tjTv+f+0/7/AC/418O/8L40n/oXL3/wNT/43Utt8d9BaUC58P6kkfOWiuo2b8ig/nR9Zx//AD5X/gSC0e59u/2xp3/P/af9/l/xo/tjTv8An/tP+/y/418W/wDC8/CH/QH13/v7B/hR/wALz8If9AfXf+/sH+FH1nH/APPlf+BILR7n2l/bGnf8/wDaf9/l/wAaP7Y07/n/ALT/AL/L/jXxb/wvPwh/0B9d/wC/sH+FH/C8/CH/AEB9d/7+Qf4UfWcf/wA+V/4EgtHufUnjvx5p1hpdxY2V1Hc3s6GMCJgyxAjBZj06dBXyP+0DqUUC6J4fDD7VCsl7cpjmLzAojU+h2Lux/til1f4/xQ28ieHNBNvdEny7y/mWYxDsViChd3u24D0ryK+vrrU72e9vbiW5uriRpZZpWLPI5OSxJ6kmqw2Grzr/AFnE2TSskunzBySVkQUUUV6pAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//Z';
+const DEV={name:'Atit Chimnan',role:'System Developer & Designer'};
 
 const FARMS=[
-  {id:1,name:'ศูนย์วิจัยไร่สาม',sh:'ไร่สาม',c:'#3f9bdb',bg:'#13212e'},
-  {id:2,name:'ศูนย์วิจัยหัวกุญแจ',sh:'หัวกุญแจ',c:'#7bc24a',bg:'#18230f'},
+  {id:1,name:'ศูนย์วิจัยไร่สาม',          sh:'ไร่สาม',        c:'#3f9bdb',bg:'#13212e'},
+  {id:2,name:'ศูนย์วิจัยหัวกุญแจ',         sh:'หัวกุญแจ',     c:'#7bc24a',bg:'#18230f'},
   {id:3,name:'ศูนย์ปรับปรุงพันธุ์สัตว์น้ำหาดเจ้า',sh:'ปรับปรุงพันธุ์',c:'#e06aa0',bg:'#2a141f'},
-  {id:4,name:'ศูนย์วิจัยหาดเจ้า',sh:'หาดเจ้า',c:'#ef9a4a',bg:'#2a1d10'},
-  {id:5,name:'ศูนย์วิจัยเพชรบุรี',sh:'เพชรบุรี',c:'#5b73d8',bg:'#161a2e'},
+  {id:4,name:'ศูนย์วิจัยหาดเจ้า',           sh:'หาดเจ้า',      c:'#ef9a4a',bg:'#2a1d10'},
+  {id:5,name:'ศูนย์วิจัยเพชรบุรี',          sh:'เพชรบุรี',     c:'#5b73d8',bg:'#161a2e'},
 ];
+const INSPECTORS=['นายอธิศ ฉิมนันท์','นายกิตติ สุขมา'];
 const CATS=[
-  {id:'equip',name:'อุปกรณ์ / เครื่องมือ'},
-  {id:'consum',name:'วัสดุสิ้นเปลือง'},
+  {id:'equip',  name:'อุปกรณ์ / เครื่องมือ'},
+  {id:'consum', name:'วัสดุสิ้นเปลือง'},
   {id:'external',name:'ยา / น้ำยาใช้ภายนอก'},
-  {id:'oral',name:'ยารับประทาน'},
+  {id:'oral',   name:'ยารับประทาน'},
 ];
-const DEF=[
-  {id:'a',name:'กรรไกร',cat:'equip',unit:'อัน',min:1,exp:false},
-  {id:'b',name:'แก้วยาน้ำ และแก้วยาเม็ด',cat:'equip',unit:'ชุด',min:1,exp:false},
-  {id:'c',name:'เข็มกลัด',cat:'equip',unit:'อัน',min:2,exp:false},
-  {id:'d',name:'ถ้วยน้ำ',cat:'equip',unit:'ใบ',min:1,exp:false},
-  {id:'e',name:'ที่ป้ายยา',cat:'equip',unit:'อัน',min:1,exp:false},
-  {id:'f',name:'ปรอทวัดไข้',cat:'equip',unit:'อัน',min:1,exp:false},
-  {id:'g',name:'ปากคีบปลายทู่',cat:'equip',unit:'อัน',min:1,exp:false},
-  {id:'j',name:'สายยางรัดห้ามเลือด',cat:'equip',unit:'เส้น',min:1,exp:false},
-  {id:'l',name:'หลอดหยดยา',cat:'equip',unit:'อัน',min:1,exp:false},
-  {id:'z',name:'ถ้วยล้างตา',cat:'equip',unit:'ใบ',min:1,exp:false},
-  {id:'h',name:'ผ้าพันยืด',cat:'consum',unit:'ม้วน',min:2,exp:false},
-  {id:'k',name:'สำลี ผ้าก๊อซ ผ้าพันแผล พลาสเตอร์',cat:'consum',unit:'ชุด',min:1,exp:false},
-  {id:'i',name:'ขี้ผึ้งป้ายตา',cat:'external',unit:'หลอด',min:1,exp:true},
-  {id:'m',name:'ขี้ผึ้งแก้ปวดบวม',cat:'external',unit:'หลอด',min:1,exp:true},
-  {id:'n',name:'ทิงเจอร์ไอโอดีน / โพวิโดน-ไอโอดีน',cat:'external',unit:'ขวด',min:1,exp:true},
-  {id:'o',name:'น้ำยาโพวิโดน-ไอโอดีน ชนิดฟอกแผล',cat:'external',unit:'ขวด',min:1,exp:true},
-  {id:'q',name:'ยาแก้ผดผื่น (ไม่ติดเชื้อ)',cat:'external',unit:'หลอด',min:1,exp:true},
-  {id:'s',name:'ยาทาแก้ผดผื่นคัน',cat:'external',unit:'หลอด',min:1,exp:true},
-  {id:'v',name:'ยารักษาแผลน้ำร้อนลวก',cat:'external',unit:'หลอด',min:1,exp:true},
-  {id:'x',name:'เหล้าแอมโมเนียหอม',cat:'external',unit:'ขวด',min:1,exp:true},
-  {id:'y',name:'แอลกอฮอล์เช็ดแผล',cat:'external',unit:'ขวด',min:1,exp:true},
-  {id:'aa',name:'น้ำกรดบอริคล้างตา',cat:'external',unit:'ขวด',min:1,exp:true},
-  {id:'ab',name:'ยาหยอดตา',cat:'external',unit:'ขวด',min:1,exp:true},
-  {id:'p',name:'ผงน้ำตาลเกลือแร่',cat:'oral',unit:'ซอง',min:5,exp:true},
-  {id:'r',name:'ยาแก้แพ้',cat:'oral',unit:'แผง',min:1,exp:true},
-  {id:'t',name:'ยาธาตุน้ำแดง',cat:'oral',unit:'ขวด',min:1,exp:true},
-  {id:'u',name:'ยาบรรเทาปวดลดไข้',cat:'oral',unit:'แผง',min:2,exp:true},
-  {id:'w',name:'ยาลดกรดในกระเพาะอาหาร',cat:'oral',unit:'แผง',min:1,exp:true},
+const STD_ITEMS=[
+  {id:'a', name:'กรรไกร',                               cat:'equip',   unit:'อัน',  min:1,exp:false},
+  {id:'b', name:'แก้วยาน้ำ และแก้วยาเม็ด',               cat:'equip',   unit:'ชุด',  min:1,exp:false},
+  {id:'c', name:'เข็มกลัด',                              cat:'equip',   unit:'อัน',  min:2,exp:false},
+  {id:'d', name:'ถ้วยน้ำ',                               cat:'equip',   unit:'ใบ',   min:1,exp:false},
+  {id:'e', name:'ที่ป้ายยา',                             cat:'equip',   unit:'อัน',  min:1,exp:false},
+  {id:'f', name:'ปรอทวัดไข้',                            cat:'equip',   unit:'อัน',  min:1,exp:false},
+  {id:'g', name:'ปากคีบปลายทู่',                         cat:'equip',   unit:'อัน',  min:1,exp:false},
+  {id:'j', name:'สายยางรัดห้ามเลือด',                    cat:'equip',   unit:'เส้น', min:1,exp:false},
+  {id:'l', name:'หลอดหยดยา',                             cat:'equip',   unit:'อัน',  min:1,exp:false},
+  {id:'z', name:'ถ้วยล้างตา',                            cat:'equip',   unit:'ใบ',   min:1,exp:false},
+  {id:'h', name:'ผ้าพันยืด',                             cat:'consum',  unit:'ม้วน', min:2,exp:false},
+  {id:'k', name:'สำลี ผ้าก๊อซ ผ้าพันแผล พลาสเตอร์',      cat:'consum',  unit:'ชุด',  min:1,exp:false},
+  {id:'i', name:'ขี้ผึ้งป้ายตา',                         cat:'external',unit:'หลอด', min:1,exp:true},
+  {id:'m', name:'ขี้ผึ้งแก้ปวดบวม',                      cat:'external',unit:'หลอด', min:1,exp:true},
+  {id:'n', name:'ทิงเจอร์ไอโอดีน / โพวิโดน-ไอโอดีน',    cat:'external',unit:'ขวด',  min:1,exp:true},
+  {id:'o', name:'น้ำยาโพวิโดน-ไอโอดีน ชนิดฟอกแผล',      cat:'external',unit:'ขวด',  min:1,exp:true},
+  {id:'q', name:'ยาแก้ผดผื่น (ไม่ติดเชื้อ)',             cat:'external',unit:'หลอด', min:1,exp:true},
+  {id:'s', name:'ยาทาแก้ผดผื่นคัน',                      cat:'external',unit:'หลอด', min:1,exp:true},
+  {id:'v', name:'ยารักษาแผลน้ำร้อนลวก',                  cat:'external',unit:'หลอด', min:1,exp:true},
+  {id:'x', name:'เหล้าแอมโมเนียหอม',                     cat:'external',unit:'ขวด',  min:1,exp:true},
+  {id:'y', name:'แอลกอฮอล์เช็ดแผล',                      cat:'external',unit:'ขวด',  min:1,exp:true},
+  {id:'aa',name:'น้ำกรดบอริคล้างตา',                     cat:'external',unit:'ขวด',  min:1,exp:true},
+  {id:'ab',name:'ยาหยอดตา',                              cat:'external',unit:'ขวด',  min:1,exp:true},
+  {id:'p', name:'ผงน้ำตาลเกลือแร่',                      cat:'oral',    unit:'ซอง',  min:5,exp:true},
+  {id:'r', name:'ยาแก้แพ้',                              cat:'oral',    unit:'แผง',  min:1,exp:true},
+  {id:'t', name:'ยาธาตุน้ำแดง',                          cat:'oral',    unit:'ขวด',  min:1,exp:true},
+  {id:'u', name:'ยาบรรเทาปวดลดไข้',                      cat:'oral',    unit:'แผง',  min:2,exp:true},
+  {id:'w', name:'ยาลดกรดในกระเพาะอาหาร',                 cat:'oral',    unit:'แผง',  min:1,exp:true},
 ];
-const NM=3;
-const STALE=30;
+
+const NM=3, STALE=30;
 const SID='16QI0_rnjBPhwiDMeYWaWd09F3qbKG-kOxUoUhsujeJU';
 const GSD='https://script.google.com/macros/s/AKfycbxJVqLsIgvXqMwUuGuqLk3fsQ7KYJugX9wwXo-_l8KsaMJh9flPdIgB_YzaaL9Wc2E/exec';
 const SM={ok:{l:'ปกติ',c:'c-ok',col:'var(--ok)'},near:{l:'ใกล้หมดอายุ',c:'c-near',col:'var(--near)'},below:{l:'ต่ำกว่าเกณฑ์',c:'c-below',col:'var(--below)'},expired:{l:'หมดอายุ',c:'c-bad',col:'var(--bad)'},out:{l:'ไม่มี/หมด',c:'c-bad',col:'var(--bad)'},pending:{l:'ยังไม่ตรวจ',c:'c-pend',col:'var(--pend)'}};
 
-let ITEMS=DEF.map(x=>({...x}));
+/* ── STATE ── */
+// FARM_CFG[fid] = { items:[{id,name,cat,unit,min,exp,hidden}], resp, inspector }
+let FARM_CFG={};
 let INSPS=[];
 let gsUrl=GSD;
 let S={view:'home',fid:null,draft:null,insp:'',rm:'month',rym:'',did:null,prev:[],q:''};
-let chartObjs=[];
+let _chartObjs=[];
 
-const mem={};
-async function sg(k){if(window.storage){try{const r=await window.storage.get(k);return r?r.value:null}catch(e){}}try{return localStorage.getItem(k)}catch(e){}return mem[k]??null}
-async function st_set(k,v){if(window.storage){try{await window.storage.set(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){}mem[k]=v}
+/* ── STORAGE ── */
+const _m={};
+async function sg(k){if(window.storage){try{const r=await window.storage.get(k);return r?r.value:null}catch(e){}}try{return localStorage.getItem(k)}catch(e){}return _m[k]??null}
+async function ss(k,v){if(window.storage){try{await window.storage.set(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){}  _m[k]=v}
 
 async function boot(){
-  const ci=await sg('items_v2');if(ci){try{const sv=JSON.parse(ci);ITEMS=DEF.map(d=>{const f=sv.find(x=>x.id===d.id);return f?{...d,min:f.min}:{...d}})}catch(e){}}
-  const ins=await sg('insp_v2');if(ins){try{INSPS=JSON.parse(ins)||[]}catch(e){INSPS=[]}}
-  S.insp=(await sg('inspector'))||'';
+  const ci=await sg('farm_cfg_v3');
+  if(ci){try{FARM_CFG=JSON.parse(ci)||{}}catch(e){FARM_CFG={}}}
+  // init ฟาร์มที่ยังไม่มี config
+  FARMS.forEach(f=>{if(!FARM_CFG[f.id])FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]}});
+  const ins=await sg('insp_v3');if(ins){try{INSPS=JSON.parse(ins)||[]}catch(e){INSPS=[]}}
   gsUrl=(await sg('gsheet_url'))||GSD;
   const n=new Date();S.rym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
   go('home');
 }
-async function svi(){await st_set('items_v2',JSON.stringify(ITEMS.map(i=>({id:i.id,min:i.min}))))}
-async function svin(){await st_set('insp_v2',JSON.stringify(INSPS))}
+async function saveCfg(){await ss('farm_cfg_v3',JSON.stringify(FARM_CFG))}
+async function saveIns(){await ss('insp_v3',JSON.stringify(INSPS))}
 
+/* ── HELPERS ── */
 function F(id){return FARMS.find(x=>x.id===id)||FARMS[0]}
+function FC(fid){return FARM_CFG[fid]||(FARM_CFG[fid]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]}),FARM_CFG[fid]}
+function fItems(fid){return FC(fid).items.filter(x=>!x.hidden)}
 function CN(id){const c=CATS.find(x=>x.id===id);return c?c.name:''}
 function beD(iso){const d=new Date(iso);const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return d.getDate()+' '+M[d.getMonth()]+' '+(d.getFullYear()+543)}
 function thM(ym){if(!ym)return'';const[y,m]=ym.split('-');const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return M[parseInt(m)-1]+' '+(parseInt(y)+543)}
 function xL(ym){if(!ym)return'—';const[y,m]=ym.split('-');return m+'/'+(parseInt(y)+543)}
 function nowYM(){const n=new Date();return n.getFullYear()*12+n.getMonth()}
-function daysTo(ym){if(!ym)return null;const[y,m]=ym.split('-').map(Number);const t=new Date(y,m,0);const now=new Date();return Math.round((t-now)/86400000)}
-function daysSince(iso){return Math.floor((Date.now()-new Date(iso).getTime())/86400000)}
+function daysTo(ym){if(!ym)return null;const[y,m]=ym.split('-').map(Number);const t=new Date(y,m,0);return Math.round((t-Date.now())/86400000)}
+function daysSince(iso){return Math.floor((Date.now()-new Date(iso))/86400000)}
 function lt(line){return(line.lots||[]).reduce((s,l)=>s+(parseInt(l.qty)||0),0)}
 function nx(line){return(line.lots||[]).filter(l=>l.exp).map(l=>l.exp).sort()[0]||''}
 function ls(line,item){
@@ -235,17 +259,22 @@ function ls(line,item){
   (line.lots||[]).forEach(l=>{if(l.exp){const[y,m]=l.exp.split('-').map(Number);const v=y*12+(m-1);if(v<c)ex=true;else if(v-c<=NM)nr=true;}});
   if(ex)return'expired';if(t<(item.min||0))return'below';if(nr)return'near';return'ok';
 }
-function summ(insp){const c={ok:0,near:0,below:0,expired:0,out:0,pending:0};ITEMS.forEach(it=>{const l=insp.lines[it.id]||{lots:[],touched:false};c[ls(l,it)]++;});return c}
+function summ(insp,fid){
+  const its=fItems(fid);
+  const c={ok:0,near:0,below:0,expired:0,out:0,pending:0};
+  its.forEach(it=>{const l=(insp.lines||{})[it.id]||{lots:[],touched:false};c[ls(l,it)]++;});
+  return c;
+}
 function latF(fid){return INSPS.filter(i=>i.farmId===fid).sort((a,b)=>b.ts-a.ts)[0]||null}
 function latFM(fid,ym){return INSPS.filter(i=>i.farmId===fid&&i.date.startsWith(ym)).sort((a,b)=>b.ts-a.ts)[0]||null}
-function allKPI(){const c={ok:0,near:0,below:0,expired:0,out:0,pending:0};FARMS.forEach(f=>{const li=latF(f.id);if(li){const s=summ(li);for(const k in c)c[k]+=s[k];}});return c}
+function allKPI(){const c={ok:0,near:0,below:0,expired:0,out:0,pending:0};FARMS.forEach(f=>{const li=latF(f.id);if(li){const s=summ(li,f.id);for(const k in c)c[k]+=s[k];}});return c}
 function buildAlerts(){
-  const A=[];const n=new Date();
+  const A=[];
   FARMS.forEach(f=>{const li=latF(f.id);
-    if(!li){A.push({sev:3,fid:f.id,farm:f.name,fc:f.c,title:'ยังไม่เคยตรวจ',desc:'ศูนย์นี้ยังไม่มีข้อมูลการตรวจ',sub:'ยังไม่ตรวจ',col:'var(--near)',ic:'🕒'});return;}
+    if(!li){A.push({sev:2,fid:f.id,farm:f.name,fc:f.c,title:'ยังไม่เคยตรวจ',desc:'ศูนย์นี้ยังไม่มีข้อมูล',sub:'ยังไม่ตรวจ',col:'var(--near)',ic:'🕒'});return;}
     const ds=daysSince(li.date);
     if(ds>=STALE)A.push({sev:2,fid:f.id,farm:f.name,fc:f.c,title:f.sh,desc:'ไม่ได้ตรวจมา '+ds+' วัน',sub:'ค้างตรวจ',col:'var(--near)',ic:'🕒'});
-    ITEMS.forEach(it=>{const line=li.lines[it.id]||{lots:[],touched:false};const stk=ls(line,it);
+    fItems(f.id).forEach(it=>{const line=(li.lines||{})[it.id]||{lots:[],touched:false};const stk=ls(line,it);
       if(stk==='expired')A.push({sev:0,fid:f.id,farm:f.name,fc:f.c,title:it.name,desc:'หมดอายุแล้ว ('+xL(nx(line))+')',sub:'หมดอายุ',col:'var(--bad)',ic:'⛔'});
       else if(stk==='out')A.push({sev:0,fid:f.id,farm:f.name,fc:f.c,title:it.name,desc:'ไม่มีของในคลัง',sub:'หมด',col:'var(--bad)',ic:'⛔'});
       else if(stk==='near'){const d=daysTo(nx(line));A.push({sev:1,fid:f.id,farm:f.name,fc:f.c,title:it.name,desc:'ใกล้หมดอายุ'+(d!=null?' ใน '+d+' วัน':''),sub:'ใกล้หมดอายุ',col:'var(--near)',ic:'⏰'});}
@@ -254,138 +283,158 @@ function buildAlerts(){
   });
   A.sort((a,b)=>a.sev-b.sev);return A;
 }
-function setTh(f){const r=document.documentElement;r.style.setProperty('--fc',f.c);r.style.setProperty('--fb',f.bg)}
-function rsTh(){const r=document.documentElement;r.style.setProperty('--fc','#5fbf8e');r.style.setProperty('--fb','#15251c')}
+function setTh(f){document.documentElement.style.setProperty('--fc',f.c);document.documentElement.style.setProperty('--fb',f.bg)}
+function rsTh(){document.documentElement.style.setProperty('--fc','#5fbf8e');document.documentElement.style.setProperty('--fb','#15251c')}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400)}
-function killCharts(){chartObjs.forEach(c=>{try{c.destroy()}catch(e){}});chartObjs=[]}
-function updBadges(){const n=buildAlerts().filter(a=>a.sev<=1).length;['abBdg','navBdg'].forEach(id=>{const e=document.getElementById(id);if(e){if(n>0){e.style.display='';e.textContent=n>99?'99+':n}else e.style.display='none'}});}
+function kc(){_chartObjs.forEach(c=>{try{c.destroy()}catch(e){}});_chartObjs=[]}
+function updB(){const n=buildAlerts().filter(a=>a.sev<=1).length;['abBdg','navBdg'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display=n?'':'none';if(n)e.textContent=n>99?'99+':n}})}
+function cred(){return`<div class="cred">MediTrack v1.0 · <strong>${DEV.name}</strong> · ${DEV.role}</div>`}
+function inspSel(cur){return`<select id="isel" style="margin-bottom:10px">${INSPECTORS.map(n=>`<option${n===cur?' selected':''}>${n}</option>`).join('')}</select>`}
 
+/* ── NAV ── */
+const ROOT=['home','pick-inspect','pick-report','alerts','settings'];
 function go(v,ex={}){
-  killCharts();
-  if(!['home','pick-inspect','pick-report','alerts','settings'].includes(v))S.prev.push({view:S.view,fid:S.fid});
+  kc();
+  if(!ROOT.includes(v))S.prev.push({view:S.view,fid:S.fid});
   S.view=v;Object.assign(S,ex);
-  const navMap={home:'home','pick-inspect':'pick-inspect','pick-report':'pick-report',alerts:'alerts',settings:'settings'};
-  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===navMap[v]));
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
   document.getElementById('scr').scrollTop=0;
   const bb=document.getElementById('bb'),nb=document.getElementById('nbtn');
-  const isR=['home','pick-inspect','pick-report','alerts','settings'].includes(v);
+  const isR=ROOT.includes(v);
   bb.style.display=isR?'none':'flex';nb.style.display=v==='alerts'?'none':'flex';
   const ab=document.getElementById('ab');
-  if(S.fid&&!['home','pick-inspect','pick-report','alerts','settings'].includes(v)){
+  if(S.fid&&!isR){
     const f=F(S.fid);setTh(f);ab.style.borderBottomColor=f.c;
-    const TT={farm:f.sh,inspect:'ตรวจนับสต็อก','farm-overview':'ภาพรวมรายการยา','farm-report':'รายงาน','inspect-history':'ประวัติการตรวจ','farm-settings':'ตั้งค่าศูนย์'};
-    document.getElementById('abt').textContent=TT[v]||'';document.getElementById('abs').textContent=f.name;
-  }else{rsTh();ab.style.borderBottomColor='var(--line)';document.getElementById('abt').textContent='ตรวจนับสต็อกยาและเวชภัณฑ์';document.getElementById('abs').textContent='ธุรกิจพันธุ์กุ้งทะเล 2';}
+    if(v==='farm'){
+      document.getElementById('abt').textContent=f.name;
+      document.getElementById('abt').style.fontSize='14.5px';
+      document.getElementById('abs').textContent='';
+    }else{
+      const TT={inspect:'ตรวจนับสต็อก','farm-overview':'ภาพรวมรายการยา','farm-report':'รายงาน','inspect-history':'ประวัติการตรวจ','farm-settings':'ตั้งค่าศูนย์'};
+      document.getElementById('abt').textContent=TT[v]||'';
+      document.getElementById('abt').style.fontSize='16px';
+      document.getElementById('abs').textContent=f.name;
+    }
+  }else{
+    rsTh();ab.style.borderBottomColor='var(--line)';
+    document.getElementById('abt').textContent='MediTrack';
+    document.getElementById('abs').textContent='ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2';
+    document.getElementById('abt').style.fontSize='16px';
+  }
   ({home:rHome,'pick-inspect':rPickI,'pick-report':rPickR,alerts:rAlerts,settings:rSett,farm:rFarm,inspect:rInsp,'farm-overview':rOv,'farm-report':rRep,'inspect-history':rHist,'farm-settings':rFSett})[v]?.();
-  updBadges();
+  updB();
 }
 function goBack(){if(S.prev.length){const p=S.prev.pop();go(p.view,{fid:p.fid})}else go('home')}
 
+/* ── HOME ── */
 function rHome(){
   const k=allKPI();const chk=FARMS.filter(f=>latF(f.id)).length;
-  const alerts=buildAlerts().filter(a=>a.sev<=1);
-  let h=`<div class="row" style="margin-bottom:10px"><div style="font-size:12px;color:var(--mut)">ภาพรวมทั้งหมด · ${beD(new Date().toISOString())}</div><div style="font-size:11px;color:var(--mut)">${chk}/5 ศูนย์</div></div>
-  <div class="s4" style="margin-bottom:13px">
-    <div class="kpi k-ok"><div class="top" style="color:var(--ok)"><span class="ic">✓</span><span class="n">${k.ok}</span></div><div class="l">ปกติ</div></div>
-    <div class="kpi k-near"><div class="top" style="color:var(--near)"><span class="ic">⏰</span><span class="n">${k.near}</span></div><div class="l">ใกล้หมดอายุ</div></div>
-    <div class="kpi k-below"><div class="top" style="color:var(--below)"><span class="ic">🔻</span><span class="n">${k.below}</span></div><div class="l">ต่ำกว่าเกณฑ์</div></div>
-    <div class="kpi k-bad"><div class="top" style="color:var(--bad)"><span class="ic">⛔</span><span class="n">${k.expired+k.out}</span></div><div class="l">หมด/หมดอายุ</div></div>
-  </div>`;
   const top=buildAlerts().filter(a=>a.sev<=2).slice(0,3);
-  h+=`<div class="card" style="margin-bottom:13px">
-    <div class="row" style="margin-bottom:6px"><span style="font-size:12.5px;font-weight:700;color:var(--bad)">รายการต้องดำเนินการ (${buildAlerts().filter(a=>a.sev<=2).length})</span>
+  const total=buildAlerts().filter(a=>a.sev<=2).length;
+  let h=`<div class="row" style="margin-bottom:10px"><div style="font-size:12px;color:var(--mut)">ภาพรวมทั้งหมด · ${beD(new Date().toISOString())}</div><div style="font-size:11px;color:var(--mut)">${chk}/5 ศูนย์ตรวจแล้ว</div></div>
+  <div class="s4" style="margin-bottom:13px">
+    <div class="kpi k-ok"><div class="top" style="color:var(--ok)"><span>✓</span><span class="n">${k.ok}</span></div><div class="l">ปกติ</div></div>
+    <div class="kpi k-near"><div class="top" style="color:var(--near)"><span>⏰</span><span class="n">${k.near}</span></div><div class="l">ใกล้หมดอายุ</div></div>
+    <div class="kpi k-below"><div class="top" style="color:var(--below)"><span>🔻</span><span class="n">${k.below}</span></div><div class="l">ต่ำกว่าเกณฑ์</div></div>
+    <div class="kpi k-bad"><div class="top" style="color:var(--bad)"><span>⛔</span><span class="n">${k.expired+k.out}</span></div><div class="l">หมด/หมดอายุ</div></div>
+  </div>
+  <div class="card" style="margin-bottom:13px">
+    <div class="row" style="margin-bottom:6px"><span style="font-size:12.5px;font-weight:700;color:var(--bad)">รายการต้องดำเนินการ (${total})</span>
     <span style="font-size:11px;color:#6ca9e0;cursor:pointer" onclick="go('alerts')">ดูทั้งหมด ›</span></div>`;
   if(!top.length)h+=`<div style="font-size:13px;color:var(--ok);padding:6px 0">ทุกศูนย์อยู่ในเกณฑ์ปกติ ✓</div>`;
-  top.forEach(a=>{h+=`<div class="acti">
-    <span style="font-size:17px">${a.ic}</span>
-    <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;color:var(--ink)">${a.title}</div><div style="font-size:10.5px;color:${a.col}">${a.desc}</div></div>
-    <span class="chip" style="background:${a.col};color:#0c1410;font-size:10px;opacity:.92">${a.sub}</span></div>`;});
-  h+=`</div>`;
-  h+=`<div class="row" style="padding:2px 2px 8px"><span style="font-size:12px;color:var(--mut);font-weight:700">ศูนย์ทั้งหมด</span></div>`;
-  FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li):null;const warn=s?s.near+s.below+s.expired+s.out:0;
+  top.forEach(a=>h+=`<div class="acti"><span style="font-size:17px">${a.ic}</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">${a.title}</div><div style="font-size:10.5px;color:${a.col}">${a.desc}</div></div><span style="font-size:9.5px;font-weight:700;background:${a.col};color:#0c1410;padding:3px 8px;border-radius:99px">${a.sub}</span></div>`);
+  h+=`</div><div class="row" style="padding:2px 2px 8px"><span style="font-size:12px;color:var(--mut);font-weight:700">ศูนย์ทั้งหมด</span></div>`;
+  FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li,f.id):null;const warn=s?s.near+s.below+s.expired+s.out:0;
     const dot=!s?'var(--pend)':(s.expired+s.out?'var(--bad)':warn?'var(--near)':'var(--ok)');
     h+=`<div class="flist" style="border-left-color:${f.c}" onclick="go('farm',{fid:${f.id}})">
       <span class="fdot" style="background:${dot};width:11px;height:11px;margin:0"></span>
-      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--ink)">${f.name}</div>
-      <div style="font-size:11px;color:var(--mut)">${s?`ปกติ ${s.ok} · ${warn?`<span style="color:${dot}">เตือน ${warn}</span>`:'เตือน 0'}`:'ยังไม่เคยตรวจ'}</div></div>
-      <i style="color:var(--hint)">›</i></div>`;});
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${f.name}</div>
+      <div style="font-size:11px;color:var(--mut)">${s?`ปกติ ${s.ok} · ${warn?`<span style="color:${dot}">เตือน ${warn}</span>`:'เตือน 0'}`:' ยังไม่เคยตรวจ'}</div></div>
+      <span style="color:var(--hint)">›</span></div>`;});
+  h+=cred();
   document.getElementById('scr').innerHTML=h;
 }
 
+/* ── PICKERS ── */
 function rPickI(){pickList('เลือกศูนย์ที่จะตรวจนับ','inspect')}
 function rPickR(){pickList('เลือกศูนย์เพื่อดูรายงาน','farm-report')}
 function pickList(title,target){
   let h=`<div class="sec-h">${title}</div>`;
-  FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li):null;const warn=s?s.near+s.below+s.expired+s.out:0;
+  FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li,f.id):null;const warn=s?s.near+s.below+s.expired+s.out:0;
     h+=`<div class="flist" style="border-left-color:${f.c}" onclick="go('${target}',{fid:${f.id}${target==='inspect'?',draft:null':''}})">
       <span class="fdot" style="background:${f.c};width:11px;height:11px;margin:0"></span>
-      <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700;color:var(--ink)">${f.name}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">${f.name}</div>
       <div style="font-size:11px;color:var(--mut)">${li?'ตรวจล่าสุด '+beD(li.date):'ยังไม่เคยตรวจ'}${warn?` · <span style="color:var(--near)">เตือน ${warn}</span>`:''}</div></div>
-      <i style="color:var(--hint)">›</i></div>`;});
-  document.getElementById('scr').innerHTML=h;
+      <span style="color:var(--hint)">›</span></div>`;});
+  h+=cred();document.getElementById('scr').innerHTML=h;
 }
 
+/* ── FARM HUB ── */
 function rFarm(){
-  const f=F(S.fid);const li=latF(f.id);const s=li?summ(li):{ok:0,near:0,below:0,expired:0,out:0,pending:28};
-  const done=li?ITEMS.filter(it=>(li.lines[it.id]||{}).touched).length:0;
+  const f=F(S.fid);const li=latF(f.id);const its=fItems(f.id);
+  const s=li?summ(li,f.id):{ok:0,near:0,below:0,expired:0,out:0,pending:its.length};
+  const done=li?its.filter(it=>(li.lines||{})[it.id]?.touched).length:0;
   const prob=s.expired+s.out+s.below+s.near;
   let h=`<div style="background:${f.bg};border:1px solid ${f.c}55;border-radius:var(--r);padding:13px 14px;margin-bottom:13px">
     <div class="s4">
       <div class="kpi k-ok" style="padding:10px 11px"><div class="top" style="color:var(--ok)"><span class="n" style="font-size:22px">${s.ok}</span></div><div class="l">ปกติ</div></div>
-      <div class="kpi k-near" style="padding:10px 11px"><div class="top" style="color:var(--near)"><span class="n" style="font-size:22px">${s.near}</span></div><div class="l">ใกล้หมดอายุ</div></div>
+      <div class="kpi k-near" style="padding:10px 11px"><div class="top" style="color:var(--near)"><span class="n" style="font-size:22px">${s.near}</span></div><div class="l">ใกล้หมด</div></div>
       <div class="kpi k-below" style="padding:10px 11px"><div class="top" style="color:var(--below)"><span class="n" style="font-size:22px">${s.below}</span></div><div class="l">ต่ำกว่าเกณฑ์</div></div>
       <div class="kpi k-bad" style="padding:10px 11px"><div class="top" style="color:var(--bad)"><span class="n" style="font-size:22px">${s.expired+s.out}</span></div><div class="l">หมด/หมดอายุ</div></div>
-    </div></div>`;
-  h+=`<div class="card">
-    <div class="row" style="padding:3px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--mut)">📅 วันที่ตรวจล่าสุด</span><span style="font-size:13px;font-weight:700">${li?beD(li.date):'—'}</span></div>
+    </div></div>
+  <div class="card">
+    <div class="row" style="padding:3px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--mut)">📅 ตรวจล่าสุด</span><span style="font-size:13px;font-weight:700">${li?beD(li.date):'—'}</span></div>
     <div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--mut)">👤 ผู้ตรวจ</span><span style="font-size:13px;font-weight:700">${li?li.inspector:'—'}</span></div>
-    <div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--mut)">📦 รายการทั้งหมด</span><span style="font-size:13px;font-weight:700">${ITEMS.length} รายการ</span></div>
-    <div class="row" style="padding:8px 0 3px"><span style="font-size:13px;color:var(--mut)">✓ ตรวจแล้ว</span><span style="font-size:13px;font-weight:700;color:var(--ok)">${done} รายการ (${Math.round(done/ITEMS.length*100)}%)</span></div></div>`;
-  h+=`<button class="btn prim cta" style="margin-bottom:14px" onclick="go('inspect',{fid:${f.id},draft:null})">＋ ตรวจนับใหม่</button>`;
-  h+=`<div class="fmenu">
+    <div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--mut)">📦 รายการยา</span><span style="font-size:13px;font-weight:700">${its.length} รายการ</span></div>
+    <div class="row" style="padding:8px 0 3px"><span style="font-size:13px;color:var(--mut)">✓ ตรวจแล้ว</span><span style="font-size:13px;font-weight:700;color:var(--ok)">${done} (${its.length?Math.round(done/its.length*100):0}%)</span></div>
+  </div>
+  ${prob?`<div style="background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:var(--r);padding:10px 14px;margin-bottom:13px;font-size:13px;color:var(--bad);font-weight:600">⚠ มี ${prob} รายการต้องดำเนินการ</div>`:''}
+  <button class="btn prim cta" style="margin-bottom:14px" onclick="go('inspect',{fid:${f.id},draft:null})">＋ ตรวจนับใหม่</button>
+  <div class="fmenu">
     <button class="mb" onclick="go('farm-overview',{fid:${f.id}})"><div class="mbar" style="background:${f.c}"></div><div class="mbody"><span class="mic">▦</span><div class="mtt">ภาพรวมรายการยา</div><div class="msb">สถานะปัจจุบัน</div></div></button>
     <button class="mb" onclick="go('farm-report',{fid:${f.id}})"><div class="mbar" style="background:${f.c}"></div><div class="mbody"><span class="mic">▤</span><div class="mtt">รายงาน</div><div class="msb">รายเดือน / ทั้งหมด</div></div></button>
     <button class="mb" onclick="go('inspect-history',{fid:${f.id}})"><div class="mbar" style="background:${f.c}"></div><div class="mbody"><span class="mic">↺</span><div class="mtt">ประวัติการตรวจ</div><div class="msb">ดูย้อนหลัง</div></div></button>
-    <button class="mb" onclick="go('farm-settings',{fid:${f.id}})"><div class="mbar" style="background:${f.c}"></div><div class="mbody"><span class="mic">⚙</span><div class="mtt">ตั้งค่าศูนย์</div><div class="msb">ขั้นต่ำ · ผู้รับผิดชอบ</div></div></button>
-  </div>`;
+    <button class="mb" onclick="go('farm-settings',{fid:${f.id}})"><div class="mbar" style="background:${f.c}"></div><div class="mbody"><span class="mic">⚙</span><div class="mtt">จัดการรายการ / ตั้งค่า</div><div class="msb">เพิ่ม · ซ่อน · ขั้นต่ำ</div></div></button>
+  </div>${cred()}`;
   document.getElementById('scr').innerHTML=h;
 }
 
-function nDraft(){const L={};ITEMS.forEach(it=>L[it.id]={lots:[],touched:false});return{lines:L}}
-function cpL(){const li=latF(S.fid);if(!li){toast('ยังไม่มีข้อมูลครั้งก่อน');return}ITEMS.forEach(it=>{const p=li.lines[it.id];const d=S.draft.lines[it.id];if(p&&p.touched){d.lots=(p.lots||[]).map(l=>({qty:l.qty,exp:l.exp}));d.touched=true;}});rInsp();toast('คัดลอกจากครั้งก่อนแล้ว')}
+/* ── INSPECT ── */
+function nDraft(fid){const L={};fItems(fid).forEach(it=>L[it.id]={lots:[],touched:false});return{lines:L}}
+function cpL(){const li=latF(S.fid);if(!li){toast('ยังไม่มีข้อมูลครั้งก่อน');return}
+  fItems(S.fid).forEach(it=>{const p=(li.lines||{})[it.id];const d=S.draft.lines[it.id];if(p&&p.touched){d.lots=(p.lots||[]).map(l=>({qty:l.qty,exp:l.exp}));d.touched=true;}});
+  rInsp();toast('คัดลอกจากครั้งก่อนแล้ว')}
 function rInsp(){
-  if(!S.draft)S.draft=nDraft();S.q='';
-  const f=F(S.fid);
+  if(!S.draft)S.draft=nDraft(S.fid);S.q='';
+  const f=F(S.fid);const cfg=FC(S.fid);
+  const its=fItems(S.fid);
   let h=`<div class="card" style="border-left:5px solid ${f.c}">
     <label class="fld">ผู้ตรวจ</label>
-    <input type="text" id="iname" placeholder="ชื่อ-สกุล" value="${(S.insp||'').replace(/"/g,'&quot;')}" oninput="S.insp=this.value" style="margin-bottom:10px">
+    ${inspSel(cfg.inspector||INSPECTORS[0])}
     <div class="row"><span style="font-size:13px;color:var(--mut)">${beD(new Date().toISOString())}</span>
-    <button class="btn sm sec" onclick="cpL()">คัดลอกครั้งก่อน</button></div></div>`;
-  h+=`<div class="card" style="padding:12px 14px">
+    <button class="btn sm sec" onclick="cpL()">คัดลอกครั้งก่อน</button></div></div>
+  <div class="card" style="padding:12px 14px">
     <div class="row" style="margin-bottom:3px"><span style="font-size:13px;font-weight:700">ความคืบหน้า</span><span style="font-size:13px;font-weight:700;color:var(--fc)" id="ppct">0%</span></div>
-    <div class="row"><span style="font-size:12px;color:var(--mut)" id="pt">0 / ${ITEMS.length} รายการ</span></div>
-    <div class="prog"><i id="pb" style="width:0%"></i></div></div>`;
-  h+=`<div class="search-wrap"><span class="si">🔍</span><input type="search" id="srch" placeholder="ค้นหารายการยา / เวชภัณฑ์" oninput="filtInsp(this.value)"></div>`;
-  h+=`<div id="ilist">`+inspList('')+`</div>`;
-  h+=`<button class="btn prim" style="margin-top:8px" onclick="svI()">บันทึกการตรวจนับ</button><div style="height:16px"></div>`;
+    <div style="font-size:12px;color:var(--mut)" id="pt">0 / ${its.length} รายการ</div>
+    <div class="prog"><i id="pb" style="width:0%"></i></div></div>
+  <div class="sw"><span class="si">🔍</span><input type="search" id="srch" placeholder="ค้นหารายการยา / เวชภัณฑ์" oninput="filtI(this.value)"></div>
+  <div id="ilist">${iList('')}</div>
+  <button class="btn prim" style="margin-top:8px" onclick="svI()">บันทึกการตรวจนับ</button>${cred()}`;
   document.getElementById('scr').innerHTML=h;upP();
 }
-function inspList(q){
-  let h='';const qq=(q||'').trim().toLowerCase();
-  CATS.forEach(cat=>{const its=ITEMS.filter(i=>i.cat===cat.id&&(!qq||i.name.toLowerCase().includes(qq)));
-    if(!its.length)return;
-    h+=`<div class="sec-h">${cat.name}</div>`;its.forEach(it=>h+=iH(it));});
-  return h||`<div class="empty">ไม่พบรายการที่ค้นหา</div>`;
-}
-function filtInsp(q){S.q=q;document.getElementById('ilist').innerHTML=inspList(q)}
+function iList(q){let h='';const qq=q.trim().toLowerCase();const its=fItems(S.fid);
+  CATS.forEach(cat=>{const items=its.filter(i=>i.cat===cat.id&&(!qq||i.name.toLowerCase().includes(qq)));
+    if(!items.length)return;h+=`<div class="sec-h">${cat.name}</div>`;items.forEach(it=>h+=iH(it));});
+  return h||`<div class="empty">ไม่พบรายการที่ค้นหา</div>`}
+function filtI(q){S.q=q;document.getElementById('ilist').innerHTML=iList(q)}
 function iH(it){
-  const line=S.draft.lines[it.id];const sm=SM[ls(line,it)];
+  const line=(S.draft.lines||{})[it.id]||{lots:[],touched:false};const sm=SM[ls(line,it)];
   let body='';
   if(!line.touched){
     body=`<div class="row" style="margin-top:11px;gap:8px"><button class="addlot" style="flex:1" onclick="fLot('${it.id}')">＋ ระบุจำนวน</button><button class="nostock" onclick="mNone('${it.id}')">ไม่มีของ</button></div>`;
   }else{
     const lots=(line.lots||[]).map((l,i)=>`<div class="lot">
-      <div class="stepper"><button onclick="cQ('${it.id}',${i},-1)">−</button><span class="qty" id="q${it.id}${i}">${parseInt(l.qty)||0}</span><button onclick="cQ('${it.id}',${i},1)">＋</button></div>
+      <div class="stepper"><button onclick="cQ('${it.id}',${i},-1)">−</button><span class="qty" id="q${it.id}_${i}">${parseInt(l.qty)||0}</span><button onclick="cQ('${it.id}',${i},1)">＋</button></div>
       ${it.exp?`<input type="month" value="${l.exp||''}" onchange="sE('${it.id}',${i},this.value)">`:`<span style="flex:1;font-size:12px;color:var(--hint)">ไม่มีวันหมดอายุ</span>`}
       <button class="rm" onclick="rL('${it.id}',${i})">✕</button></div>`).join('');
     body=`${lots||`<div style="font-size:13px;color:var(--hint);margin-top:8px">บันทึกว่าไม่มีของ</div>`}
@@ -394,139 +443,115 @@ function iH(it){
   return`<div class="card" id="cd${it.id}" style="margin-bottom:10px">
     <div class="row" style="align-items:flex-start">
       <div style="min-width:0"><div style="font-size:15px;font-weight:700">${it.name}</div>
-      <div style="font-size:12px;color:var(--hint);margin-top:2px">คงเหลือขั้นต่ำ ${it.min} ${it.unit}</div></div>
+      <div style="font-size:12px;color:var(--hint);margin-top:2px">ขั้นต่ำ ${it.min} ${it.unit}</div></div>
       <span class="chip ${sm.c}" id="cp${it.id}">${sm.l}</span></div>${body}</div>`;
 }
-function rC(id){const it=ITEMS.find(x=>x.id===id);const el=document.getElementById('cd'+id);if(el)el.outerHTML=iH(it);upP()}
-function rfC(id){const it=ITEMS.find(x=>x.id===id);const line=S.draft.lines[id];const sm=SM[ls(line,it)];const c=document.getElementById('cp'+id);if(c){c.className='chip '+sm.c;c.textContent=sm.l;}upP()}
-function fLot(id){S.draft.lines[id]={lots:[{qty:1,exp:''}],touched:true};rC(id)}
+function rC(id){const it=fItems(S.fid).find(x=>x.id===id);const el=document.getElementById('cd'+id);if(el&&it)el.outerHTML=iH(it);upP()}
+function rfC(id){const it=fItems(S.fid).find(x=>x.id===id);if(!it)return;const line=(S.draft.lines||{})[id]||{lots:[],touched:false};const sm=SM[ls(line,it)];const c=document.getElementById('cp'+id);if(c){c.className='chip '+sm.c;c.textContent=sm.l;}upP()}
+function fLot(id){if(!S.draft.lines[id])S.draft.lines[id]={lots:[],touched:false};S.draft.lines[id]={lots:[{qty:1,exp:''}],touched:true};rC(id)}
 function mNone(id){S.draft.lines[id]={lots:[],touched:true};rC(id)}
-function aL(id){S.draft.lines[id].lots.push({qty:1,exp:''});S.draft.lines[id].touched=true;rC(id)}
+function aL(id){if(!S.draft.lines[id])S.draft.lines[id]={lots:[],touched:true};S.draft.lines[id].lots.push({qty:1,exp:''});S.draft.lines[id].touched=true;rC(id)}
 function rL(id,i){S.draft.lines[id].lots.splice(i,1);rC(id)}
-function cQ(id,i,d){const l=S.draft.lines[id].lots[i];l.qty=Math.max(0,(parseInt(l.qty)||0)+d);S.draft.lines[id].touched=true;const el=document.getElementById('q'+id+i);if(el)el.textContent=l.qty;rfC(id)}
-function sE(id,i,v){S.draft.lines[id].lots[i].exp=v;S.draft.lines[id].touched=true;rfC(id)}
-function upP(){let d=0;ITEMS.forEach(it=>{if(S.draft?.lines[it.id]?.touched)d++;});const pct=Math.round(d/ITEMS.length*100);const pt=document.getElementById('pt');const pb=document.getElementById('pb');const pp=document.getElementById('ppct');if(pt)pt.textContent=d+' / '+ITEMS.length+' รายการ';if(pb)pb.style.width=pct+'%';if(pp)pp.textContent=pct+'%'}
+function cQ(id,i,d){const l=S.draft.lines[id]?.lots[i];if(!l)return;l.qty=Math.max(0,(parseInt(l.qty)||0)+d);S.draft.lines[id].touched=true;const el=document.getElementById('q'+id+'_'+i);if(el)el.textContent=l.qty;rfC(id)}
+function sE(id,i,v){if(S.draft.lines[id]?.lots[i])S.draft.lines[id].lots[i].exp=v;S.draft.lines[id].touched=true;rfC(id)}
+function upP(){const its=fItems(S.fid);let d=0;its.forEach(it=>{if(S.draft?.lines[it.id]?.touched)d++;});const pct=its.length?Math.round(d/its.length*100):0;const pt=document.getElementById('pt');const pb=document.getElementById('pb');const pp=document.getElementById('ppct');if(pt)pt.textContent=d+' / '+its.length+' รายการ';if(pb)pb.style.width=pct+'%';if(pp)pp.textContent=pct+'%'}
 async function svI(){
-  if(!ITEMS.some(it=>S.draft.lines[it.id].touched)){toast('ยังไม่ได้ตรวจรายการใดเลย');return}
-  if(!(S.insp||'').trim()){toast('กรุณาระบุชื่อผู้ตรวจ');return}
-  const done=ITEMS.filter(it=>S.draft.lines[it.id].touched).length;
-  if(done<ITEMS.length&&!confirm(`ตรวจแล้ว ${done}/${ITEMS.length} รายการ\nรายการที่เหลือจะบันทึกเป็น "ยังไม่ตรวจ" — ยืนยัน?`))return;
-  const rec={id:'i'+Date.now(),farmId:S.fid,date:new Date().toISOString(),ts:Date.now(),inspector:S.insp.trim(),lines:JSON.parse(JSON.stringify(S.draft.lines))};
-  INSPS.push(rec);await svin();await st_set('inspector',S.insp.trim());
+  const its=fItems(S.fid);
+  const isel=document.getElementById('isel');const insp=isel?isel.value:FC(S.fid).inspector||INSPECTORS[0];
+  if(!its.some(it=>S.draft.lines[it.id]?.touched)){toast('ยังไม่ได้ตรวจรายการใดเลย');return}
+  const done=its.filter(it=>S.draft.lines[it.id]?.touched).length;
+  if(done<its.length&&!confirm(`ตรวจแล้ว ${done}/${its.length} รายการ
+ที่เหลือบันทึกเป็น "ยังไม่ตรวจ" — ยืนยัน?`))return;
+  FC(S.fid).inspector=insp;
+  const rec={id:'i'+Date.now(),farmId:S.fid,date:new Date().toISOString(),ts:Date.now(),inspector:insp,lines:JSON.parse(JSON.stringify(S.draft.lines))};
+  INSPS.push(rec);await saveIns();await saveCfg();
   S.draft=null;pSh(rec);toast('บันทึกการตรวจเรียบร้อย ✓');go('farm',{fid:S.fid});
 }
 
+/* ── OVERVIEW ── */
 function rOv(){
-  const li=latF(S.fid);
-  if(!li){document.getElementById('scr').innerHTML='<div class="empty">ยังไม่มีข้อมูล<br>กด "ตรวจนับใหม่" เพื่อเริ่ม</div>';return}
-  const s=summ(li);
-  let h=`<div class="search-wrap"><span class="si">🔍</span><input type="search" id="ovs" placeholder="ค้นหารายการ" oninput="ovFilt(this.value)"></div>
+  const li=latF(S.fid);const its=fItems(S.fid);
+  if(!li){document.getElementById('scr').innerHTML='<div class="empty">ยังไม่มีข้อมูล<br>กด "ตรวจนับใหม่" เพื่อเริ่ม</div>'+cred();return}
+  const s=summ(li,S.fid);
+  let h=`<div class="sw"><span class="si">🔍</span><input type="search" id="ovs" placeholder="ค้นหารายการ" oninput="ovFilt(this.value)"></div>
   <div style="display:flex;gap:6px;margin-bottom:12px">
-    <button id="fa" class="seg-b" style="flex:1" onclick="ovF('all')">ทั้งหมด</button>
-    <button id="fp" class="seg-b" style="flex:1" onclick="ovF('prob')">⚠ ต้องดูแล</button></div>
-  <style>.seg-b{padding:8px 4px;border-radius:9px;border:1px solid var(--line2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--card2);color:var(--mut)}.seg-b.on{background:var(--fc);color:#08130d;border-color:var(--fc)}</style>
-  <div id="ovr"></div>`;
+    <button id="fa" class="btn sm prim" style="flex:1" onclick="ovF('all')">ทั้งหมด</button>
+    <button id="fp" class="btn sm sec" style="flex:1" onclick="ovF('prob')">⚠ ต้องดูแล</button></div>
+  <div id="ovr"></div>${cred()}`;
   document.getElementById('scr').innerHTML=h;
   S._ovMode='all';S._ovQ='';
-  document.getElementById('fa').classList.add('on');
-  window.ovF=function(m){S._ovMode=m;document.getElementById('fa').classList.toggle('on',m==='all');document.getElementById('fp').classList.toggle('on',m==='prob');document.getElementById('ovr').innerHTML=ovRw(li);};
-  window.ovFilt=function(q){S._ovQ=q;document.getElementById('ovr').innerHTML=ovRw(li);};
-  document.getElementById('ovr').innerHTML=ovRw(li);
+  window.ovF=m=>{S._ovMode=m;document.getElementById('fa').className='btn sm '+(m==='all'?'prim':'sec');document.getElementById('fp').className='btn sm '+(m==='prob'?'prim':'sec');document.getElementById('ovr').innerHTML=ovRw(li,its);};
+  window.ovFilt=q=>{S._ovQ=q;document.getElementById('ovr').innerHTML=ovRw(li,its);};
+  document.getElementById('ovr').innerHTML=ovRw(li,its);
 }
-function ovRw(li){let r='';const qq=(S._ovQ||'').trim().toLowerCase();
-  CATS.forEach(cat=>{const its=ITEMS.filter(i=>i.cat===cat.id);let rows='';
-    its.forEach(it=>{if(qq&&!it.name.toLowerCase().includes(qq))return;const line=li.lines[it.id]||{lots:[],touched:false};const stk=ls(line,it);const sm=SM[stk];
-      if(S._ovMode==='prob'&&(stk==='ok'||stk==='pending'))return;
-      rows+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${it.name}</div>
-        <div style="font-size:12px;color:var(--hint);margin-top:2px">${line.touched?lt(line)+' '+it.unit:'—'}${it.exp&&nx(line)?' · หมด '+xL(nx(line)):''} · ขั้นต่ำ ${it.min}</div></div>
-        <span class="chip ${sm.c}">${sm.l}</span></div>`;});
-    if(rows)r+=`<div class="sec-h">${cat.name}</div>${rows}`;});
-  return r||'<div class="empty">ไม่พบรายการ</div>';
-}
+function ovRw(li,its){let r='';const qq=(S._ovQ||'').trim().toLowerCase();
+  CATS.forEach(cat=>{let rows='';its.filter(i=>i.cat===cat.id).forEach(it=>{if(qq&&!it.name.toLowerCase().includes(qq))return;const line=(li.lines||{})[it.id]||{lots:[],touched:false};const stk=ls(line,it);const sm=SM[stk];if(S._ovMode==='prob'&&(stk==='ok'||stk==='pending'))return;rows+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">${line.touched?lt(line)+' '+it.unit:'—'}${it.exp&&nx(line)?' · หมด '+xL(nx(line)):''} · ขั้นต่ำ ${it.min}</div></div><span class="chip ${sm.c}">${sm.l}</span></div>`;});if(rows)r+=`<div class="sec-h">${cat.name}</div>${rows}`;});
+  return r||'<div class="empty">ไม่พบรายการ</div>';}
 
+/* ── REPORT ── */
 function rRep(){
-  const f=F(S.fid);const n=new Date();
+  const f=F(S.fid);const n=new Date();const its=fItems(S.fid);
   if(!S.rym)S.rym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
   const isM=S.rm==='month';
   const li=isM?latFM(S.fid,S.rym):latF(S.fid);
-  const s=li?summ(li):{ok:0,near:0,below:0,expired:0,out:0,pending:28};
+  const s=li?summ(li,S.fid):{ok:0,near:0,below:0,expired:0,out:0,pending:its.length};
   const acts=[];
-  if(li){ITEMS.forEach(it=>{const line=li.lines[it.id]||{lots:[],touched:false};const stk=ls(line,it);if(['expired','out','below','near'].includes(stk))acts.push({it,stk,total:lt(line),ne:nx(line)});});acts.sort((a,b)=>['expired','out','below','near'].indexOf(a.stk)-['expired','out','below','near'].indexOf(b.stk));}
-  const tr=[];for(let i=5;i>=0;i--){const d=new Date(n.getFullYear(),n.getMonth()-i,1);const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const ti=latFM(S.fid,ym);const ts=ti?summ(ti):{near:0,below:0,expired:0,out:0};tr.push({label:thM(ym).split(' ')[0],val:ts.near+ts.below+ts.expired+ts.out,has:!!ti});}
+  if(li){its.forEach(it=>{const line=(li.lines||{})[it.id]||{};const stk=ls(line,it);if(['expired','out','below','near'].includes(stk))acts.push({it,stk,total:lt(line),ne:nx(line)});});acts.sort((a,b)=>['expired','out','below','near'].indexOf(a.stk)-['expired','out','below','near'].indexOf(b.stk));}
+  const tr=[];for(let i=5;i>=0;i--){const d=new Date(n.getFullYear(),n.getMonth()-i,1);const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const ti=latFM(S.fid,ym);const ts=ti?summ(ti,S.fid):{near:0,below:0,expired:0,out:0};tr.push({label:thM(ym).split(' ')[0],val:ts.near+ts.below+ts.expired+ts.out,has:!!ti});}
   let h=`<div class="seg"><button class="${isM?'on':''}" onclick="S.rm='month';rRep()">รายเดือน</button><button class="${!isM?'on':''}" onclick="S.rm='all';rRep()">ทั้งหมด (ล่าสุด)</button></div>`;
   if(isM)h+=`<div class="mnav"><button onclick="cMon(-1)">‹</button><div class="label">${thM(S.rym)}</div><button onclick="cMon(1)">›</button></div>`;
-  if(!li){h+=`<div class="card"><div class="empty">ไม่มีข้อมูล${isM?'ในเดือนนี้':''}</div></div>`;document.getElementById('scr').innerHTML=h;window.cMon=cMonFn;return}
+  if(!li){h+=`<div class="card"><div class="empty">ไม่มีข้อมูล${isM?'ในเดือนนี้':''}</div></div>${cred()}`;document.getElementById('scr').innerHTML=h;window.cMon=cMonFn;return}
   h+=`<div style="font-size:12px;color:var(--mut);margin-bottom:12px">ตรวจ ${beD(li.date)} · ${li.inspector}</div>`;
+  h+=`<div class="s4" style="margin-bottom:14px">
+    <div class="kpi k-ok" style="padding:10px 11px"><div class="top" style="color:var(--ok)"><span class="n" style="font-size:22px">${s.ok}</span></div><div class="l">ปกติ</div></div>
+    <div class="kpi k-near" style="padding:10px 11px"><div class="top" style="color:var(--near)"><span class="n" style="font-size:22px">${s.near}</span></div><div class="l">ใกล้หมด</div></div>
+    <div class="kpi k-below" style="padding:10px 11px"><div class="top" style="color:var(--below)"><span class="n" style="font-size:22px">${s.below}</span></div><div class="l">ต่ำกว่า</div></div>
+    <div class="kpi k-bad" style="padding:10px 11px"><div class="top" style="color:var(--bad)"><span class="n" style="font-size:22px">${s.expired+s.out}</span></div><div class="l">หมด/หมดอายุ</div></div></div>`;
   h+=`<div class="sec-h">สัดส่วนสถานะ</div><div class="card"><div style="display:flex;align-items:center;gap:14px">
     <div style="position:relative;width:130px;height:130px;flex:none"><canvas id="pie"></canvas>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none"><div style="font-size:22px;font-weight:700">${ITEMS.length}</div><div style="font-size:10px;color:var(--mut)">รายการ</div></div></div>
-    <div style="flex:1;font-size:12px">
-      ${pieLeg('ปกติ',s.ok,'var(--ok)')}${pieLeg('ใกล้หมดอายุ',s.near,'var(--near)')}${pieLeg('ต่ำกว่าเกณฑ์',s.below,'var(--below)')}${pieLeg('หมด/หมดอายุ',s.expired+s.out,'var(--bad)')}${s.pending?pieLeg('ยังไม่ตรวจ',s.pending,'var(--pend)'):''}
-    </div></div></div>`;
-  h+=`<div class="sec-h">แนวโน้ม 6 เดือน (รายการต้องดูแล)</div><div class="card"><div class="canvas-wrap"><canvas id="trend"></canvas></div></div>`;
-  h+=`<div class="sec-h">อันดับศูนย์จัดการสต็อกดีที่สุด</div><div class="card">`+rankHTML()+`</div>`;
-  if(acts.length){h+=`<div class="sec-h">รายการต้องดำเนินการ (${acts.length})</div>`;
-    acts.forEach(a=>{const sm=SM[a.stk];h+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${a.it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">มี ${a.total} ${a.it.unit} · ขั้นต่ำ ${a.it.min}${a.ne?' · หมด '+xL(a.ne):''}</div></div><span class="chip ${sm.c}">${sm.l}</span></div>`;});}
-  h+=`<div class="sec-h noprint">ออกรายงาน</div><div class="s2 noprint"><button class="btn prim" onclick="dPr(false)">PDF สรุป 1 หน้า</button><button class="btn sec" onclick="dPr(true)">PDF รายละเอียด</button></div>
-    <button class="btn sec noprint" style="margin-top:10px" onclick="dCsv()">ดาวน์โหลด Excel (CSV)</button>`;
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none"><div style="font-size:22px;font-weight:700">${its.length}</div><div style="font-size:10px;color:var(--mut)">รายการ</div></div></div>
+    <div style="flex:1;font-size:12px">${pieLeg('ปกติ',s.ok,'var(--ok)',its.length)}${pieLeg('ใกล้หมดอายุ',s.near,'var(--near)',its.length)}${pieLeg('ต่ำกว่าเกณฑ์',s.below,'var(--below)',its.length)}${pieLeg('หมด/หมดอายุ',s.expired+s.out,'var(--bad)',its.length)}${s.pending?pieLeg('ยังไม่ตรวจ',s.pending,'var(--pend)',its.length):''}</div></div></div>`;
+  h+=`<div class="sec-h">แนวโน้ม 6 เดือน</div><div class="card"><div class="canvas-wrap"><canvas id="trend"></canvas></div></div>`;
+  h+=`<div class="sec-h">อันดับศูนย์จัดการสต็อก</div><div class="card">${rankHTML()}</div>`;
+  if(acts.length){h+=`<div class="sec-h">รายการต้องดำเนินการ (${acts.length})</div>`;acts.forEach(a=>{const sm=SM[a.stk];h+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${a.it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">มี ${a.total} ${a.it.unit} · ขั้นต่ำ ${a.it.min}${a.ne?' · หมด '+xL(a.ne):''}</div></div><span class="chip ${sm.c}">${sm.l}</span></div>`;});}
+  h+=`<div class="sec-h noprint">ออกรายงาน</div><div class="s2 noprint"><button class="btn prim" onclick="dPr(false)">PDF สรุป 1 หน้า</button><button class="btn sec" onclick="dPr(true)">PDF รายละเอียด</button></div><button class="btn sec noprint" style="margin-top:10px" onclick="dCsv()">ดาวน์โหลด Excel (CSV)</button>${cred()}`;
   document.getElementById('scr').innerHTML=h;
-  window.cMon=cMonFn;window.dPr=function(d){bPr(li,s,acts,d)};window.dCsv=function(){csvX(li)};
+  window.cMon=cMonFn;window.dPr=d=>bPr(li,s,acts,d,its);window.dCsv=()=>csvX(li,its);
   drawPie(s);drawTrend(tr,f.c);
 }
 function cMonFn(d){const[y,m]=S.rym.split('-').map(Number);let nm=m+d,ny=y;if(nm>12){nm=1;ny++}if(nm<1){nm=12;ny--}S.rym=ny+'-'+String(nm).padStart(2,'0');rRep()}
-function pieLeg(l,v,c){const tot=ITEMS.length;return`<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};flex:none"></span><span style="flex:1;color:var(--mut)">${l}</span><span style="font-weight:700">${v} (${Math.round(v/tot*100)}%)</span></div>`}
-function cssc(v){const m={'var(--ok)':'#5fd39b','var(--near)':'#f3c75a','var(--below)':'#ef9a5d','var(--bad)':'#f0726b','var(--pend)':'#8aa39a'};return m[v]||v}
-function drawPie(s){const el=document.getElementById('pie');if(!el||!window.Chart)return;
-  const c=new Chart(el,{type:'doughnut',data:{labels:['ปกติ','ใกล้หมดอายุ','ต่ำกว่าเกณฑ์','หมด/หมดอายุ','ยังไม่ตรวจ'],datasets:[{data:[s.ok,s.near,s.below,s.expired+s.out,s.pending],backgroundColor:['#5fd39b','#f3c75a','#ef9a5d','#f0726b','#3a4a42'],borderWidth:0}]},options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:500}}});chartObjs.push(c);}
-function drawTrend(tr,col){const el=document.getElementById('trend');if(!el||!window.Chart)return;
-  const c=new Chart(el,{type:'bar',data:{labels:tr.map(t=>t.label),datasets:[{data:tr.map(t=>t.has?t.val:0),backgroundColor:tr.map(t=>t.val>3?'#f0726b':t.val>0?'#f3c75a':'#5fd39b'),borderRadius:5,maxBarThickness:30}]},options:{plugins:{legend:{display:false},tooltip:{enabled:true}},scales:{y:{beginAtZero:true,ticks:{color:'#8aa39a',precision:0},grid:{color:'#243029'}},x:{ticks:{color:'#8aa39a'},grid:{display:false}}},animation:{duration:500}}});chartObjs.push(c);}
-function rankHTML(){
-  const rk=FARMS.map(f=>{const li=latF(f.id);if(!li)return{f,score:-1,warn:0,ok:0};const s=summ(li);const warn=s.near+s.below+s.expired+s.out;const checked=ITEMS.length-s.pending;const score=checked?Math.round(s.ok/ITEMS.length*100):-1;return{f,score,warn,ok:s.ok};});
-  rk.sort((a,b)=>b.score-a.score);
-  const medal=['#f3c75a','#c8ccd0','#cd8c52'];
-  return rk.map((r,i)=>`<div class="rk">
-    <div class="pos" style="background:${i<3?medal[i]:'var(--card2)'};color:${i<3?'#1a1a1a':'var(--mut)'}">${i+1}</div>
-    <span class="fdot" style="background:${r.f.c};width:10px;height:10px;margin:0"></span>
-    <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">${r.f.sh}</div>
-    <div style="font-size:11px;color:var(--mut)">${r.score>=0?`ปกติ ${r.ok}/${ITEMS.length} · เตือน ${r.warn}`:'ยังไม่เคยตรวจ'}</div></div>
-    <div style="font-size:15px;font-weight:700;color:${r.score>=80?'var(--ok)':r.score>=50?'var(--near)':r.score>=0?'var(--bad)':'var(--hint)'}">${r.score>=0?r.score+'%':'—'}</div></div>`).join('');
-}
-function bPr(li,s,acts,detail){
-  const f=F(S.fid);const today=beD(new Date().toISOString());const pr=document.getElementById('prt');
+function pieLeg(l,v,c,tot){return`<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><span style="width:10px;height:10px;border-radius:3px;background:${c};flex:none"></span><span style="flex:1;color:var(--mut)">${l}</span><span style="font-weight:700">${v} (${Math.round(v/(tot||1)*100)}%)</span></div>`}
+function drawPie(s){const el=document.getElementById('pie');if(!el||!window.Chart)return;const c=new Chart(el,{type:'doughnut',data:{labels:['ปกติ','ใกล้หมด','ต่ำกว่า','หมด/หมดอายุ','ยังไม่ตรวจ'],datasets:[{data:[s.ok,s.near,s.below,s.expired+s.out,s.pending],backgroundColor:['#5fd39b','#f3c75a','#ef9a5d','#f0726b','#3a4a42'],borderWidth:0}]},options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:500}}});_chartObjs.push(c)}
+function drawTrend(tr,col){const el=document.getElementById('trend');if(!el||!window.Chart)return;const c=new Chart(el,{type:'bar',data:{labels:tr.map(t=>t.label),datasets:[{data:tr.map(t=>t.has?t.val:0),backgroundColor:tr.map(t=>t.val>3?'#f0726b':t.val>0?'#f3c75a':'#5fd39b'),borderRadius:5,maxBarThickness:30}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#8aa39a',precision:0},grid:{color:'#243029'}},x:{ticks:{color:'#8aa39a'},grid:{display:false}}},animation:{duration:500}}});_chartObjs.push(c)}
+function rankHTML(){const rk=FARMS.map(f=>{const li=latF(f.id);const its=fItems(f.id);if(!li)return{f,score:-1,warn:0,ok:0};const s=summ(li,f.id);const warn=s.near+s.below+s.expired+s.out;const score=its.length?Math.round(s.ok/its.length*100):-1;return{f,score,warn,ok:s.ok};});rk.sort((a,b)=>b.score-a.score);const md=['#f3c75a','#c8ccd0','#cd8c52'];
+  return rk.map((r,i)=>`<div class="rk"><div class="pos" style="background:${i<3?md[i]:'var(--card2)'};color:${i<3?'#1a1a1a':'var(--mut)'}">${i+1}</div><span class="fdot" style="background:${r.f.c};width:10px;height:10px;margin:0"></span><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">${r.f.sh}</div><div style="font-size:11px;color:var(--mut)">${r.score>=0?`ปกติ ${r.ok} · เตือน ${r.warn}`:'ยังไม่เคยตรวจ'}</div></div><div style="font-size:15px;font-weight:700;color:${r.score>=80?'var(--ok)':r.score>=50?'var(--near)':r.score>=0?'var(--bad)':'var(--hint)'}">${r.score>=0?r.score+'%':'—'}</div></div>`).join('')}
+function bPr(li,s,acts,detail,its){const f=F(S.fid);const today=beD(new Date().toISOString());const pr=document.getElementById('prt');
   let rows=acts.map(a=>`<tr><td class="l">${a.it.name}</td><td>${CN(a.it.cat)}</td><td>${a.total} ${a.it.unit}</td><td>${a.it.min}</td><td>${a.ne?xL(a.ne):'—'}</td><td>${SM[a.stk].l}</td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center">ทุกรายการครบถ้วน</td></tr>';
-  let detR='';if(detail){CATS.forEach(cat=>{detR+=`<tr><td colspan="6" style="background:#eef;font-weight:700">${cat.name}</td></tr>`;ITEMS.filter(i=>i.cat===cat.id).forEach(it=>{const line=li.lines[it.id]||{lots:[],touched:false};detR+=`<tr><td class="l">${it.name}</td><td>${it.unit}</td><td>${it.min}</td><td>${line.touched?lt(line):'—'}</td><td>${it.exp&&nx(line)?xL(nx(line)):'—'}</td><td>${SM[ls(line,it)].l}</td></tr>`;});});}
-  pr.innerHTML=`<div style="font-family:Sarabun,sans-serif;padding:20px;font-size:13px;color:#111;background:#fff">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;padding-bottom:10px;border-bottom:3px solid ${f.c}">
-      <img src="${LSRC}" style="width:50px;height:50px;object-fit:contain">
-      <div><div style="font-size:17px;font-weight:700">${detail?'รายงานตรวจนับสต็อก (รายละเอียด)':'รายงานสรุปสต็อกยาและเวชภัณฑ์'}</div>
-        <div style="color:#555;font-size:12px">${f.name} · ธุรกิจพันธุ์กุ้งทะเล 2 · ${today}</div></div></div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <div style="flex:1;background:#e5f3ec;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#1a7a4e">${s.ok}</div><div>ปกติ</div></div>
-      <div style="flex:1;background:#fbefd5;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#9a6510">${s.near}</div><div>ใกล้หมด</div></div>
-      <div style="flex:1;background:#fce8db;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#a8480f">${s.below}</div><div>ต่ำกว่าเกณฑ์</div></div>
-      <div style="flex:1;background:#fbe5e3;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#b0312a">${s.expired+s.out}</div><div>หมด/หมดอายุ</div></div></div>
-    <div style="font-weight:700;margin-bottom:5px">รายการที่ต้องดำเนินการ</div>
-    <table class="rep" style="margin-bottom:12px;color:#111"><tr style="background:#eef"><th class="l">รายการ</th><th>หมวด</th><th>คงเหลือ</th><th>ขั้นต่ำ</th><th>หมดอายุ</th><th>สถานะ</th></tr>${rows}</table>
-    ${detail?`<div style="font-weight:700;margin-bottom:5px">รายการทั้งหมด</div><table class="rep" style="color:#111"><tr style="background:#eef"><th class="l">รายการ</th><th>หน่วย</th><th>ขั้นต่ำ</th><th>คงเหลือ</th><th>หมดอายุ</th><th>สถานะ</th></tr>${detR}</table>`:''}
-    <div style="margin-top:14px;font-size:12px;color:#777;display:flex;gap:30px"><div>ผู้ตรวจ ............................................</div><div>ผู้รับรอง ............................................</div></div></div>`;
-  pr.style.display='block';window.print();setTimeout(()=>pr.style.display='none',800);
-}
-function csvX(li){const f=F(S.fid);let rows=[['ศูนย์','วันที่ตรวจ','ผู้ตรวจ','หมวด','รายการ','หน่วย','ขั้นต่ำ','คงเหลือ','วันหมดอายุ','สถานะ']];
-  ITEMS.forEach(it=>{const line=li.lines[it.id]||{lots:[],touched:false};rows.push([f.name,beD(li.date),li.inspector,CN(it.cat),it.name,it.unit,it.min,line.touched?lt(line):'',it.exp&&nx(line)?xL(nx(line)):'—',SM[ls(line,it)].l]);});
+  let detR='';if(detail){CATS.forEach(cat=>{detR+=`<tr><td colspan="6" style="background:#e8f4f0;font-weight:700">${cat.name}</td></tr>`;its.filter(i=>i.cat===cat.id).forEach(it=>{const line=(li.lines||{})[it.id]||{};detR+=`<tr><td class="l">${it.name}</td><td>${it.unit}</td><td>${it.min}</td><td>${line.touched?lt(line):'—'}</td><td>${it.exp&&nx(line)?xL(nx(line)):'—'}</td><td>${SM[ls(line,it)].l}</td></tr>`;});});}
+  pr.innerHTML=`<div style="font-family:Sarabun,sans-serif;padding:20px;font-size:13px;color:#111;background:#fff"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;padding-bottom:10px;border-bottom:3px solid ${f.c}"><img src="${LSRC}" style="width:50px;height:50px;object-fit:contain"><div><div style="font-size:17px;font-weight:700">MediTrack · ${detail?'รายละเอียด':'สรุป'}</div><div style="font-size:12px;color:#555">${f.name} · ธุรกิจพันธุ์กุ้งทะเล 2 · ${today}</div></div></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px"><div style="flex:1;background:#e5f3ec;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#1a7a4e">${s.ok}</div><div>ปกติ</div></div><div style="flex:1;background:#fbefd5;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#9a6510">${s.near}</div><div>ใกล้หมด</div></div><div style="flex:1;background:#fce8db;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#a8480f">${s.below}</div><div>ต่ำกว่าเกณฑ์</div></div><div style="flex:1;background:#fbe5e3;border-radius:8px;padding:8px;text-align:center"><div style="font-size:20px;font-weight:800;color:#b0312a">${s.expired+s.out}</div><div>หมด/หมดอายุ</div></div></div>
+    <div style="font-weight:700;margin-bottom:5px">รายการต้องดำเนินการ</div>
+    <table class="rep" style="margin-bottom:12px;color:#111"><tr style="background:#e8f4f0"><th class="l">รายการ</th><th>หมวด</th><th>คงเหลือ</th><th>ขั้นต่ำ</th><th>หมดอายุ</th><th>สถานะ</th></tr>${rows}</table>
+    ${detail?`<div style="font-weight:700;margin-bottom:5px">รายการทั้งหมด (${its.length} รายการ)</div><table class="rep" style="color:#111"><tr style="background:#e8f4f0"><th class="l">รายการ</th><th>หน่วย</th><th>ขั้นต่ำ</th><th>คงเหลือ</th><th>หมดอายุ</th><th>สถานะ</th></tr>${detR}</table>`:''}
+    <div style="margin-top:14px;font-size:12px;color:#777;display:flex;gap:30px"><div>ผู้ตรวจ ................................</div><div>ผู้รับรอง ................................</div></div>
+    <div style="margin-top:10px;font-size:11px;color:#aaa">MediTrack · ${DEV.name} · ${DEV.role}</div></div>`;
+  pr.style.display='block';window.print();setTimeout(()=>pr.style.display='none',800);}
+function csvX(li,its){const f=F(S.fid);let rows=[['ศูนย์','วันที่ตรวจ','ผู้ตรวจ','หมวด','รายการ','หน่วย','ขั้นต่ำ','คงเหลือ','วันหมดอายุ','สถานะ']];
+  its.forEach(it=>{const line=(li.lines||{})[it.id]||{};rows.push([f.name,beD(li.date),li.inspector,CN(it.cat),it.name,it.unit,it.min,line.touched?lt(line):'',it.exp&&nx(line)?xL(nx(line)):'—',SM[ls(line,it)].l]);});
   const csv=rows.map(r=>r.map(c=>{c=String(c);return/[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c}).join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;
-  const d=new Date();a.download='stock_'+f.sh+'_'+(d.getFullYear()+543)+String(d.getMonth()+1).padStart(2,'0')+'.csv';
-  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('ดาวน์โหลด CSV แล้ว');
-}
+  const d=new Date();a.download='MediTrack_'+f.sh+'_'+(d.getFullYear()+543)+String(d.getMonth()+1).padStart(2,'0')+'.csv';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('ดาวน์โหลด CSV แล้ว')}
 
+/* ── HISTORY ── */
 function rHist(){
   const list=INSPS.filter(i=>i.farmId===S.fid).sort((a,b)=>b.ts-a.ts);
-  if(!list.length){document.getElementById('scr').innerHTML='<div class="empty">ยังไม่มีประวัติ</div>';return}
-  document.getElementById('scr').innerHTML=list.map(insp=>{const s=summ(insp);const prob=s.expired+s.out+s.below+s.near;
-    return`<div class="irow" style="cursor:pointer" onclick="S.did='${insp.id}';rHD()"><div><div style="font-size:14.5px;font-weight:700">${beD(insp.date)}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">ผู้ตรวจ: ${insp.inspector}</div></div><span class="chip ${prob?'c-bad':'c-ok'}">${prob?prob+' รายการ':'ครบถ้วน'}</span></div>`;}).join('');
+  if(!list.length){document.getElementById('scr').innerHTML='<div class="empty">ยังไม่มีประวัติ</div>'+cred();return}
+  document.getElementById('scr').innerHTML=list.map(insp=>{const s=summ(insp,S.fid);const prob=s.expired+s.out+s.below+s.near;return`<div class="irow" style="cursor:pointer" onclick="S.did='${insp.id}';rHD()"><div><div style="font-size:14.5px;font-weight:700">${beD(insp.date)}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">ผู้ตรวจ: ${insp.inspector}</div></div><span class="chip ${prob?'c-bad':'c-ok'}">${prob?prob+' รายการ':'ครบถ้วน'}</span></div>`;}).join('')+cred();
 }
 function rHD(){
-  const insp=INSPS.find(i=>i.id===S.did);if(!insp){rHist();return}const s=summ(insp);const f=F(S.fid);
+  const insp=INSPS.find(i=>i.id===S.did);if(!insp){rHist();return}
+  const s=summ(insp,S.fid);const f=F(S.fid);const its=fItems(S.fid);
   let h=`<button class="btn sm sec" style="margin-bottom:12px" onclick="rHist()">‹ กลับรายการ</button>
     <div class="card" style="border-left:5px solid ${f.c}"><div style="font-weight:700;font-size:15px">${beD(insp.date)}</div><div style="font-size:13px;color:var(--mut);margin-top:3px">ผู้ตรวจ: ${insp.inspector}</div>
     <div class="s4" style="margin-top:12px">
@@ -534,69 +559,200 @@ function rHD(){
       <div class="kpi k-near" style="padding:9px 10px"><div class="top" style="color:var(--near)"><span class="n" style="font-size:19px">${s.near}</span></div><div class="l">ใกล้หมด</div></div>
       <div class="kpi k-below" style="padding:9px 10px"><div class="top" style="color:var(--below)"><span class="n" style="font-size:19px">${s.below}</span></div><div class="l">ต่ำกว่า</div></div>
       <div class="kpi k-bad" style="padding:9px 10px"><div class="top" style="color:var(--bad)"><span class="n" style="font-size:19px">${s.expired+s.out}</span></div><div class="l">หมด/หมดอายุ</div></div></div></div>`;
-  CATS.forEach(cat=>{h+=`<div class="sec-h">${cat.name}</div>`;ITEMS.filter(i=>i.cat===cat.id).forEach(it=>{const line=insp.lines[it.id]||{lots:[],touched:false};const sm=SM[ls(line,it)];
-    h+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">${line.touched?lt(line)+' '+it.unit:'—'}${it.exp&&nx(line)?' · หมด '+xL(nx(line)):''}</div></div><span class="chip ${sm.c}">${sm.l}</span></div>`;});});
-  document.getElementById('scr').innerHTML=h;
+  CATS.forEach(cat=>{h+=`<div class="sec-h">${cat.name}</div>`;its.filter(i=>i.cat===cat.id).forEach(it=>{const line=(insp.lines||{})[it.id]||{};const sm=SM[ls(line,it)];h+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">${line.touched?lt(line)+' '+it.unit:'—'}${it.exp&&nx(line)?' · หมด '+xL(nx(line)):''}</div></div><span class="chip ${sm.c}">${sm.l}</span></div>`;});});
+  document.getElementById('scr').innerHTML=h+cred();
 }
 
+/* ── ALERTS ── */
 function rAlerts(){
-  rsTh();
-  const all=buildAlerts();
-  let h=`<div class="seg"><button class="on" id="al-all" onclick="alF('all')">ทั้งหมด (${all.length})</button><button id="al-act" onclick="alF('act')">ต้องดำเนินการ (${all.filter(a=>a.sev<=1).length})</button></div><div id="alr"></div>`;
-  document.getElementById('scr').innerHTML=h;
-  S._alMode='all';
-  window.alF=function(m){S._alMode=m;document.getElementById('al-all').classList.toggle('on',m==='all');document.getElementById('al-act').classList.toggle('on',m==='act');document.getElementById('alr').innerHTML=alrHTML(all);};
-  document.getElementById('alr').innerHTML=alrHTML(all);
+  rsTh();const all=buildAlerts();
+  let h=`<div class="seg"><button class="on" id="al-all" onclick="alF('all')">ทั้งหมด (${all.length})</button><button id="al-act" onclick="alF('act')">ต้องดำเนินการ (${all.filter(a=>a.sev<=1).length})</button></div><div id="alr"></div>${cred()}`;
+  document.getElementById('scr').innerHTML=h;S._alMode='all';
+  window.alF=m=>{S._alMode=m;document.getElementById('al-all').classList.toggle('on',m==='all');document.getElementById('al-act').classList.toggle('on',m==='act');document.getElementById('alr').innerHTML=alrH(all);};
+  document.getElementById('alr').innerHTML=alrH(all);
 }
-function alrHTML(all){
-  let list=S._alMode==='act'?all.filter(a=>a.sev<=1):all;
-  if(!list.length)return`<div class="empty">ไม่มีรายการแจ้งเตือน ✓</div>`;
-  return list.map(a=>`<div class="irow" style="cursor:pointer" onclick="go('farm',{fid:${a.fid}})">
-    <div style="display:flex;gap:10px;min-width:0"><span style="font-size:18px">${a.ic}</span>
-    <div style="min-width:0"><div style="font-size:14px;font-weight:700">${a.title}</div>
-    <div style="font-size:12px;color:${a.col};margin-top:1px">${a.desc}</div>
-    <div style="font-size:11px;color:var(--hint);margin-top:2px"><span class="fdot" style="background:${a.fc};width:8px;height:8px"></span>${a.farm}</div></div></div>
-    <span class="chip" style="background:${a.col};color:#0c1410;opacity:.92">${a.sub}</span></div>`).join('');
-}
+function alrH(all){const list=S._alMode==='act'?all.filter(a=>a.sev<=1):all;if(!list.length)return`<div class="empty">ไม่มีรายการแจ้งเตือน ✓</div>`;
+  return list.map(a=>`<div class="irow" style="cursor:pointer" onclick="go('farm',{fid:${a.fid}})"><div style="display:flex;gap:10px;min-width:0"><span style="font-size:18px">${a.ic}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700">${a.title}</div><div style="font-size:12px;color:${a.col};margin-top:1px">${a.desc}</div><div style="font-size:11px;color:var(--hint);margin-top:2px"><span class="fdot" style="background:${a.fc};width:8px;height:8px"></span>${a.farm}</div></div></div><span class="chip" style="background:${a.col};color:#0c1410">${a.sub}</span></div>`).join('')}
 
+/* ── FARM SETTINGS (เพิ่ม/ซ่อน/ลบรายการ + ผู้รับผิดชอบ) ── */
 function rFSett(){
-  const f=F(S.fid);
-  let h=`<div class="card" style="border-left:5px solid ${f.c}"><div style="font-size:14px;font-weight:700;margin-bottom:8px">ผู้รับผิดชอบประจำศูนย์</div>
-    <input type="text" id="ri" placeholder="ชื่อ-สกุล" value="${(f.resp||'').replace(/"/g,'&quot;')}">
-    <button class="btn prim" style="margin-top:10px" onclick="svR()">บันทึก</button></div>
-    <div class="sec-h">จำนวนขั้นต่ำต่อรายการ</div>`;
-  CATS.forEach(cat=>{h+=`<div class="sec-h" style="padding-top:4px;font-size:11.5px">${cat.name}</div>`;
-    ITEMS.filter(i=>i.cat===cat.id).forEach(it=>{h+=`<div class="card" style="padding:10px 13px;margin-bottom:7px"><div class="row"><div><div style="font-size:14px;font-weight:700">${it.name}</div><div style="font-size:12px;color:var(--hint)">${it.unit}</div></div>
-      <div class="stepper"><button onclick="cMin('${it.id}',-1)">−</button><span class="qty" id="mn${it.id}" style="font-size:16px">${it.min}</span><button onclick="cMin('${it.id}',1)">＋</button></div></div></div>`;});});
-  h+=`<button class="btn sec" style="margin-top:6px" onclick="rsMin()">คืนค่าเริ่มต้น</button>`;
-  document.getElementById('scr').innerHTML=h;
-  window.svR=async function(){const v=document.getElementById('ri').value.trim();F(S.fid).resp=v;await st_set('resp_'+S.fid,v);toast('บันทึกแล้ว')};
-}
-async function cMin(id,d){const it=ITEMS.find(x=>x.id===id);it.min=Math.max(0,(it.min||0)+d);const el=document.getElementById('mn'+id);if(el)el.textContent=it.min;await svi()}
-async function rsMin(){if(!confirm('คืนค่าขั้นต่ำทั้งหมดเป็นค่าเริ่มต้น?'))return;ITEMS.forEach(it=>{const d=DEF.find(x=>x.id===it.id);it.min=d.min});await svi();rFSett();toast('คืนค่าแล้ว')}
+  const f=F(S.fid);const cfg=FC(S.fid);
+  let h=`<div class="card" style="border-left:5px solid ${f.c}">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">ผู้รับผิดชอบประจำศูนย์</div>
+    <select id="respSel" style="margin-bottom:10px">${INSPECTORS.map(n=>`<option${n===cfg.resp?' selected':''}>${n}</option>`).join('')}</select>
+    <button class="btn prim" onclick="svResp()">บันทึกผู้รับผิดชอบ</button></div>
+  <div class="sec-h">จัดการรายการยาและเวชภัณฑ์</div>
+  <div class="card" style="padding:12px 14px;margin-bottom:11px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px">เพิ่มรายการใหม่</div>
+    <label class="fld">ชื่อรายการ</label>
+    <input type="text" id="nname" placeholder="เช่น Calcium Hypochlorite" style="margin-bottom:8px">
+    <div class="s2" style="gap:8px;margin-bottom:8px">
+      <div><label class="fld">หมวด</label>
+        <select id="ncat"><option value="equip">อุปกรณ์</option><option value="consum">วัสดุสิ้นเปลือง</option><option value="external" selected>ยาภายนอก</option><option value="oral">ยารับประทาน</option></select></div>
+      <div><label class="fld">หน่วย</label><input type="text" id="nunit" placeholder="ขวด / หลอด / แผง"></div>
+    </div>
+    <div class="s2" style="gap:8px;margin-bottom:10px">
+      <div><label class="fld">ขั้นต่ำ</label><input type="text" id="nmin" placeholder="1" style="width:100%"></div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end"><label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);cursor:pointer"><input type="checkbox" id="nexp" checked> มีวันหมดอายุ</label></div>
+    </div>
+    <button class="btn prim" onclick="addItem()">＋ เพิ่มรายการนี้</button></div>`;
 
+  h+=`<div class="sec-h">รายการทั้งหมด (${cfg.items.length} รายการ)</div>`;
+  CATS.forEach(cat=>{const its=cfg.items.filter(i=>i.cat===cat.id);if(!its.length)return;
+    h+=`<div class="sec-h" style="padding-top:4px;font-size:11.5px;color:var(--fc)">${cat.name}</div>`;
+    its.forEach(it=>{const isStd=STD_ITEMS.some(s=>s.id===it.id);
+      h+=`<div class="card" style="padding:10px 13px;margin-bottom:7px;${it.hidden?'opacity:.45':''}">
+        <div class="row" style="margin-bottom:6px">
+          <div style="min-width:0"><div style="font-size:14px;font-weight:700">${it.name}${isStd?'':' <span style="font-size:10px;color:var(--fc);background:var(--ok-bg);padding:1px 6px;border-radius:5px">เพิ่มเอง</span>'}</div>
+          <div style="font-size:12px;color:var(--hint)">${it.unit} · ขั้นต่ำ <span id="mv${it.id}">${it.min}</span></div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn sm sec" style="padding:6px 10px" onclick="toggleHide('${it.id}')">${it.hidden?'แสดง':'ซ่อน'}</button>
+            ${!isStd?`<button class="btn sm" style="padding:6px 10px;background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-bd)" onclick="delItem('${it.id}')">ลบ</button>`:''}
+          </div></div>
+        <div class="row" style="margin-top:2px">
+          <span style="font-size:12px;color:var(--mut)">ขั้นต่ำ</span>
+          <div class="stepper"><button onclick="chMin('${it.id}',-1)">−</button><span class="qty" id="mn${it.id}" style="font-size:16px">${it.min}</span><button onclick="chMin('${it.id}',1)">＋</button></div>
+        </div></div>`;});});
+  h+=`<button class="btn sec" style="margin-top:6px" onclick="rsMin()">คืนค่าขั้นต่ำเป็นค่ามาตรฐาน</button>${cred()}`;
+  document.getElementById('scr').innerHTML=h;
+  window.svResp=async()=>{cfg.resp=document.getElementById('respSel').value;await saveCfg();toast('บันทึกผู้รับผิดชอบแล้ว')};
+  window.addItem=async()=>{
+    const name=document.getElementById('nname').value.trim();
+    if(!name){toast('กรุณาใส่ชื่อรายการ');return}
+    const it={id:'c'+Date.now(),name,cat:document.getElementById('ncat').value,unit:document.getElementById('nunit').value.trim()||'ชิ้น',min:parseInt(document.getElementById('nmin').value)||1,exp:document.getElementById('nexp').checked,hidden:false};
+    cfg.items.push(it);await saveCfg();toast('เพิ่ม "'+name+'" แล้ว');rFSett();};
+  window.toggleHide=async id=>{const it=cfg.items.find(x=>x.id===id);if(it){it.hidden=!it.hidden;await saveCfg();rFSett();}};
+  window.delItem=async id=>{if(!confirm('ลบรายการนี้ออกจากศูนย์นี้?'))return;cfg.items=cfg.items.filter(x=>x.id!==id);await saveCfg();toast('ลบแล้ว');rFSett();};
+}
+async function chMin(id,d){const it=FC(S.fid).items.find(x=>x.id===id);if(!it)return;it.min=Math.max(0,(it.min||0)+d);const el=document.getElementById('mn'+id);if(el)el.textContent=it.min;await saveCfg()}
+async function rsMin(){if(!confirm('คืนค่าขั้นต่ำทั้งหมดเป็นค่ามาตรฐาน?'))return;const cfg=FC(S.fid);cfg.items.forEach(it=>{const s=STD_ITEMS.find(x=>x.id===it.id);if(s)it.min=s.min});await saveCfg();rFSett();toast('คืนค่าแล้ว')}
+
+/* ── GLOBAL SETTINGS ── */
 function rSett(){
   rsTh();
-  document.getElementById('scr').innerHTML=`<div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:10px">เชื่อมต่อ Google Sheet</div>
+  document.getElementById('scr').innerHTML=`<div class="card">
+    <div style="font-size:15px;font-weight:700;margin-bottom:10px">เชื่อมต่อ Google Sheet</div>
     <div style="font-size:13px;color:var(--mut);margin-bottom:10px">Sheet ID: <code style="background:var(--card2);padding:2px 6px;border-radius:5px;font-size:11px">${SID}</code></div>
     <label class="fld">ลิงก์ Web App</label>
     <input type="text" id="gu" value="${gsUrl}" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:10px">
     <div class="s2" style="gap:8px"><button class="btn prim sm" style="flex:1" onclick="svGs()">บันทึก</button><button class="btn sec sm" style="flex:1" onclick="tstGs()">ทดสอบ</button></div>
     <div style="font-size:12px;color:${gsUrl?'var(--ok)':'var(--hint)'};margin-top:8px">${gsUrl?'● เชื่อมต่อแล้ว':'○ ยังไม่ได้ตั้งค่า'}</div></div>
-    <div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:5px">🔔 แจ้งเตือน Telegram</div>
-    <div style="font-size:13px;color:var(--mut);line-height:1.7">ส่วนนี้จะเพิ่มในขั้นถัดไป — ตั้งเตือนล่วงหน้าก่อนหมดอายุ และศูนย์ที่ค้างตรวจ ผ่าน Telegram อัตโนมัติ</div></div>
-    <div class="card"><div style="font-size:15px;font-weight:700;margin-bottom:5px">เกี่ยวกับแอป</div>
-    <div style="font-size:13px;color:var(--mut);line-height:1.8">ตรวจนับสต็อกยาและเวชภัณฑ์<br>ธุรกิจพันธุ์กุ้งทะเล 2 · CPF<br>${ITEMS.length} รายการ · ${INSPS.length} บันทึก · โหมดมืด</div></div>`;
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;margin-bottom:6px">🔔 Telegram (เร็วๆ นี้)</div>
+    <div style="font-size:13px;color:var(--mut)">ระบบแจ้งเตือนอัตโนมัติผ่าน Telegram กำลังพัฒนา</div></div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;margin-bottom:5px">เกี่ยวกับ MediTrack</div>
+    <div style="font-size:13px;color:var(--mut);line-height:1.9">ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2<br>5 ศูนย์วิจัย · ${INSPS.length} บันทึก · Dark Mode</div></div>
+  ${cred()}`;
 }
-async function svGs(){gsUrl=(document.getElementById('gu').value||'').trim();await st_set('gsheet_url',gsUrl);toast('บันทึกลิงก์แล้ว')}
+async function svGs(){gsUrl=(document.getElementById('gu').value||'').trim();await ss('gsheet_url',gsUrl);toast('บันทึกลิงก์แล้ว')}
 async function tstGs(){const u=(document.getElementById('gu').value||'').trim();if(!u){toast('ใส่ลิงก์ก่อน');return}
-  const p={sheetId:SID,farm:'(ทดสอบ)',date:beD(new Date().toISOString()),inspector:'ระบบ',ts:new Date().toISOString(),rows:[{category:'ทดสอบ',item:'ทดสอบการเชื่อมต่อ',unit:'-',min:0,qty:1,exp:'-',status:'ทดสอบ'}]};
+  const p={sheetId:SID,farm:'(ทดสอบ)',date:beD(new Date().toISOString()),inspector:'ระบบ',ts:new Date().toISOString(),rows:[{category:'ทดสอบ',item:'MediTrack Connection Test',unit:'-',min:0,qty:1,exp:'-',status:'ทดสอบ'}]};
   try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});toast('ส่งทดสอบแล้ว — เปิดชีตตรวจสอบ')}catch(e){toast('ส่งไม่สำเร็จ')}}
-async function pSh(rec){if(!gsUrl)return;
-  const p={sheetId:SID,farm:F(rec.farmId).name,date:beD(rec.date),inspector:rec.inspector,ts:new Date(rec.ts).toISOString(),rows:ITEMS.map(it=>{const line=rec.lines[it.id]||{lots:[],touched:false};const stk=ls(line,it);return{category:CN(it.cat),item:it.name,unit:it.unit,min:it.min,qty:line.touched?lt(line):'',exp:it.exp&&nx(line)?xL(nx(line)):'—',status:SM[stk].l};})};
-  try{await fetch(gsUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});toast('ส่งข้อมูลเข้า Google Sheet แล้ว ✓')}catch(e){}}
+async function pSh(rec){if(!gsUrl)return;const its=fItems(rec.farmId);
+  const p={sheetId:SID,farm:F(rec.farmId).name,date:beD(rec.date),inspector:rec.inspector,ts:new Date(rec.ts).toISOString(),rows:its.map(it=>{const line=(rec.lines||{})[it.id]||{};const stk=ls(line,it);return{category:CN(it.cat),item:it.name,unit:it.unit,min:it.min,qty:line.touched?lt(line):'',exp:it.exp&&nx(line)?xL(nx(line)):'—',status:SM[stk].l};})};
+  try{await fetch(gsUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});toast('ส่งข้อมูลเข้า Google Sheet ✓')}catch(e){}}
 
 boot();
+
+/* ═══ FARM_ITEMS SYSTEM ═══ */
+const FARM_ITEMS={};
+function FI(fid){if(!FARM_ITEMS[fid])FARM_ITEMS[fid]=DEF.map(x=>({...x}));return FARM_ITEMS[fid]}
+function activeItems(fid){return FI(fid).filter(x=>!x.hidden)}
+async function saveFI(fid){await st_set('fi_'+fid,JSON.stringify(FARM_ITEMS[fid]))}
+async function loadFI(fid){const d=await sg('fi_'+fid);if(d){try{FARM_ITEMS[fid]=JSON.parse(d);return}catch(e){}}FARM_ITEMS[fid]=DEF.map(x=>({...x}))}
+const INSPECTORS_LIST=['นายอธิศ ฉิมนันท์','นายกิตติ สุขมา'];
+function footer(){return`<div class="footer-dev">MediTrack · MSBRC-2<br><span style="color:var(--mut);font-weight:600">Atit Chimnan</span> · System Developer &amp; Designer</div>`}
+async function togItem(id){const it=FI(S.fid).find(x=>x.id===id);if(!it)return;it.hidden=!it.hidden;await saveFI(S.fid);rFSett();toast(it.hidden?'ซ่อนรายการแล้ว':'เปิดใช้รายการแล้ว')}
+async function cMinF(id,d){const it=FI(S.fid).find(x=>x.id===id);if(!it)return;it.min=Math.max(0,(it.min||0)+d);const el=document.getElementById('mnq'+id);if(el)el.textContent=it.min;await saveFI(S.fid)}
+async function resetFarmItems(){if(!confirm('คืนรายการเป็น 28 รายการมาตรฐาน?\nรายการที่เพิ่มเองจะหายไป'))return;FARM_ITEMS[S.fid]=DEF.map(x=>({...x}));await saveFI(S.fid);rFSett();toast('คืนค่าแล้ว')}
+function addItemModal(){
+  const catOpts=CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const m=document.getElementById('modalEl');
+  m.innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <h3>＋ เพิ่มรายการใหม่</h3>
+    <label class="fld">ชื่อรายการ *</label><input type="text" id="ni" placeholder="เช่น ยาฟ้าทะลายโจร" style="margin-bottom:10px">
+    <label class="fld">หมวด</label><select id="nc" style="margin-bottom:10px">${catOpts}</select>
+    <div class="s2" style="gap:10px;margin-bottom:12px">
+      <div><label class="fld">หน่วย *</label><input type="text" id="nu" placeholder="เช่น เม็ด"></div>
+      <div><label class="fld">ขั้นต่ำ</label><input type="text" id="nm" placeholder="1"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn sec sm" style="flex:1" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn prim sm" style="flex:1" onclick="saveNewItem()">บันทึก</button>
+    </div></div></div>`;
+  m.style.display='block';
+}
+function closeModal(){document.getElementById('modalEl').style.display='none';document.getElementById('modalEl').innerHTML=''}
+async function saveNewItem(){
+  const name=(document.getElementById('ni').value||'').trim();
+  const cat=document.getElementById('nc').value;
+  const unit=(document.getElementById('nu').value||'').trim();
+  const min=parseInt(document.getElementById('nm').value)||1;
+  if(!name){toast('กรุณาระบุชื่อรายการ');return}
+  if(!unit){toast('กรุณาระบุหน่วย');return}
+  const id='c'+Date.now();
+  FI(S.fid).push({id,name,cat,unit,min,exp:true,hidden:false,custom:true});
+  await saveFI(S.fid);closeModal();rFSett();toast('เพิ่ม "'+name+'" แล้ว');}
+
+/* ═══ OVERRIDE rFSett with farm-items management ═══ */
+rFSett=function(){
+  const f=F(S.fid);const fitems=FI(S.fid);
+  const rOpts=INSPECTORS_LIST.map(n=>`<option value="${n}" ${(f.resp||'')==n?'selected':''}>${n}</option>`).join('');
+  let h=`<div class="card" style="border-left:5px solid ${f.c}">
+    <label class="fld">ผู้รับผิดชอบประจำศูนย์</label>
+    <select id="ri" style="margin-bottom:10px"><option value="">-- เลือก --</option>${rOpts}</select>
+    <button class="btn prim sm" onclick="(async()=>{const v=document.getElementById('ri').value;F(S.fid).resp=v;await st_set('resp_'+S.fid,v);toast('บันทึกแล้ว')})()">บันทึก</button></div>
+  <div class="row" style="padding:6px 0 8px;align-items:center">
+    <span style="font-size:12.5px;font-weight:700;color:var(--mut)">รายการยา (${fitems.filter(x=>!x.hidden).length}/${fitems.length})</span>
+    <button class="btn sm sec" onclick="addItemModal()">＋ เพิ่มรายการ</button></div>`;
+  CATS.forEach(cat=>{const its=fitems.filter(i=>i.cat===cat.id);if(!its.length)return;
+    h+=`<div style="font-size:11.5px;font-weight:700;color:var(--mut);padding:8px 2px 5px">${cat.name}</div>`;
+    its.forEach(it=>{h+=`<div class="card" style="padding:10px 13px;margin-bottom:7px;${it.hidden?'opacity:.42':''}">
+      <div class="row"><div style="min-width:0">
+        <div style="font-size:14px;font-weight:700">${it.name}${it.custom?'<span style="font-size:10px;color:var(--fc);margin-left:6px">เพิ่มเอง</span>':''}</div>
+        <div style="font-size:11.5px;color:var(--hint)">${it.unit} · ขั้นต่ำ <span id="mnq${it.id}">${it.min}</span></div></div>
+        <div style="display:flex;align-items:center;gap:8px;flex:none">
+          <div class="stepper" style="gap:5px">
+            <button onclick="cMinF('${it.id}',-1)" ${it.hidden?'disabled':''}>−</button>
+            <span class="qty" style="font-size:15px;min-width:22px">${it.min}</span>
+            <button onclick="cMinF('${it.id}',1)" ${it.hidden?'disabled':''}>＋</button></div>
+          <button class="tgl ${it.hidden?'off':'on'}" onclick="togItem('${it.id}')"></button>
+        </div></div></div>`;});});
+  h+=`<div style="font-size:12px;font-weight:700;color:var(--bad);padding:10px 2px 6px">โซนอันตราย</div>
+    <button class="btn danger" onclick="resetFarmItems()">คืนรายการเป็น 28 มาตรฐาน</button>`;
+  document.getElementById('scr').innerHTML=h+footer();
+};
+
+/* ═══ OVERRIDE rInsp to use dropdown inspector ═══ */
+const _origRInsp=rInsp;
+rInsp=function(){
+  if(!S.draft)S.draft=nDraft();S.q='';
+  const f=F(S.fid);
+  const inspOpts=INSPECTORS_LIST.map(n=>`<option value="${n}" ${S.insp===n?'selected':''}>${n}</option>`).join('');
+  let h=`<div class="card" style="border-left:5px solid ${f.c}">
+    <label class="fld">ผู้ตรวจ</label>
+    <select id="iname" onchange="S.insp=this.value" style="margin-bottom:10px">${inspOpts}</select>
+    <div class="row"><span style="font-size:13px;color:var(--mut)">${beD(new Date().toISOString())}</span>
+    <button class="btn sm sec" onclick="cpL()">คัดลอกครั้งก่อน</button></div></div>
+  <div class="card" style="padding:12px 14px">
+    <div class="row" style="margin-bottom:3px"><span style="font-size:13px;font-weight:700">ความคืบหน้า</span><span style="font-size:13px;font-weight:700;color:var(--fc)" id="ppct">0%</span></div>
+    <div style="font-size:12px;color:var(--mut)" id="pt">0 / ${ITEMS.length} รายการ</div>
+    <div class="prog"><i id="pb" style="width:0%"></i></div></div>
+  <div class="sw-wrap"><span class="si">🔍</span><input type="search" id="srch" placeholder="ค้นหารายการยา / เวชภัณฑ์" oninput="filtI(this.value)"></div>
+  <div id="ilist">${inspList('')}</div>
+  <button class="btn prim" style="margin-top:8px" onclick="svI()">บันทึกการตรวจนับ</button>${footer()}`;
+  document.getElementById('scr').innerHTML=h;upP();
+};
+
+/* ═══ boot override: load farm items first ═══ */
+const _origBoot=boot;
+boot=async function(){
+  for(const f of FARMS)await loadFI(f.id);
+  await _origBoot();
+};
+
 </script>
+<div id="modalEl" style="display:none"></div>
 </body>
 </html>
