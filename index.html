@@ -231,6 +231,16 @@ async function boot(){
   if(ci){try{FARM_CFG=JSON.parse(ci)||{}}catch(e){FARM_CFG={}}}
   // init ฟาร์มที่ยังไม่มี config
   FARMS.forEach(f=>{if(!FARM_CFG[f.id])FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]}});
+  for(const f of FARMS){
+    if(!FARM_CFG[f.id]._fiMigrated){
+      const oldItems=await sg('fi_'+f.id);
+      if(oldItems){try{const parsed=JSON.parse(oldItems);if(Array.isArray(parsed)&&parsed.length)FARM_CFG[f.id].items=parsed}catch(e){}}
+      const oldResp=await sg('resp_'+f.id);
+      if(oldResp&&!FARM_CFG[f.id].resp)FARM_CFG[f.id].resp=oldResp;
+      FARM_CFG[f.id]._fiMigrated=true;
+    }
+  }
+  await saveCfg();
   const ins=await sg('insp_v3');if(ins){try{INSPS=JSON.parse(ins)||[]}catch(e){INSPS=[]}}
   gsUrl=(await sg('gsheet_url'))||GSD;
   const n=new Date();S.rym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
@@ -465,7 +475,10 @@ async function svI(){
   FC(S.fid).inspector=insp;
   const rec={id:'i'+Date.now(),farmId:S.fid,date:new Date().toISOString(),ts:Date.now(),inspector:insp,lines:JSON.parse(JSON.stringify(S.draft.lines))};
   INSPS.push(rec);await saveIns();await saveCfg();
-  S.draft=null;pSh(rec);toast('บันทึกการตรวจเรียบร้อย ✓');go('farm',{fid:S.fid});
+  S.draft=null;
+  const sent=await pSh(rec);
+  toast(sent?'บันทึกและส่งเข้า Google Sheet แล้ว ✓':'บันทึกในเครื่องแล้ว แต่ส่งเข้า Google Sheet ไม่สำเร็จ');
+  go('farm',{fid:S.fid});
 }
 
 /* ── OVERVIEW ── */
@@ -649,108 +662,11 @@ async function svGs(){gsUrl=(document.getElementById('gu').value||'').trim();awa
 async function tstGs(){const u=(document.getElementById('gu').value||'').trim();if(!u){toast('ใส่ลิงก์ก่อน');return}
   const p={sheetId:SID,farm:'(ทดสอบ)',date:beD(new Date().toISOString()),inspector:'ระบบ',ts:new Date().toISOString(),rows:[{category:'ทดสอบ',item:'MediTrack Connection Test',unit:'-',min:0,qty:1,exp:'-',status:'ทดสอบ'}]};
   try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});toast('ส่งทดสอบแล้ว — เปิดชีตตรวจสอบ')}catch(e){toast('ส่งไม่สำเร็จ')}}
-async function pSh(rec){if(!gsUrl)return;const its=fItems(rec.farmId);
+async function pSh(rec){if(!gsUrl)return false;const its=fItems(rec.farmId);
   const p={sheetId:SID,farm:F(rec.farmId).name,date:beD(rec.date),inspector:rec.inspector,ts:new Date(rec.ts).toISOString(),rows:its.map(it=>{const line=(rec.lines||{})[it.id]||{};const stk=ls(line,it);return{category:CN(it.cat),item:it.name,unit:it.unit,min:it.min,qty:line.touched?lt(line):'',exp:it.exp&&nx(line)?xL(nx(line)):'—',status:SM[stk].l};})};
-  try{await fetch(gsUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});toast('ส่งข้อมูลเข้า Google Sheet ✓')}catch(e){}}
+  try{await fetch(gsUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});return true}catch(e){return false}}
 
 boot();
-
-/* ═══ FARM_ITEMS SYSTEM ═══ */
-const FARM_ITEMS={};
-function FI(fid){if(!FARM_ITEMS[fid])FARM_ITEMS[fid]=DEF.map(x=>({...x}));return FARM_ITEMS[fid]}
-function activeItems(fid){return FI(fid).filter(x=>!x.hidden)}
-async function saveFI(fid){await st_set('fi_'+fid,JSON.stringify(FARM_ITEMS[fid]))}
-async function loadFI(fid){const d=await sg('fi_'+fid);if(d){try{FARM_ITEMS[fid]=JSON.parse(d);return}catch(e){}}FARM_ITEMS[fid]=DEF.map(x=>({...x}))}
-const INSPECTORS_LIST=['นายอธิศ ฉิมนันท์','นายกิตติ สุขมา'];
-function footer(){return`<div class="footer-dev">MediTrack · MSBRC-2<br><span style="color:var(--mut);font-weight:600">Atit Chimnan</span> · System Developer &amp; Designer</div>`}
-async function togItem(id){const it=FI(S.fid).find(x=>x.id===id);if(!it)return;it.hidden=!it.hidden;await saveFI(S.fid);rFSett();toast(it.hidden?'ซ่อนรายการแล้ว':'เปิดใช้รายการแล้ว')}
-async function cMinF(id,d){const it=FI(S.fid).find(x=>x.id===id);if(!it)return;it.min=Math.max(0,(it.min||0)+d);const el=document.getElementById('mnq'+id);if(el)el.textContent=it.min;await saveFI(S.fid)}
-async function resetFarmItems(){if(!confirm('คืนรายการเป็น 28 รายการมาตรฐาน?\nรายการที่เพิ่มเองจะหายไป'))return;FARM_ITEMS[S.fid]=DEF.map(x=>({...x}));await saveFI(S.fid);rFSett();toast('คืนค่าแล้ว')}
-function addItemModal(){
-  const catOpts=CATS.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  const m=document.getElementById('modalEl');
-  m.innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
-    <h3>＋ เพิ่มรายการใหม่</h3>
-    <label class="fld">ชื่อรายการ *</label><input type="text" id="ni" placeholder="เช่น ยาฟ้าทะลายโจร" style="margin-bottom:10px">
-    <label class="fld">หมวด</label><select id="nc" style="margin-bottom:10px">${catOpts}</select>
-    <div class="s2" style="gap:10px;margin-bottom:12px">
-      <div><label class="fld">หน่วย *</label><input type="text" id="nu" placeholder="เช่น เม็ด"></div>
-      <div><label class="fld">ขั้นต่ำ</label><input type="text" id="nm" placeholder="1"></div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn sec sm" style="flex:1" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn prim sm" style="flex:1" onclick="saveNewItem()">บันทึก</button>
-    </div></div></div>`;
-  m.style.display='block';
-}
-function closeModal(){document.getElementById('modalEl').style.display='none';document.getElementById('modalEl').innerHTML=''}
-async function saveNewItem(){
-  const name=(document.getElementById('ni').value||'').trim();
-  const cat=document.getElementById('nc').value;
-  const unit=(document.getElementById('nu').value||'').trim();
-  const min=parseInt(document.getElementById('nm').value)||1;
-  if(!name){toast('กรุณาระบุชื่อรายการ');return}
-  if(!unit){toast('กรุณาระบุหน่วย');return}
-  const id='c'+Date.now();
-  FI(S.fid).push({id,name,cat,unit,min,exp:true,hidden:false,custom:true});
-  await saveFI(S.fid);closeModal();rFSett();toast('เพิ่ม "'+name+'" แล้ว');}
-
-/* ═══ OVERRIDE rFSett with farm-items management ═══ */
-rFSett=function(){
-  const f=F(S.fid);const fitems=FI(S.fid);
-  const rOpts=INSPECTORS_LIST.map(n=>`<option value="${n}" ${(f.resp||'')==n?'selected':''}>${n}</option>`).join('');
-  let h=`<div class="card" style="border-left:5px solid ${f.c}">
-    <label class="fld">ผู้รับผิดชอบประจำศูนย์</label>
-    <select id="ri" style="margin-bottom:10px"><option value="">-- เลือก --</option>${rOpts}</select>
-    <button class="btn prim sm" onclick="(async()=>{const v=document.getElementById('ri').value;F(S.fid).resp=v;await st_set('resp_'+S.fid,v);toast('บันทึกแล้ว')})()">บันทึก</button></div>
-  <div class="row" style="padding:6px 0 8px;align-items:center">
-    <span style="font-size:12.5px;font-weight:700;color:var(--mut)">รายการยา (${fitems.filter(x=>!x.hidden).length}/${fitems.length})</span>
-    <button class="btn sm sec" onclick="addItemModal()">＋ เพิ่มรายการ</button></div>`;
-  CATS.forEach(cat=>{const its=fitems.filter(i=>i.cat===cat.id);if(!its.length)return;
-    h+=`<div style="font-size:11.5px;font-weight:700;color:var(--mut);padding:8px 2px 5px">${cat.name}</div>`;
-    its.forEach(it=>{h+=`<div class="card" style="padding:10px 13px;margin-bottom:7px;${it.hidden?'opacity:.42':''}">
-      <div class="row"><div style="min-width:0">
-        <div style="font-size:14px;font-weight:700">${it.name}${it.custom?'<span style="font-size:10px;color:var(--fc);margin-left:6px">เพิ่มเอง</span>':''}</div>
-        <div style="font-size:11.5px;color:var(--hint)">${it.unit} · ขั้นต่ำ <span id="mnq${it.id}">${it.min}</span></div></div>
-        <div style="display:flex;align-items:center;gap:8px;flex:none">
-          <div class="stepper" style="gap:5px">
-            <button onclick="cMinF('${it.id}',-1)" ${it.hidden?'disabled':''}>−</button>
-            <span class="qty" style="font-size:15px;min-width:22px">${it.min}</span>
-            <button onclick="cMinF('${it.id}',1)" ${it.hidden?'disabled':''}>＋</button></div>
-          <button class="tgl ${it.hidden?'off':'on'}" onclick="togItem('${it.id}')"></button>
-        </div></div></div>`;});});
-  h+=`<div style="font-size:12px;font-weight:700;color:var(--bad);padding:10px 2px 6px">โซนอันตราย</div>
-    <button class="btn danger" onclick="resetFarmItems()">คืนรายการเป็น 28 มาตรฐาน</button>`;
-  document.getElementById('scr').innerHTML=h+footer();
-};
-
-/* ═══ OVERRIDE rInsp to use dropdown inspector ═══ */
-const _origRInsp=rInsp;
-rInsp=function(){
-  if(!S.draft)S.draft=nDraft();S.q='';
-  const f=F(S.fid);
-  const inspOpts=INSPECTORS_LIST.map(n=>`<option value="${n}" ${S.insp===n?'selected':''}>${n}</option>`).join('');
-  let h=`<div class="card" style="border-left:5px solid ${f.c}">
-    <label class="fld">ผู้ตรวจ</label>
-    <select id="iname" onchange="S.insp=this.value" style="margin-bottom:10px">${inspOpts}</select>
-    <div class="row"><span style="font-size:13px;color:var(--mut)">${beD(new Date().toISOString())}</span>
-    <button class="btn sm sec" onclick="cpL()">คัดลอกครั้งก่อน</button></div></div>
-  <div class="card" style="padding:12px 14px">
-    <div class="row" style="margin-bottom:3px"><span style="font-size:13px;font-weight:700">ความคืบหน้า</span><span style="font-size:13px;font-weight:700;color:var(--fc)" id="ppct">0%</span></div>
-    <div style="font-size:12px;color:var(--mut)" id="pt">0 / ${ITEMS.length} รายการ</div>
-    <div class="prog"><i id="pb" style="width:0%"></i></div></div>
-  <div class="sw-wrap"><span class="si">🔍</span><input type="search" id="srch" placeholder="ค้นหารายการยา / เวชภัณฑ์" oninput="filtI(this.value)"></div>
-  <div id="ilist">${inspList('')}</div>
-  <button class="btn prim" style="margin-top:8px" onclick="svI()">บันทึกการตรวจนับ</button>${footer()}`;
-  document.getElementById('scr').innerHTML=h;upP();
-};
-
-/* ═══ boot override: load farm items first ═══ */
-const _origBoot=boot;
-boot=async function(){
-  for(const f of FARMS)await loadFI(f.id);
-  await _origBoot();
-};
 
 </script>
 <div id="modalEl" style="display:none"></div>
