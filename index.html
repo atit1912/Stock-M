@@ -688,7 +688,7 @@ function bPr(li, s, acts, detail, its) {
       return [hdr, r];
     }).join('');
     detailTable = `
-      <div style="margin-top:18px;page-break-before:${acts.length>5?'always':'auto'}">
+      <div style="margin-top:18px;page-break-inside:auto">
         <div style="background:#1c7a3e;color:#fff;padding:7px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">
           รายการตรวจนับทั้งหมด (${total} รายการ) — สำหรับตรวจสอบและสั่งซื้อ
         </div>
@@ -713,7 +713,7 @@ function bPr(li, s, acts, detail, its) {
   const scoreColor = s.ok===total?'#1a7a4e':s.expired+s.out+s.below>0?'#b0312a':'#b8860b';
 
   document.getElementById('prt').innerHTML = `
-  <div style="font-family:'Sarabun',Arial,sans-serif;font-size:13px;color:#111;background:#fff;width:210mm;min-height:297mm;margin:0;padding:16mm 18mm 14mm">
+  <div style="font-family:'Sarabun',Arial,sans-serif;font-size:13px;color:#111;background:#fff;width:210mm;margin:0 auto;padding:16mm 18mm 14mm">
 
     <!-- หัวเอกสาร -->
     <div style="display:flex;align-items:flex-start;gap:14px;padding-bottom:12px;border-bottom:3.5px solid ${fc};margin-bottom:14px">
@@ -788,8 +788,8 @@ function bPr(li, s, acts, detail, its) {
     ${detailTable}
 
     <!-- ลายเซ็น -->
-    <div style="margin-top:${detail?24:40}px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
-      <div>
+    <div style="margin-top:${detail?28:44}px;display:flex;justify-content:flex-start">
+      <div style="width:55%;max-width:340px">
         <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
           <div style="font-weight:700">ผู้ตรวจสต็อก</div>
           <div style="color:#777;margin-top:16px">ลงชื่อ ................................................</div>
@@ -797,18 +797,10 @@ function bPr(li, s, acts, detail, its) {
           <div style="color:#777;margin-top:6px">วันที่ ${inspDate}</div>
         </div>
       </div>
-      <div>
-        <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
-          <div style="font-weight:700">ผู้รับรอง / ผู้บังคับบัญชา</div>
-          <div style="color:#777;margin-top:16px">ลงชื่อ ................................................</div>
-          <div style="color:#777;margin-top:6px">(..........................................)</div>
-          <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
-        </div>
-      </div>
     </div>
 
     <!-- footer เอกสาร -->
-    <div style="position:fixed;bottom:10mm;left:18mm;right:18mm;border-top:1px solid #ddd;padding-top:6px;display:flex;justify-content:space-between;font-size:9.5px;color:#aaa">
+    <div style="margin-top:28px;border-top:1px solid #ddd;padding-top:6px;display:flex;justify-content:space-between;font-size:9.5px;color:#aaa">
       <span>MediTrack · ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</span>
       <span>${today}</span>
       <span>${DEV.name} · ${DEV.role}</span>
@@ -1004,24 +996,6 @@ function bPrAll() {
     </tr>`;
   }).join('');
 
-  /* ranking */
-  const ranked = FARMS.map(f=>{
-    const li=latF(f.id);if(!li)return{f,score:-1};
-    const s=summ(li,f.id);const its=fItems(f.id);
-    return{f,score:its.length?Math.round(s.ok/its.length*100):-1,
-           ok:s.ok,warn:s.near+s.below+s.expired+s.out,date:beD(li.date)};
-  }).sort((a,b)=>b.score-a.score);
-  const rankRows = ranked.map((r,i)=>`
-    <tr>
-      <td style="padding:6px 10px;text-align:center;font-weight:700;color:${['#b8860b','#888','#8B4513','#555','#777'][i]||'#555'}">${i+1}</td>
-      <td style="padding:6px 10px">
-        <span style="width:9px;height:9px;border-radius:50%;background:${r.f.c};display:inline-block;margin-right:6px"></span>
-        ${r.f.sh}
-      </td>
-      <td style="padding:6px 10px;text-align:center;font-weight:700;color:${r.score>=80?'#1a7a4e':r.score>=50?'#b8860b':'#b0312a'}">${r.score>=0?r.score+'%':'—'}</td>
-      <td style="padding:6px 10px;text-align:center;color:#666">${r.score>=0?r.date:'ยังไม่ตรวจ'}</td>
-    </tr>`).join('');
-
   /* urgent items ทุกศูนย์ */
   const urgentItems = [];
   FARMS.forEach(f=>{
@@ -1048,7 +1022,7 @@ function bPrAll() {
     : `<tr><td colspan="4" style="text-align:center;padding:10px;color:#1a7a4e;font-weight:700">✓ ไม่มีรายการเร่งด่วน</td></tr>`;
 
   pr.innerHTML = `
-  <div style="font-family:'Sarabun',Arial,sans-serif;font-size:13px;color:#111;background:#fff;width:210mm;min-height:297mm;margin:0;padding:14mm 18mm 12mm">
+  <div style="font-family:'Sarabun',Arial,sans-serif;font-size:13px;color:#111;background:#fff;width:210mm;margin:0 auto;padding:14mm 18mm 12mm">
 
     <!-- หัวเอกสาร -->
     <div style="display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:4px solid #1c7a3e;margin-bottom:14px">
@@ -1098,7 +1072,7 @@ function bPrAll() {
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:14px;margin-bottom:16px">
+    <div style="margin-bottom:16px">
       <!-- ตารางเปรียบเทียบ 5 ศูนย์ -->
       <div>
         <div style="background:#1c7a3e;color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">สถานะรายศูนย์</div>
@@ -1112,20 +1086,6 @@ function bPrAll() {
             <th style="padding:5px 8px;border:1px solid #ddd">คะแนน</th>
           </tr></thead>
           <tbody>${farmRows}</tbody>
-        </table>
-      </div>
-
-      <!-- อันดับ -->
-      <div>
-        <div style="background:#1c7a3e;color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">อันดับการจัดการสต็อก</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #ddd;border-top:none">
-          <thead><tr style="background:#f0f0f0">
-            <th style="padding:5px 8px;border:1px solid #ddd">#</th>
-            <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">ศูนย์</th>
-            <th style="padding:5px 8px;border:1px solid #ddd">คะแนน</th>
-            <th style="padding:5px 8px;border:1px solid #ddd">ตรวจล่าสุด</th>
-          </tr></thead>
-          <tbody>${rankRows}</tbody>
         </table>
       </div>
     </div>
@@ -1147,21 +1107,19 @@ function bPrAll() {
     </div>
 
     <!-- ลายเซ็น -->
-    <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
-      <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
-        <div style="font-weight:700">ผู้จัดทำรายงาน</div>
-        <div style="color:#777;margin-top:14px">ลงชื่อ ................................................</div>
-        <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
-      </div>
-      <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
-        <div style="font-weight:700">ผู้รับรอง / ผู้บังคับบัญชา</div>
-        <div style="color:#777;margin-top:14px">ลงชื่อ ................................................</div>
-        <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
+    <div style="margin-top:28px;display:flex;justify-content:flex-start">
+      <div style="width:55%;max-width:340px">
+        <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
+          <div style="font-weight:700">ผู้จัดทำรายงาน</div>
+          <div style="color:#777;margin-top:16px">ลงชื่อ ................................................</div>
+          <div style="color:#777;margin-top:6px">(..........................................)</div>
+          <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
+        </div>
       </div>
     </div>
 
     <!-- footer -->
-    <div style="position:fixed;bottom:8mm;left:18mm;right:18mm;border-top:1px solid #ddd;padding-top:5px;display:flex;justify-content:space-between;font-size:9px;color:#bbb">
+    <div style="margin-top:24px;border-top:1px solid #ddd;padding-top:5px;display:flex;justify-content:space-between;font-size:9px;color:#bbb">
       <span>MediTrack · ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</span>
       <span>${today}</span>
       <span>${DEV.name} · ${DEV.role}</span>
