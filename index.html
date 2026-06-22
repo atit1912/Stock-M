@@ -130,14 +130,15 @@ table.rep th,table.rep td{border:1px solid var(--line2);padding:7px 8px;text-ali
 table.rep th{font-weight:700;font-size:12px;color:var(--mut)}
 table.rep td.l{text-align:left}
 .canvas-wrap{position:relative;height:175px}
+#prt{display:none;position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto;padding:0}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  body,.app{background:#fff!important;color:#111!important}
-  .app,.scr,.bnav,.ab,.ibtn,.noprint,.btn,.seg,.mnav,.swrap,nav,
-  #toast,.modal-bg,.ftdev,.cred{display:none!important}
-  #prt{display:none;position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto}
-  @page{size:A4;margin:0}
-}.bnav,.ibtn,.noprint{display:none!important}.scr{padding:0;overflow:visible}#prt{display:block!important}.cred{display:none}}
+  html,body{background:#fff!important;margin:0!important;padding:0!important;height:auto!important;overflow:visible!important}
+  .app,.scr,.bnav,.ab,nav,#toast,.modal-bg{display:none!important}
+  #prt{display:block!important;position:static!important;background:#fff!important;color:#111!important}
+  @page{size:A4;margin:10mm}
+}
+
 
 .tgl{width:42px;height:24px;border-radius:99px;border:none;cursor:pointer;position:relative;flex:none;transition:background .2s}
 .tgl.on{background:var(--fc)}.tgl.off{background:var(--line2)}
@@ -162,6 +163,7 @@ table.rep td.l{text-align:left}
       <div class="sub" id="abs">ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</div>
     </div>
     <button id="bb" onclick="goBack()" style="display:none" class="bb"><span class="arr">‹</span>กลับ</button>
+    <button class="ibtn" id="hbtn" onclick="go('home')" style="display:none" title="หน้าหลัก">🏠</button>
     <button class="ibtn" id="nbtn" onclick="go('alerts')">🔔<span class="bdg" id="abBdg" style="display:none"></span></button>
   </div>
   <div class="scr" id="scr"></div>
@@ -331,6 +333,7 @@ function go(v,ex={}){
   const bb=document.getElementById('bb'),nb=document.getElementById('nbtn');
   const isR=ROOT.includes(v);
   bb.style.display=isR?'none':'flex';nb.style.display=v==='alerts'?'none':'flex';
+  const hb=document.getElementById('hbtn');if(hb)hb.style.display=(v==='home')?'none':'flex';
   const ab=document.getElementById('ab');
   if(S.fid&&!isR){
     const f=F(S.fid);setTh(f);ab.style.borderBottomColor=f.c;
@@ -615,7 +618,7 @@ function rRep(){
   h+=`<div class="sec-h">แนวโน้ม 6 เดือน</div><div class="card"><div class="canvas-wrap"><canvas id="trend"></canvas></div></div>`;
   h+=`<div class="sec-h">อันดับศูนย์จัดการสต็อก</div><div class="card">${rankHTML()}</div>`;
   if(acts.length){h+=`<div class="sec-h">รายการต้องดำเนินการ (${acts.length})</div>`;acts.forEach(a=>{const sm=SM[a.stk];h+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${a.it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">มี ${a.total} ${a.it.unit} · ขั้นต่ำ ${a.it.min}${a.ne?' · หมด '+xL(a.ne):''}</div></div><span class="chip ${sm.c}">${sm.l}</span></div>`;});}
-  h+=`<div class="sec-h noprint">ออกรายงาน</div><div class="s2 noprint"><button class="btn prim" onclick="dPr(false)">PDF สรุป 1 หน้า</button><button class="btn sec" onclick="dPr(true)">PDF รายละเอียด</button></div><button class="btn sec noprint" style="margin-top:10px" onclick="dCsv()">ดาวน์โหลด Excel (CSV)</button>${cred()}`;
+  h+=`<div class="sec-h noprint">ออกรายงาน</div><div class="s2 noprint"><button class="btn prim" onclick="dPr(false)">PDF สรุป 1 หน้า</button><button class="btn sec" onclick="dPr(true)">PDF รายละเอียด (สั่งของ)</button></div><button class="btn sec noprint" style="margin-top:10px" onclick="dCsv()">ดาวน์โหลด Excel (CSV)</button>${cred()}`;
   document.getElementById('scr').innerHTML=h;
   window.cMon=cMonFn;window.dPr=d=>bPr(li,s,acts,d,its);window.dCsv=()=>csvX(li,its);
   drawPie(s);drawTrend(tr,f.c);
@@ -664,17 +667,22 @@ function bPr(li, s, acts, detail, its) {
     const rows = CATS.flatMap(cat => {
       const catItems = its.filter(i => i.cat===cat.id);
       if (!catItems.length) return [];
-      const hdr = `<tr><td colspan="5" style="background:#e8f5ee;font-weight:700;padding:5px 8px;font-size:11px;color:#1a7a4e">${cat.name}</td></tr>`;
+      const hdr = `<tr><td colspan="7" style="background:#e8f5ee;font-weight:700;padding:5px 8px;font-size:11px;color:#1a7a4e">${cat.name}</td></tr>`;
       const r = catItems.map((it,i) => {
         const line = li.lines[it.id]||{lots:[],touched:false};
         const stk = ls(line, it);
         const stCol = {'expired':'#b0312a','out':'#b0312a','below':'#b85c00','near':'#b8860b','ok':'#1a7a4e','pending':'#888'}[stk]||'#111';
+        const qty = line.touched?lt(line):0;
+        const need = Math.max(0,(it.min||0)-qty);
+        const lotInfo = (line.lots||[]).filter(l=>l.exp).map(l=>`${l.qty}@${xL(l.exp)}`).join(', ')||'—';
         return `<tr style="background:${i%2?'#fff':'#fafafa'}">
-          <td style="text-align:left;padding:4px 8px">${it.name}</td>
-          <td style="padding:4px 8px">${it.unit}</td>
-          <td style="padding:4px 8px">${it.min}</td>
-          <td style="padding:4px 8px">${line.touched?lt(line):'—'}</td>
-          <td style="padding:4px 8px;font-weight:${stk==='ok'||stk==='pending'?'400':'700'};color:${stCol}">${SM[stk].l}</td>
+          <td style="text-align:left;padding:4px 7px">${it.name}</td>
+          <td style="padding:4px 7px">${it.unit}</td>
+          <td style="padding:4px 7px">${it.min}</td>
+          <td style="padding:4px 7px;font-weight:600">${line.touched?qty:'—'}</td>
+          <td style="padding:4px 7px;font-size:10px">${lotInfo}</td>
+          <td style="padding:4px 7px;font-weight:700;color:${need>0?'#b0312a':'#999'}">${need>0?need:'—'}</td>
+          <td style="padding:4px 7px;font-weight:${stk==='ok'||stk==='pending'?'400':'700'};color:${stCol}">${SM[stk].l}</td>
         </tr>`;
       }).join('');
       return [hdr, r];
@@ -682,18 +690,23 @@ function bPr(li, s, acts, detail, its) {
     detailTable = `
       <div style="margin-top:18px;page-break-before:${acts.length>5?'always':'auto'}">
         <div style="background:#1c7a3e;color:#fff;padding:7px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">
-          รายการตรวจนับทั้งหมด (${total} รายการ)
+          รายการตรวจนับทั้งหมด (${total} รายการ) — สำหรับตรวจสอบและสั่งซื้อ
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #ddd">
+        <table style="width:100%;border-collapse:collapse;font-size:10.5px;border:1px solid #ddd">
           <thead><tr style="background:#e8f5ee">
-            <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">รายการ</th>
-            <th style="padding:5px 8px;border:1px solid #ddd">หน่วย</th>
-            <th style="padding:5px 8px;border:1px solid #ddd">ขั้นต่ำ</th>
-            <th style="padding:5px 8px;border:1px solid #ddd">คงเหลือ</th>
-            <th style="padding:5px 8px;border:1px solid #ddd">สถานะ</th>
+            <th style="padding:5px 7px;text-align:left;border:1px solid #ddd">รายการ</th>
+            <th style="padding:5px 7px;border:1px solid #ddd">หน่วย</th>
+            <th style="padding:5px 7px;border:1px solid #ddd">ขั้นต่ำ</th>
+            <th style="padding:5px 7px;border:1px solid #ddd">คงเหลือ</th>
+            <th style="padding:5px 7px;border:1px solid #ddd">ล็อต/หมดอายุ</th>
+            <th style="padding:5px 7px;border:1px solid #ddd">ต้องสั่งเพิ่ม</th>
+            <th style="padding:5px 7px;border:1px solid #ddd">สถานะ</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>
+        <div style="font-size:9.5px;color:#888;margin-top:5px">
+          * "ล็อต/หมดอายุ" แสดงจำนวนแยกตามวันหมดอายุ (จำนวน@เดือน/ปี) · "ต้องสั่งเพิ่ม" = ขั้นต่ำ − คงเหลือ
+        </div>
       </div>`;
   }
 
