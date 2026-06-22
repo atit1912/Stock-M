@@ -128,7 +128,14 @@ table.rep th,table.rep td{border:1px solid var(--line2);padding:7px 8px;text-ali
 table.rep th{font-weight:700;font-size:12px;color:var(--mut)}
 table.rep td.l{text-align:left}
 .canvas-wrap{position:relative;height:175px}
-@media print{body,.app{background:#fff!important}.bnav,.ibtn,.noprint{display:none!important}.scr{padding:0;overflow:visible}#prt{display:block!important;color:#111}.cred{display:none}}
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body,.app{background:#fff!important;color:#111!important}
+  .app,.scr,.bnav,.ab,.ibtn,.noprint,.btn,.seg,.mnav,.swrap,nav,
+  #toast,.modal-bg,.ftdev,.cred{display:none!important}
+  #prt{display:block!important}
+  @page{size:A4;margin:0}
+}.bnav,.ibtn,.noprint{display:none!important}.scr{padding:0;overflow:visible}#prt{display:block!important;color:#111}.cred{display:none}}
 #prt{display:none}
 
 .tgl{width:42px;height:24px;border-radius:99px;border:none;cursor:pointer;position:relative;flex:none;transition:background .2s}
@@ -370,6 +377,7 @@ function rHome(){
       <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${f.name}</div>
       <div style="font-size:11px;color:var(--mut)">${s?`ปกติ ${s.ok} · ${warn?`<span style="color:${dot}">เตือน ${warn}</span>`:'เตือน 0'}`:' ยังไม่เคยตรวจ'}</div></div>
       <span style="color:var(--hint)">›</span></div>`;});
+  h+=`<div class="noprint" style="margin:0 0 12px"><button class="btn sec" style="font-size:13px;padding:11px;border:1px solid var(--line2)" onclick="bPrAll()">📄 PDF ภาพรวม 5 ศูนย์ · สำหรับผู้บริหาร</button></div>`;
   h+=cred();
   document.getElementById('scr').innerHTML=h;
 }
@@ -557,147 +565,185 @@ function drawPie(s){const el=document.getElementById('pie');if(!el||!window.Char
 function drawTrend(tr,col){const el=document.getElementById('trend');if(!el||!window.Chart)return;const c=new Chart(el,{type:'bar',data:{labels:tr.map(t=>t.label),datasets:[{data:tr.map(t=>t.has?t.val:0),backgroundColor:tr.map(t=>t.val>3?'#f0726b':t.val>0?'#f3c75a':'#5fd39b'),borderRadius:5,maxBarThickness:30}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#8aa39a',precision:0},grid:{color:'#243029'}},x:{ticks:{color:'#8aa39a'},grid:{display:false}}},animation:{duration:500}}});_chartObjs.push(c)}
 function rankHTML(){const rk=FARMS.map(f=>{const li=latF(f.id);const its=fItems(f.id);if(!li)return{f,score:-1,warn:0,ok:0};const s=summ(li,f.id);const warn=s.near+s.below+s.expired+s.out;const score=its.length?Math.round(s.ok/its.length*100):-1;return{f,score,warn,ok:s.ok};});rk.sort((a,b)=>b.score-a.score);const md=['#f3c75a','#c8ccd0','#cd8c52'];
   return rk.map((r,i)=>`<div class="rk"><div class="pos" style="background:${i<3?md[i]:'var(--card2)'};color:${i<3?'#1a1a1a':'var(--mut)'}">${i+1}</div><span class="fdot" style="background:${r.f.c};width:10px;height:10px;margin:0"></span><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">${r.f.sh}</div><div style="font-size:11px;color:var(--mut)">${r.score>=0?`ปกติ ${r.ok} · เตือน ${r.warn}`:'ยังไม่เคยตรวจ'}</div></div><div style="font-size:15px;font-weight:700;color:${r.score>=80?'var(--ok)':r.score>=50?'var(--near)':r.score>=0?'var(--bad)':'var(--hint)'}">${r.score>=0?r.score+'%':'—'}</div></div>`).join('')}
-function bPr(li,s,acts,detail,its){
-  const f=F(S.fid);
-  const today=beD(new Date().toISOString());
-  const insp=li.inspector||'—';
-  const inspDate=beD(li.date);
-  const pr=document.getElementById('prt');
+/* ─── PDF: รายงานฟาร์มเดียว ─── */
+function bPr(li, s, acts, detail, its) {
+  const f = F(S.fid);
+  const today = beD(new Date().toISOString());
+  const inspDate = beD(li.date);
+  const total = its.length;
+  const fc = f.c;
 
-  /* ── ตารางรายการต้องดำเนินการ ── */
-  const probRows=acts.length
-    ? acts.map(a=>`<tr>
-        <td style="text-align:left;padding:6px 8px">${a.it.name}</td>
-        <td style="padding:6px 8px">${CN(a.it.cat)}</td>
-        <td style="padding:6px 8px">${a.total} ${a.it.unit}</td>
-        <td style="padding:6px 8px">${a.it.min}</td>
-        <td style="padding:6px 8px">${a.ne?xL(a.ne):'—'}</td>
-        <td style="padding:6px 8px;font-weight:700;color:${SM[a.stk].col}">${SM[a.stk].l}</td>
+  /* แถบ progress สัดส่วน */
+  function progressBar(s, total) {
+    const segs = [
+      {v:s.ok,        bg:'#1a7a4e'},
+      {v:s.near,      bg:'#b8860b'},
+      {v:s.below,     bg:'#b85c00'},
+      {v:s.expired+s.out, bg:'#b0312a'},
+      {v:s.pending,   bg:'#ccc'},
+    ].filter(x=>x.v>0);
+    return segs.map(x=>`<div style="flex:${x.v};background:${x.bg}"></div>`).join('');
+  }
+
+  /* ตารางรายการต้องดำเนินการ */
+  const actRows = acts.length
+    ? acts.map((a,i)=>`<tr style="background:${i%2?'#fff':'#fafafa'}">
+        <td style="text-align:left;padding:5px 8px">${a.it.name}</td>
+        <td style="padding:5px 8px">${CN(a.it.cat)}</td>
+        <td style="padding:5px 8px">${a.total} ${a.it.unit}</td>
+        <td style="padding:5px 8px">${a.it.min}</td>
+        <td style="padding:5px 8px">${a.ne?xL(a.ne):'—'}</td>
+        <td style="padding:5px 8px;font-weight:700;color:${{'expired':'#b0312a','out':'#b0312a','below':'#b85c00','near':'#b8860b'}[a.stk]||'#111'}">${SM[a.stk].l}</td>
       </tr>`).join('')
-    : `<tr><td colspan="6" style="text-align:center;padding:8px;color:#666">ทุกรายการอยู่ในเกณฑ์ปกติ</td></tr>`;
+    : `<tr><td colspan="6" style="text-align:center;padding:10px;color:#1a7a4e;font-weight:700">✓ ทุกรายการอยู่ในเกณฑ์ปกติ</td></tr>`;
 
-  /* ── ตารางรายการทั้งหมด (detail mode) ── */
-  let detailSection='';
-  if(detail){
-    const allRows=CATS.map(cat=>{
-      const catItems=fItems(S.fid).filter(i=>i.cat===cat.id);
-      if(!catItems.length)return'';
-      const rows=catItems.map(it=>{
-        const line=li.lines[it.id]||{lots:[],touched:false};
-        const stk=ls(line,it);
-        return`<tr>
-          <td style="text-align:left;padding:5px 8px">${it.name}</td>
-          <td style="padding:5px 8px">${it.unit}</td>
-          <td style="padding:5px 8px">${it.min}</td>
-          <td style="padding:5px 8px">${line.touched?lt(line):'—'}</td>
-          <td style="padding:5px 8px">${it.exp&&nx(line)?xL(nx(line)):'—'}</td>
-          <td style="padding:5px 8px;font-weight:${stk!=='ok'&&stk!=='pending'?'700':'400'};color:${SM[stk].col}">${SM[stk].l}</td>
-        </tr>`;}).join('');
-      return`<tr><td colspan="6" style="background:#f0f7f4;font-weight:700;padding:6px 8px;font-size:12px">${cat.name}</td></tr>${rows}`;
+  /* ตารางรายการทั้งหมด (detail mode) */
+  let detailTable = '';
+  if (detail) {
+    const rows = CATS.flatMap(cat => {
+      const catItems = its.filter(i => i.cat===cat.id);
+      if (!catItems.length) return [];
+      const hdr = `<tr><td colspan="5" style="background:#e8f5ee;font-weight:700;padding:5px 8px;font-size:11px;color:#1a7a4e">${cat.name}</td></tr>`;
+      const r = catItems.map((it,i) => {
+        const line = li.lines[it.id]||{lots:[],touched:false};
+        const stk = ls(line, it);
+        const stCol = {'expired':'#b0312a','out':'#b0312a','below':'#b85c00','near':'#b8860b','ok':'#1a7a4e','pending':'#888'}[stk]||'#111';
+        return `<tr style="background:${i%2?'#fff':'#fafafa'}">
+          <td style="text-align:left;padding:4px 8px">${it.name}</td>
+          <td style="padding:4px 8px">${it.unit}</td>
+          <td style="padding:4px 8px">${it.min}</td>
+          <td style="padding:4px 8px">${line.touched?lt(line):'—'}</td>
+          <td style="padding:4px 8px;font-weight:${stk==='ok'||stk==='pending'?'400':'700'};color:${stCol}">${SM[stk].l}</td>
+        </tr>`;
+      }).join('');
+      return [hdr, r];
     }).join('');
-    detailSection=`
-      <div style="margin-top:20px">
-        <div style="font-size:13px;font-weight:700;color:#1c7a3e;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #1c7a3e">รายการตรวจนับทั้งหมด (${its.length} รายการ)</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11.5px">
-          <thead><tr style="background:#1c7a3e;color:#fff">
-            <th style="padding:6px 8px;text-align:left">รายการ</th>
-            <th style="padding:6px 8px">หน่วย</th>
-            <th style="padding:6px 8px">ขั้นต่ำ</th>
-            <th style="padding:6px 8px">คงเหลือ</th>
-            <th style="padding:6px 8px">หมดอายุ</th>
-            <th style="padding:6px 8px">สถานะ</th>
+    detailTable = `
+      <div style="margin-top:18px;page-break-before:${acts.length>5?'always':'auto'}">
+        <div style="background:#1c7a3e;color:#fff;padding:7px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">
+          รายการตรวจนับทั้งหมด (${total} รายการ)
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;border:1px solid #ddd">
+          <thead><tr style="background:#e8f5ee">
+            <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">รายการ</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">หน่วย</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">ขั้นต่ำ</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">คงเหลือ</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">สถานะ</th>
           </tr></thead>
-          <tbody>${allRows}</tbody>
+          <tbody>${rows}</tbody>
         </table>
       </div>`;
   }
 
-  /* ── แถบสี KPI ── */
-  const kpiBar=[
-    {l:'ปกติ',v:s.ok,bg:'#e5f3ec',c:'#1a7a4e'},
-    {l:'ใกล้หมดอายุ',v:s.near,bg:'#fbefd5',c:'#9a6510'},
-    {l:'ต่ำกว่าเกณฑ์',v:s.below,bg:'#fce8db',c:'#a8480f'},
-    {l:'หมด/หมดอายุ',v:s.expired+s.out,bg:'#fbe5e3',c:'#b0312a'},
-  ].map(k=>`<div style="flex:1;background:${k.bg};border-radius:8px;padding:10px 8px;text-align:center">
-    <div style="font-size:22px;font-weight:800;color:${k.c}">${k.v}</div>
-    <div style="font-size:11px;color:#555;margin-top:2px">${k.l}</div>
-  </div>`).join('');
+  const scoreColor = s.ok===total?'#1a7a4e':s.expired+s.out+s.below>0?'#b0312a':'#b8860b';
 
-  pr.innerHTML=`
-  <div style="font-family:'Sarabun',sans-serif;font-size:13px;color:#111;background:#fff;padding:24px 28px;max-width:720px;margin:0 auto">
+  document.getElementById('prt').innerHTML = `
+  <div style="font-family:'Sarabun',Arial,sans-serif;font-size:13px;color:#111;background:#fff;width:210mm;min-height:297mm;margin:0;padding:16mm 18mm 14mm">
 
     <!-- หัวเอกสาร -->
-    <div style="display:flex;align-items:center;gap:16px;padding-bottom:14px;border-bottom:3px solid ${f.c};margin-bottom:16px">
-      <img src="${LSRC}" style="width:54px;height:54px;object-fit:contain;flex:none">
+    <div style="display:flex;align-items:flex-start;gap:14px;padding-bottom:12px;border-bottom:3.5px solid ${fc};margin-bottom:14px">
+      <img src="${LSRC}" style="width:52px;height:52px;object-fit:contain;flex:none;margin-top:2px">
       <div style="flex:1">
-        <div style="font-size:9px;color:#888;letter-spacing:.5px;text-transform:uppercase">MediTrack · MSBRC-2</div>
-        <div style="font-size:17px;font-weight:700;color:#111;margin:2px 0">${detail?'รายงานตรวจนับสต็อกยาและเวชภัณฑ์ (รายละเอียด)':'รายงานสรุปสต็อกยาและเวชภัณฑ์'}</div>
-        <div style="font-size:12px;color:#555">${f.name}</div>
+        <div style="font-size:9.5px;color:#888;letter-spacing:.8px;font-weight:600">MSBRC-2 · MediTrack</div>
+        <div style="font-size:18px;font-weight:700;color:#111;margin:3px 0 2px">
+          ${detail?'รายงานตรวจนับสต็อกยาและเวชภัณฑ์':'รายงานสรุปสต็อกยาและเวชภัณฑ์'}
+        </div>
+        <div style="font-size:13px;color:#444;font-weight:600">${f.name}</div>
       </div>
-      <div style="text-align:right;font-size:11.5px;color:#555;line-height:1.8">
-        <div>วันที่ตรวจ: <strong>${inspDate}</strong></div>
-        <div>ผู้ตรวจ: <strong>${insp}</strong></div>
-        <div>วันที่พิมพ์: <strong>${today}</strong></div>
+      <div style="text-align:right;font-size:11px;color:#555;line-height:2;flex:none">
+        <div>วันที่ตรวจ: <strong style="color:#111">${inspDate}</strong></div>
+        <div>ผู้ตรวจ: <strong style="color:#111">${li.inspector}</strong></div>
+        <div>วันที่พิมพ์: <strong style="color:#111">${today}</strong></div>
       </div>
     </div>
 
     <!-- KPI 4 ช่อง -->
-    <div style="display:flex;gap:10px;margin-bottom:18px">${kpiBar}</div>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div style="flex:1;background:#e5f3ec;border:1.5px solid #b2dfc4;border-radius:8px;padding:11px 10px;text-align:center">
+        <div style="font-size:28px;font-weight:800;color:#1a7a4e;line-height:1">${s.ok}</div>
+        <div style="font-size:11px;color:#1a7a4e;margin-top:3px;font-weight:600">ปกติ</div>
+      </div>
+      <div style="flex:1;background:#fef9e7;border:1.5px solid #f5d76e;border-radius:8px;padding:11px 10px;text-align:center">
+        <div style="font-size:28px;font-weight:800;color:#b8860b;line-height:1">${s.near}</div>
+        <div style="font-size:11px;color:#b8860b;margin-top:3px;font-weight:600">ใกล้หมดอายุ</div>
+      </div>
+      <div style="flex:1;background:#fef5ec;border:1.5px solid #f5c281;border-radius:8px;padding:11px 10px;text-align:center">
+        <div style="font-size:28px;font-weight:800;color:#b85c00;line-height:1">${s.below}</div>
+        <div style="font-size:11px;color:#b85c00;margin-top:3px;font-weight:600">ต่ำกว่าเกณฑ์</div>
+      </div>
+      <div style="flex:1;background:#fdeeee;border:1.5px solid #f5a7a7;border-radius:8px;padding:11px 10px;text-align:center">
+        <div style="font-size:28px;font-weight:800;color:#b0312a;line-height:1">${s.expired+s.out}</div>
+        <div style="font-size:11px;color:#b0312a;margin-top:3px;font-weight:600">หมด/หมดอายุ</div>
+      </div>
+    </div>
 
-    <!-- แถบสีสถานะ -->
-    <div style="display:flex;gap:0;border-radius:6px;overflow:hidden;margin-bottom:18px;height:10px">
-      ${s.ok?`<div style="flex:${s.ok};background:#5fd39b" title="ปกติ ${s.ok}"></div>`:''}
-      ${s.near?`<div style="flex:${s.near};background:#f3c75a" title="ใกล้หมด ${s.near}"></div>`:''}
-      ${s.below?`<div style="flex:${s.below};background:#ef9a5d" title="ต่ำกว่าเกณฑ์ ${s.below}"></div>`:''}
-      ${s.expired+s.out?`<div style="flex:${s.expired+s.out};background:#f0726b" title="หมด/หมดอายุ ${s.expired+s.out}"></div>`:''}
-      ${s.pending?`<div style="flex:${s.pending};background:#c8d5d0" title="ยังไม่ตรวจ ${s.pending}"></div>`:''}
+    <!-- Progress bar -->
+    <div style="display:flex;height:9px;border-radius:5px;overflow:hidden;margin-bottom:14px;border:1px solid #e0e0e0">
+      ${progressBar(s,total)}
+    </div>
+
+    <!-- Executive summary line -->
+    <div style="background:#f7fdf9;border:1px solid #c3e6d2;border-radius:6px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:#1a4a2a">
+      <strong>สรุป:</strong> มีรายการทั้งหมด ${total} รายการ
+      ${s.ok===total
+        ? '— <strong style="color:#1a7a4e">ทุกรายการอยู่ในเกณฑ์ปกติ ✓</strong>'
+        : `— ต้องดำเนินการ <strong style="color:#b0312a">${acts.length} รายการ</strong>${s.pending?` · ยังไม่ตรวจ <strong>${s.pending} รายการ</strong>`:''}`
+      }
+      &nbsp;·&nbsp; คะแนนสต็อก <strong style="color:${scoreColor}">${total?Math.round(s.ok/total*100):0}%</strong>
     </div>
 
     <!-- รายการต้องดำเนินการ -->
-    <div style="margin-bottom:${detail?18:24}px">
-      <div style="font-size:13px;font-weight:700;color:${acts.length?'#b0312a':'#1a7a4e'};margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid ${acts.length?'#f0726b':'#1c7a3e'}">
-        ${acts.length?`⚠ รายการที่ต้องดำเนินการ (${acts.length} รายการ)`:'✓ ทุกรายการอยู่ในเกณฑ์ปกติ'}
+    <div style="margin-bottom:${detail?16:24}px">
+      <div style="background:${acts.length?'#b0312a':'#1c7a3e'};color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">
+        ${acts.length?`⚠ รายการที่ต้องดำเนินการ (${acts.length} รายการ)`:'✓ ไม่มีรายการที่ต้องดำเนินการ'}
       </div>
-      ${acts.length?`<table style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead><tr style="background:#fbe5e3">
-          <th style="padding:6px 8px;text-align:left;font-weight:700">รายการ</th>
-          <th style="padding:6px 8px;font-weight:700">หมวด</th>
-          <th style="padding:6px 8px;font-weight:700">คงเหลือ</th>
-          <th style="padding:6px 8px;font-weight:700">ขั้นต่ำ</th>
-          <th style="padding:6px 8px;font-weight:700">หมดอายุ</th>
-          <th style="padding:6px 8px;font-weight:700">สถานะ</th>
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #ddd;border-top:none">
+        <thead><tr style="background:#f5f5f5">
+          <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">รายการ</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">หมวด</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">คงเหลือ</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">ขั้นต่ำ</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">หมดอายุ</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">สถานะ</th>
         </tr></thead>
-        <tbody>${probRows}</tbody>
-      </table>`:''}
+        <tbody>${actRows}</tbody>
+      </table>
     </div>
 
-    ${detailSection}
+    ${detailTable}
 
     <!-- ลายเซ็น -->
-    <div style="margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:30px;font-size:12px">
-      <div style="border-top:1px solid #aaa;padding-top:8px">
-        <div>ผู้ตรวจ</div>
-        <div style="margin-top:4px;color:#888">(.......................................................)</div>
-        <div style="color:#888">วันที่ ...................</div>
+    <div style="margin-top:${detail?24:40}px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div>
+        <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
+          <div style="font-weight:700">ผู้ตรวจสต็อก</div>
+          <div style="color:#777;margin-top:16px">ลงชื่อ ................................................</div>
+          <div style="color:#777;margin-top:6px">(${li.inspector})</div>
+          <div style="color:#777;margin-top:6px">วันที่ ${inspDate}</div>
+        </div>
       </div>
-      <div style="border-top:1px solid #aaa;padding-top:8px">
-        <div>ผู้รับรอง / ผู้บังคับบัญชา</div>
-        <div style="margin-top:4px;color:#888">(.......................................................)</div>
-        <div style="color:#888">วันที่ ...................</div>
+      <div>
+        <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
+          <div style="font-weight:700">ผู้รับรอง / ผู้บังคับบัญชา</div>
+          <div style="color:#777;margin-top:16px">ลงชื่อ ................................................</div>
+          <div style="color:#777;margin-top:6px">(..........................................)</div>
+          <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
+        </div>
       </div>
     </div>
 
     <!-- footer เอกสาร -->
-    <div style="margin-top:20px;padding-top:10px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:10px;color:#aaa">
-      <span>MediTrack · MSBRC-2 · ระบบตรวจนับสต็อกยาและเวชภัณฑ์</span>
-      <span>Atit Chimnan · System Developer &amp; Designer</span>
+    <div style="position:fixed;bottom:10mm;left:18mm;right:18mm;border-top:1px solid #ddd;padding-top:6px;display:flex;justify-content:space-between;font-size:9.5px;color:#aaa">
+      <span>MediTrack · ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</span>
+      <span>${today}</span>
+      <span>${DEV.name} · ${DEV.role}</span>
     </div>
-
   </div>`;
 
-  pr.style.display='block';
+  document.getElementById('prt').style.display = 'block';
   window.print();
-  setTimeout(()=>{pr.style.display='none'},800);
+  setTimeout(()=>{ document.getElementById('prt').style.display='none'; }, 900);
 }
 
 function csvX(li,its){const f=F(S.fid);let rows=[['ศูนย์','วันที่ตรวจ','ผู้ตรวจ','หมวด','รายการ','หน่วย','ขั้นต่ำ','คงเหลือ','วันหมดอายุ','สถานะ']];
@@ -833,6 +879,221 @@ async function delIns(){
   if(!confirm("ลบการตรวจวันที่ "+beD(insp.date)+" ?\nลบแล้วกู้คืนไม่ได้"))return;
   INSPS=INSPS.filter(i=>i.id!==S.did);
   await saveIns();toast("ลบการตรวจแล้ว");go("farm-hist",{fid:insp.farmId});
+}
+
+/* ─── PDF: ภาพรวมทุกศูนย์ (Executive Report) ─── */
+function bPrAll() {
+  const today = beD(new Date().toISOString());
+  const pr = document.getElementById('prt');
+
+  /* KPI รวม */
+  const kAll = {ok:0,near:0,below:0,expired:0,out:0,pending:0};
+  FARMS.forEach(f=>{const li=latF(f.id);if(li){const s=summ(li,f.id);for(const k in kAll)kAll[k]+=s[k];}});
+  const totalAll = Object.values(kAll).reduce((a,b)=>a+b,0);
+  const checkedFarms = FARMS.filter(f=>latF(f.id)).length;
+
+  /* สรุปประโยค executive */
+  const urgentTotal = kAll.expired+kAll.out+kAll.below;
+  const summaryLine = urgentTotal>0
+    ? `พบรายการต้องดำเนินการทันที <strong style="color:#b0312a">${urgentTotal} รายการ</strong> ใน ${FARMS.filter(f=>{const li=latF(f.id);if(!li)return false;const s=summ(li,f.id);return s.expired+s.out+s.below>0}).length} ศูนย์`
+    : `ทุกศูนย์อยู่ในเกณฑ์ปกติ <strong style="color:#1a7a4e">✓</strong>`;
+
+  /* แถวแต่ละฟาร์ม */
+  const farmRows = FARMS.map((f,i) => {
+    const li = latF(f.id);
+    if (!li) return `<tr style="background:${i%2?'#fff':'#fafafa'}">
+      <td style="padding:7px 10px;font-weight:700">${f.name}</td>
+      <td colspan="5" style="padding:7px 10px;color:#999;text-align:center">ยังไม่มีข้อมูล</td>
+    </tr>`;
+    const s = summ(li, f.id);
+    const its = fItems(f.id);
+    const score = its.length?Math.round(s.ok/its.length*100):0;
+    const scoreCol = score>=80?'#1a7a4e':score>=50?'#b8860b':'#b0312a';
+    const prob = s.near+s.below+s.expired+s.out;
+    return `<tr style="background:${i%2?'#fff':'#fafafa'}">
+      <td style="padding:7px 10px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${f.c};display:inline-block;flex:none"></span>
+          <strong>${f.name}</strong>
+        </div>
+      </td>
+      <td style="padding:7px 10px;text-align:center;color:#1a7a4e;font-weight:700">${s.ok}</td>
+      <td style="padding:7px 10px;text-align:center;color:${s.near?'#b8860b':'#999'};font-weight:${s.near?'700':'400'}">${s.near||'—'}</td>
+      <td style="padding:7px 10px;text-align:center;color:${s.below?'#b85c00':'#999'};font-weight:${s.below?'700':'400'}">${s.below||'—'}</td>
+      <td style="padding:7px 10px;text-align:center;color:${s.expired+s.out?'#b0312a':'#999'};font-weight:${s.expired+s.out?'700':'400'}">${s.expired+s.out||'—'}</td>
+      <td style="padding:7px 10px;text-align:center">
+        <span style="font-weight:700;color:${scoreCol}">${score}%</span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  /* ranking */
+  const ranked = FARMS.map(f=>{
+    const li=latF(f.id);if(!li)return{f,score:-1};
+    const s=summ(li,f.id);const its=fItems(f.id);
+    return{f,score:its.length?Math.round(s.ok/its.length*100):-1,
+           ok:s.ok,warn:s.near+s.below+s.expired+s.out,date:beD(li.date)};
+  }).sort((a,b)=>b.score-a.score);
+  const rankRows = ranked.map((r,i)=>`
+    <tr>
+      <td style="padding:6px 10px;text-align:center;font-weight:700;color:${['#b8860b','#888','#8B4513','#555','#777'][i]||'#555'}">${i+1}</td>
+      <td style="padding:6px 10px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${r.f.c};display:inline-block;margin-right:6px"></span>
+        ${r.f.sh}
+      </td>
+      <td style="padding:6px 10px;text-align:center;font-weight:700;color:${r.score>=80?'#1a7a4e':r.score>=50?'#b8860b':'#b0312a'}">${r.score>=0?r.score+'%':'—'}</td>
+      <td style="padding:6px 10px;text-align:center;color:#666">${r.score>=0?r.date:'ยังไม่ตรวจ'}</td>
+    </tr>`).join('');
+
+  /* urgent items ทุกศูนย์ */
+  const urgentItems = [];
+  FARMS.forEach(f=>{
+    const li=latF(f.id);if(!li)return;
+    fItems(f.id).forEach(it=>{
+      const line=li.lines[it.id]||{lots:[],touched:false};
+      const stk=ls(line,it);
+      if(['expired','out','below'].includes(stk))
+        urgentItems.push({farm:f.sh,fc:f.c,name:it.name,stk,total:lt(line),unit:it.unit,ne:nx(line)});
+    });
+  });
+  urgentItems.sort((a,b)=>['expired','out','below'].indexOf(a.stk)-['expired','out','below'].indexOf(b.stk));
+
+  const urgentRows = urgentItems.length
+    ? urgentItems.map((u,i)=>`<tr style="background:${i%2?'#fff':'#fafafa'}">
+        <td style="padding:5px 8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${u.fc};display:inline-block;margin-right:5px"></span>
+          ${u.farm}
+        </td>
+        <td style="padding:5px 8px">${u.name}</td>
+        <td style="padding:5px 8px;text-align:center">${u.total||'—'} ${u.unit}</td>
+        <td style="padding:5px 8px;font-weight:700;color:${u.stk==='expired'||u.stk==='out'?'#b0312a':'#b85c00'}">${SM[u.stk].l}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="4" style="text-align:center;padding:10px;color:#1a7a4e;font-weight:700">✓ ไม่มีรายการเร่งด่วน</td></tr>`;
+
+  pr.innerHTML = `
+  <div style="font-family:'Sarabun',Arial,sans-serif;font-size:13px;color:#111;background:#fff;width:210mm;min-height:297mm;margin:0;padding:14mm 18mm 12mm">
+
+    <!-- หัวเอกสาร -->
+    <div style="display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:4px solid #1c7a3e;margin-bottom:14px">
+      <img src="${LSRC}" style="width:52px;height:52px;object-fit:contain;flex:none">
+      <div style="flex:1">
+        <div style="font-size:9.5px;color:#888;letter-spacing:.8px;font-weight:600">MSBRC-2 · MediTrack</div>
+        <div style="font-size:18px;font-weight:700;color:#111;margin:3px 0 2px">รายงานภาพรวมสต็อกยาและเวชภัณฑ์</div>
+        <div style="font-size:11px;color:#555">ระบบตรวจนับสต็อก 5 ศูนย์วิจัย · ธุรกิจพันธุ์กุ้งทะเล 2</div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:#555;line-height:2;flex:none">
+        <div>วันที่พิมพ์: <strong style="color:#111">${today}</strong></div>
+        <div>ศูนย์ที่ตรวจแล้ว: <strong style="color:#111">${checkedFarms}/5 ศูนย์</strong></div>
+      </div>
+    </div>
+
+    <!-- Executive Summary box -->
+    <div style="background:#f0faf4;border:2px solid #1c7a3e;border-radius:8px;padding:12px 16px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#1c7a3e;letter-spacing:.5px;margin-bottom:6px">EXECUTIVE SUMMARY</div>
+      <div style="font-size:13px;line-height:1.8">
+        ณ วันที่ ${today} ภาพรวมระบบสต็อกยาและเวชภัณฑ์ทั้ง 5 ศูนย์ มีรายการปกติ
+        <strong style="color:#1a7a4e">${kAll.ok} รายการ</strong>
+        · ใกล้หมดอายุ <strong style="color:#b8860b">${kAll.near} รายการ</strong>
+        · ต่ำกว่าเกณฑ์ <strong style="color:#b85c00">${kAll.below} รายการ</strong>
+        · หมด/หมดอายุ <strong style="color:#b0312a">${kAll.expired+kAll.out} รายการ</strong>
+        <br>${summaryLine}
+        ${checkedFarms<5?`<br><span style="color:#b85c00">⚠ อีก ${5-checkedFarms} ศูนย์ยังไม่มีข้อมูล</span>`:''}
+      </div>
+    </div>
+
+    <!-- KPI 4 ช่อง -->
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <div style="flex:1;background:#e5f3ec;border:1.5px solid #b2dfc4;border-radius:7px;padding:10px;text-align:center">
+        <div style="font-size:30px;font-weight:800;color:#1a7a4e;line-height:1">${kAll.ok}</div>
+        <div style="font-size:11px;color:#1a7a4e;font-weight:600;margin-top:3px">ปกติ</div>
+      </div>
+      <div style="flex:1;background:#fef9e7;border:1.5px solid #f5d76e;border-radius:7px;padding:10px;text-align:center">
+        <div style="font-size:30px;font-weight:800;color:#b8860b;line-height:1">${kAll.near}</div>
+        <div style="font-size:11px;color:#b8860b;font-weight:600;margin-top:3px">ใกล้หมดอายุ</div>
+      </div>
+      <div style="flex:1;background:#fef5ec;border:1.5px solid #f5c281;border-radius:7px;padding:10px;text-align:center">
+        <div style="font-size:30px;font-weight:800;color:#b85c00;line-height:1">${kAll.below}</div>
+        <div style="font-size:11px;color:#b85c00;font-weight:600;margin-top:3px">ต่ำกว่าเกณฑ์</div>
+      </div>
+      <div style="flex:1;background:#fdeeee;border:1.5px solid #f5a7a7;border-radius:7px;padding:10px;text-align:center">
+        <div style="font-size:30px;font-weight:800;color:#b0312a;line-height:1">${kAll.expired+kAll.out}</div>
+        <div style="font-size:11px;color:#b0312a;font-weight:600;margin-top:3px">หมด/หมดอายุ</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:14px;margin-bottom:16px">
+      <!-- ตารางเปรียบเทียบ 5 ศูนย์ -->
+      <div>
+        <div style="background:#1c7a3e;color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">สถานะรายศูนย์</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #ddd;border-top:none">
+          <thead><tr style="background:#f0f0f0">
+            <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">ศูนย์</th>
+            <th style="padding:5px 8px;border:1px solid #ddd;color:#1a7a4e">ปกติ</th>
+            <th style="padding:5px 8px;border:1px solid #ddd;color:#b8860b">ใกล้หมด</th>
+            <th style="padding:5px 8px;border:1px solid #ddd;color:#b85c00">ต่ำกว่า</th>
+            <th style="padding:5px 8px;border:1px solid #ddd;color:#b0312a">หมด</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">คะแนน</th>
+          </tr></thead>
+          <tbody>${farmRows}</tbody>
+        </table>
+      </div>
+
+      <!-- อันดับ -->
+      <div>
+        <div style="background:#1c7a3e;color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">อันดับการจัดการสต็อก</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #ddd;border-top:none">
+          <thead><tr style="background:#f0f0f0">
+            <th style="padding:5px 8px;border:1px solid #ddd">#</th>
+            <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">ศูนย์</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">คะแนน</th>
+            <th style="padding:5px 8px;border:1px solid #ddd">ตรวจล่าสุด</th>
+          </tr></thead>
+          <tbody>${rankRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- รายการเร่งด่วนทุกศูนย์ -->
+    <div>
+      <div style="background:${urgentItems.length?'#b0312a':'#1c7a3e'};color:#fff;padding:6px 10px;font-size:12px;font-weight:700;border-radius:4px 4px 0 0">
+        ${urgentItems.length?`⚠ รายการเร่งด่วนที่ต้องดำเนินการทันที (${urgentItems.length} รายการ)`:'✓ ไม่มีรายการเร่งด่วน'}
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #ddd;border-top:none">
+        <thead><tr style="background:#f5f5f5">
+          <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">ศูนย์</th>
+          <th style="padding:5px 8px;text-align:left;border:1px solid #ddd">รายการ</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">คงเหลือ</th>
+          <th style="padding:5px 8px;border:1px solid #ddd">สถานะ</th>
+        </tr></thead>
+        <tbody>${urgentRows}</tbody>
+      </table>
+    </div>
+
+    <!-- ลายเซ็น -->
+    <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
+        <div style="font-weight:700">ผู้จัดทำรายงาน</div>
+        <div style="color:#777;margin-top:14px">ลงชื่อ ................................................</div>
+        <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
+      </div>
+      <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
+        <div style="font-weight:700">ผู้รับรอง / ผู้บังคับบัญชา</div>
+        <div style="color:#777;margin-top:14px">ลงชื่อ ................................................</div>
+        <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div style="position:fixed;bottom:8mm;left:18mm;right:18mm;border-top:1px solid #ddd;padding-top:5px;display:flex;justify-content:space-between;font-size:9px;color:#bbb">
+      <span>MediTrack · ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</span>
+      <span>${today}</span>
+      <span>${DEV.name} · ${DEV.role}</span>
+    </div>
+  </div>`;
+
+  pr.style.display = 'block';
+  window.print();
+  setTimeout(()=>{ pr.style.display='none'; }, 900);
 }
 
 boot();
