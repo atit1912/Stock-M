@@ -32,6 +32,8 @@ html,body{height:100%;background:var(--bg)}
 body{font-family:'Sarabun',-apple-system,sans-serif;font-size:16px;color:var(--ink);-webkit-font-smoothing:antialiased}
 .app{display:flex;flex-direction:column;height:100vh;max-width:520px;margin:0 auto;background:var(--bg)}
 .ab{flex:none;height:58px;display:flex;align-items:center;padding:0 14px;gap:10px;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.bb{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#dfe;border-radius:8px;padding:5px 10px 5px 7px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex:none;white-space:nowrap}
+.bb .arr{font-size:17px;line-height:1}
 .ab .logo{width:36px;height:36px;border-radius:8px;background:#fff;padding:2px;object-fit:contain;flex:none}
 .ab h1{font-size:15px;font-weight:700;color:#fff;line-height:1.2}
 .ab .sub{font-size:10.5px;color:var(--mut)}
@@ -160,7 +162,7 @@ table.rep td.l{text-align:left}
       <h1 id="abt">MediTrack</h1>
       <div class="sub" id="abs">ระบบตรวจนับสต็อกยาและเวชภัณฑ์ MSBRC-2</div>
     </div>
-    <button class="ibtn" id="bb" onclick="goBack()" style="display:none">‹</button>
+    <button id="bb" onclick="goBack()" style="display:none" class="bb"><span class="arr">‹</span>กลับ</button>
     <button class="ibtn" id="nbtn" onclick="go('alerts')">🔔<span class="bdg" id="abBdg" style="display:none"></span></button>
   </div>
   <div class="scr" id="scr"></div>
@@ -318,12 +320,13 @@ function cred(){return`<div class="cred">MediTrack v1.0 · <strong>${DEV.name}</
 function inspSel(cur){return`<select id="isel" style="margin-bottom:10px">${INSPECTORS.map(n=>`<option${n===cur?' selected':''}>${n}</option>`).join('')}</select>`}
 
 /* ── NAV ── */
-const ROOT=['home','pick-inspect','pick-report','alerts','settings'];
+const ROOT=['home','alerts','settings'];
 function go(v,ex={}){
   kc();
   if(!ROOT.includes(v))S.prev.push({view:S.view,fid:S.fid});
   S.view=v;Object.assign(S,ex);
-  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  const navHl={'pick-inspect':'pick-inspect','pick-report':'pick-report','farm-report':'pick-report','farm':'pick-inspect','inspect':'pick-inspect','farm-overview':'pick-inspect','inspect-history':'pick-inspect','farm-settings':'pick-inspect'};
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===(navHl[v]||v)));
   document.getElementById('scr').scrollTop=0;
   const bb=document.getElementById('bb'),nb=document.getElementById('nbtn');
   const isR=ROOT.includes(v);
@@ -354,37 +357,95 @@ function goBack(){if(S.prev.length){const p=S.prev.pop();go(p.view,{fid:p.fid})}
 
 /* ── HOME ── */
 function rHome(){
-  const k=allKPI();const chk=FARMS.filter(f=>latF(f.id)).length;
-  const top=buildAlerts().filter(a=>a.sev<=2).slice(0,3);
-  const total=buildAlerts().filter(a=>a.sev<=2).length;
-  let h=`<div class="row" style="margin-bottom:10px"><div style="font-size:12px;color:var(--mut)">ภาพรวมทั้งหมด · ${beD(new Date().toISOString())}</div><div style="font-size:11px;color:var(--mut)">${chk}/5 ศูนย์ตรวจแล้ว</div></div>
-  <div class="s4" style="margin-bottom:13px">
-    <div class="kpi k-ok"><div class="top" style="color:var(--ok)"><span>✓</span><span class="n">${k.ok}</span></div><div class="l">ปกติ</div></div>
-    <div class="kpi k-near"><div class="top" style="color:var(--near)"><span>⏰</span><span class="n">${k.near}</span></div><div class="l">ใกล้หมดอายุ</div></div>
-    <div class="kpi k-below"><div class="top" style="color:var(--below)"><span>🔻</span><span class="n">${k.below}</span></div><div class="l">ต่ำกว่าเกณฑ์</div></div>
-    <div class="kpi k-bad"><div class="top" style="color:var(--bad)"><span>⛔</span><span class="n">${k.expired+k.out}</span></div><div class="l">หมด/หมดอายุ</div></div>
-  </div>
-  <div class="card" style="margin-bottom:13px">
-    <div class="row" style="margin-bottom:6px"><span style="font-size:12.5px;font-weight:700;color:var(--bad)">รายการต้องดำเนินการ (${total})</span>
-    <span style="font-size:11px;color:#6ca9e0;cursor:pointer" onclick="go('alerts')">ดูทั้งหมด ›</span></div>`;
-  if(!top.length)h+=`<div style="font-size:13px;color:var(--ok);padding:6px 0">ทุกศูนย์อยู่ในเกณฑ์ปกติ ✓</div>`;
-  top.forEach(a=>h+=`<div class="acti"><span style="font-size:17px">${a.ic}</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">${a.title}</div><div style="font-size:10.5px;color:${a.col}">${a.desc}</div></div><span style="font-size:9.5px;font-weight:700;background:${a.col};color:#0c1410;padding:3px 8px;border-radius:99px">${a.sub}</span></div>`);
-  h+=`</div><div class="row" style="padding:2px 2px 8px"><span style="font-size:12px;color:var(--mut);font-weight:700">ศูนย์ทั้งหมด</span></div>`;
-  FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li,f.id):null;const warn=s?s.near+s.below+s.expired+s.out:0;
-    const dot=!s?'var(--pend)':(s.expired+s.out?'var(--bad)':warn?'var(--near)':'var(--ok)');
-    h+=`<div class="flist" style="border-left-color:${f.c}" onclick="go('farm',{fid:${f.id}})">
-      <span class="fdot" style="background:${dot};width:11px;height:11px;margin:0"></span>
-      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${f.name}</div>
-      <div style="font-size:11px;color:var(--mut)">${s?`ปกติ ${s.ok} · ${warn?`<span style="color:${dot}">เตือน ${warn}</span>`:'เตือน 0'}`:' ยังไม่เคยตรวจ'}</div></div>
-      <span style="color:var(--hint)">›</span></div>`;});
-  h+=`<div class="noprint" style="margin:0 0 12px"><button class="btn sec" style="font-size:13px;padding:11px;border:1px solid var(--line2)" onclick="bPrAll()">📄 PDF ภาพรวม 5 ศูนย์ · สำหรับผู้บริหาร</button></div>`;
+  const k=allKPI();
+  const chk=FARMS.filter(f=>latF(f.id)).length;
+  const tot=FARMS.length;
+  const pct=Math.round(chk/tot*100);
+  const today=beD(new Date().toISOString());
+  const alrts=buildAlerts().filter(a=>a.sev<=2);
+
+  const R=54,CX=70,CY=70,SW=11;
+  const circ=2*Math.PI*R;
+  const dash=circ*(pct/100);
+  const rc=chk===tot?'#5fd39b':chk>0?'#f3c75a':'#6f857c';
+  const ring='<svg width="140" height="140" viewBox="0 0 140 140">'
+    +'<circle cx="'+CX+'" cy="'+CY+'" r="'+R+'" fill="none" stroke="var(--line)" stroke-width="'+SW+'"/>'
+    +'<circle cx="'+CX+'" cy="'+CY+'" r="'+R+'" fill="none" stroke="'+rc+'" stroke-width="'+SW+'"'
+    +' stroke-dasharray="'+dash+' '+circ+'" stroke-dashoffset="'+circ/4+'" stroke-linecap="round"/>'
+    +'<text x="'+CX+'" y="'+(CY-8)+'" text-anchor="middle" fill="#fff" font-size="22" font-weight="700" font-family="Sarabun,sans-serif">'+pct+'%</text>'
+    +'<text x="'+CX+'" y="'+(CY+10)+'" text-anchor="middle" fill="var(--mut)" font-size="11" font-family="Sarabun,sans-serif">ตรวจแล้ว</text>'
+    +'<text x="'+CX+'" y="'+(CY+24)+'" text-anchor="middle" fill="var(--mut)" font-size="11" font-family="Sarabun,sans-serif">'+chk+'/'+tot+' ศูนย์</text>'
+    +'</svg>';
+
+  let h='';
+  h+='<div class="row" style="margin-bottom:12px">'
+    +'<div style="font-size:12px;color:var(--mut)">📅 '+today+'</div>'
+    +'<div style="font-size:11px;color:var(--hint)">ข้อมูล ณ ปัจจุบัน</div></div>';
+
+  h+='<div class="card" style="padding:14px;margin-bottom:12px">'
+    +'<div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:10px">ภาพรวมทั้งหมด</div>'
+    +'<div style="display:flex;align-items:center;gap:14px">'+ring
+    +'<div style="flex:1;min-width:0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div style="background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:10px;padding:9px 10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--ok);line-height:1">'+k.ok+'</div><div style="font-size:10.5px;color:var(--ok);margin-top:2px">ปกติ</div></div>'
+    +'<div style="background:var(--near-bg);border:1px solid var(--near-bd);border-radius:10px;padding:9px 10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--near);line-height:1">'+k.near+'</div><div style="font-size:10.5px;color:var(--near);margin-top:2px">ใกล้หมดอายุ</div></div>'
+    +'<div style="background:var(--below-bg);border:1px solid var(--below-bd);border-radius:10px;padding:9px 10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--below);line-height:1">'+k.below+'</div><div style="font-size:10.5px;color:var(--below);margin-top:2px">ต่ำกว่าเกณฑ์</div></div>'
+    +'<div style="background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:10px;padding:9px 10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--bad);line-height:1">'+(k.expired+k.out)+'</div><div style="font-size:10.5px;color:var(--bad);margin-top:2px">หมด/หมดอายุ</div></div>'
+    +'</div></div></div></div>';
+
+  h+='<div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:8px">ทางลัด</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px">'
+    +'<button onclick="go(\'pick-inspect\')" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 4px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:22px">📦</span><span style="font-size:10.5px;font-weight:700;color:var(--ink)">ตรวจนับ</span></button>'
+    +'<button onclick="go(\'pick-report\')" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 4px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:22px">📊</span><span style="font-size:10.5px;font-weight:700;color:var(--ink)">รายงาน</span></button>'
+    +'<button onclick="bPrAll()" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 4px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:22px">📄</span><span style="font-size:10.5px;font-weight:700;color:var(--ink)">PDF</span><span style="font-size:9px;color:var(--mut)">ผู้บริหาร</span></button>'
+    +'<button onclick="go(\'alerts\')" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 4px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative"><span style="font-size:22px">🔔</span><span style="font-size:10.5px;font-weight:700;color:var(--ink)">แจ้งเตือน</span>'
+    +(alrts.length?'<span style="position:absolute;top:6px;right:6px;background:var(--bad);color:#1a0505;font-size:8px;font-weight:700;padding:1px 5px;border-radius:99px">'+alrts.length+'</span>':'')
+    +'</button></div>';
+
+  if(alrts.length){
+    h+='<div class="card" style="margin-bottom:12px"><div class="row" style="margin-bottom:6px">'
+      +'<span style="font-size:12.5px;font-weight:700;color:var(--bad)">รายการต้องดำเนินการ ('+alrts.length+')</span>'
+      +'<span style="font-size:11px;color:#6ca9e0;cursor:pointer" onclick="go(\'alerts\')">ดูทั้งหมด ›</span></div>';
+    alrts.slice(0,3).forEach(a=>{
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">'
+        +'<span style="font-size:17px">'+a.ic+'</span><div style="flex:1;min-width:0">'
+        +'<div style="font-size:12.5px;font-weight:700">'+a.title+'</div>'
+        +'<div style="font-size:10.5px;color:'+a.col+'">'+a.desc+'</div></div>'
+        +'<span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:'+a.col+';color:#0c1410;flex:none">'+a.sub+'</span></div>';
+    });
+    h+='</div>';
+  }
+
+  h+='<div class="row" style="margin-bottom:8px"><span style="font-size:11.5px;font-weight:700;color:var(--mut)">สถานะศูนย์ ('+FARMS.length+')</span></div>';
+  FARMS.forEach(f=>{
+    const li=latF(f.id);const sv=li?summ(li,f.id):null;
+    const warn=sv?sv.near+sv.below+sv.expired+sv.out:0;
+    const bCol=!sv?'var(--pend)':warn?'var(--near)':'var(--ok)';
+    const bBg=!sv?'var(--pend-bg)':warn?'var(--near-bg)':'var(--ok-bg)';
+    const bTxt=!sv?'ยังไม่ตรวจ':warn?'เตือน '+warn:'ตรวจแล้ว';
+    const lDate=li?beD(li.date):'';
+    h+='<div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-left:5px solid '+f.c+';border-radius:10px;padding:10px 13px;margin-bottom:8px;cursor:pointer" onclick="go(\'farm\',{fid:'+f.id+'})">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">'+f.name+'</div>'
+      +'<div style="font-size:11px;color:var(--mut);margin-top:2px">'+(lDate?'ตรวจล่าสุด '+lDate:'ยังไม่เคยตรวจ')+'</div></div>'
+      +'<span style="font-size:11px;font-weight:700;padding:4px 11px;border-radius:99px;background:'+bBg+';color:'+bCol+';flex:none;white-space:nowrap">'+bTxt+'</span>'
+      +'<span style="color:var(--hint)">›</span></div>';
+  });
+
   h+=cred();
   document.getElementById('scr').innerHTML=h;
 }
-
-/* ── PICKERS ── */
 function rPickI(){pickList('เลือกศูนย์ที่จะตรวจนับ','inspect')}
-function rPickR(){pickList('เลือกศูนย์เพื่อดูรายงาน','farm-report')}
+function rPickR(){
+  let h=`<button class="btn sec noprint" style="margin-bottom:14px;padding:13px" onclick="bPrAll()">
+    📄 PDF ภาพรวม 5 ศูนย์ · สำหรับผู้บริหาร</button>
+  <div class="sec-h">เลือกศูนย์เพื่อดูรายงาน</div>`;
+  FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li,f.id):null;const warn=s?s.near+s.below+s.expired+s.out:0;
+    h+=`<div class="flist" style="border-left-color:${f.c}" onclick="go('farm-report',{fid:${f.id}})">
+      <span class="fdot" style="background:${f.c};width:11px;height:11px;margin:0"></span>
+      <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">${f.name}</div>
+      <div style="font-size:11px;color:var(--mut)">${li?'ตรวจล่าสุด '+beD(li.date):'ยังไม่เคยตรวจ'}${warn?` · <span style="color:var(--near)">เตือน ${warn}</span>`:''}</div></div>
+      <span style="color:var(--hint)">›</span></div>`;});
+  h+=cred();document.getElementById('scr').innerHTML=h;
+}
 function pickList(title,target){
   let h=`<div class="sec-h">${title}</div>`;
   FARMS.forEach(f=>{const li=latF(f.id);const s=li?summ(li,f.id):null;const warn=s?s.near+s.below+s.expired+s.out:0;
