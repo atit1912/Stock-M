@@ -135,10 +135,9 @@ table.rep td.l{text-align:left}
   body,.app{background:#fff!important;color:#111!important}
   .app,.scr,.bnav,.ab,.ibtn,.noprint,.btn,.seg,.mnav,.swrap,nav,
   #toast,.modal-bg,.ftdev,.cred{display:none!important}
-  #prt{display:block!important}
+  #prt{display:none;position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto}
   @page{size:A4;margin:0}
-}.bnav,.ibtn,.noprint{display:none!important}.scr{padding:0;overflow:visible}#prt{display:block!important;color:#111}.cred{display:none}}
-#prt{display:none}
+}.bnav,.ibtn,.noprint{display:none!important}.scr{padding:0;overflow:visible}#prt{display:block!important}.cred{display:none}}
 
 .tgl{width:42px;height:24px;border-radius:99px;border:none;cursor:pointer;position:relative;flex:none;transition:background .2s}
 .tgl.on{background:var(--fc)}.tgl.off{background:var(--line2)}
@@ -323,7 +322,8 @@ function inspSel(cur){return`<select id="isel" style="margin-bottom:10px">${INSP
 const ROOT=['home','alerts','settings'];
 function go(v,ex={}){
   kc();
-  if(!ROOT.includes(v))S.prev.push({view:S.view,fid:S.fid});
+  if(ROOT.includes(v))S.prev=[];
+  else S.prev.push({view:S.view,fid:S.fid});
   S.view=v;Object.assign(S,ex);
   const navHl={'pick-inspect':'pick-inspect','pick-report':'pick-report','farm-report':'pick-report','farm':'pick-inspect','inspect':'pick-inspect','farm-overview':'pick-inspect','inspect-history':'pick-inspect','farm-settings':'pick-inspect'};
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===(navHl[v]||v)));
@@ -802,9 +802,12 @@ function bPr(li, s, acts, detail, its) {
     </div>
   </div>`;
 
-  document.getElementById('prt').style.display = 'block';
+  const prt2=document.getElementById('prt');
+  prt2.style.display='block';
+  const _h2=()=>{prt2.style.display='none';window.onafterprint=null;};
+  window.onafterprint=_h2;
   window.print();
-  setTimeout(()=>{ document.getElementById('prt').style.display='none'; }, 900);
+  setTimeout(_h2,2000);
 }
 
 function csvX(li,its){const f=F(S.fid);let rows=[['ศูนย์','วันที่ตรวจ','ผู้ตรวจ','หมวด','รายการ','หน่วย','ขั้นต่ำ','คงเหลือ','วันหมดอายุ','สถานะ']];
@@ -1153,8 +1156,10 @@ function bPrAll() {
   </div>`;
 
   pr.style.display = 'block';
+  const _hidePrt=()=>{pr.style.display='none';window.onafterprint=null;};
+  window.onafterprint=_hidePrt;
   window.print();
-  setTimeout(()=>{ pr.style.display='none'; }, 900);
+  setTimeout(_hidePrt, 2000);
 }
 
 boot();
