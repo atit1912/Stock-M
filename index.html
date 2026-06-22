@@ -722,12 +722,12 @@ function bPr(li, s, acts, detail, its) {
       <img src="${LSRC}" style="width:52px;height:52px;object-fit:contain;flex:none;margin-top:2px">
       <div style="flex:1">
         <div style="font-size:9.5px;color:#888;letter-spacing:.8px;font-weight:600">MSBRC-2 · MediTrack</div>
-        <div style="font-size:18px;font-weight:700;color:#111;margin:3px 0 2px">
+        <div style="font-size:17px;font-weight:700;color:#111;margin:3px 0 2px;line-height:1.25">
           ${detail?'รายงานตรวจนับสต็อกยาและเวชภัณฑ์':'รายงานสรุปสต็อกยาและเวชภัณฑ์'}
         </div>
         <div style="font-size:13px;color:#444;font-weight:600">${f.name}</div>
       </div>
-      <div style="text-align:right;font-size:11px;color:#555;line-height:2;flex:none">
+      <div style="text-align:right;font-size:11px;color:#555;line-height:1.9;flex:none;white-space:nowrap;min-width:130px">
         <div>วันที่ตรวจ: <strong style="color:#111">${inspDate}</strong></div>
         <div>ผู้ตรวจ: <strong style="color:#111">${li.inspector}</strong></div>
         <div>วันที่พิมพ์: <strong style="color:#111">${today}</strong></div>
@@ -955,6 +955,8 @@ async function delIns(){
 /* ─── PDF: ภาพรวมทุกศูนย์ (Executive Report) ─── */
 function bPrAll() {
   const today = beD(new Date().toISOString());
+  let lastInspector='—',lastInspDate='';
+  FARMS.forEach(f=>{const li=latF(f.id);if(li){lastInspector=li.inspector;lastInspDate=beD(li.date);}});
   const pr = document.getElementById('prt');
 
   /* KPI รวม */
@@ -1031,10 +1033,10 @@ function bPrAll() {
       <img src="${LSRC}" style="width:52px;height:52px;object-fit:contain;flex:none">
       <div style="flex:1">
         <div style="font-size:9.5px;color:#888;letter-spacing:.8px;font-weight:600">MSBRC-2 · MediTrack</div>
-        <div style="font-size:18px;font-weight:700;color:#111;margin:3px 0 2px">รายงานภาพรวมสต็อกยาและเวชภัณฑ์</div>
+        <div style="font-size:17px;font-weight:700;color:#111;margin:3px 0 2px;line-height:1.25">รายงานภาพรวมสต็อกยาและเวชภัณฑ์</div>
         <div style="font-size:11px;color:#555">ระบบตรวจนับสต็อก 5 ศูนย์วิจัย · ธุรกิจพันธุ์กุ้งทะเล 2</div>
       </div>
-      <div style="text-align:right;font-size:11px;color:#555;line-height:2;flex:none">
+      <div style="text-align:right;font-size:11px;color:#555;line-height:1.9;flex:none;white-space:nowrap;min-width:130px">
         <div>วันที่พิมพ์: <strong style="color:#111">${today}</strong></div>
         <div>ศูนย์ที่ตรวจแล้ว: <strong style="color:#111">${checkedFarms}/5 ศูนย์</strong></div>
       </div>
@@ -1112,10 +1114,10 @@ function bPrAll() {
     <div style="margin-top:28px;display:flex;justify-content:flex-start">
       <div style="width:55%;max-width:340px">
         <div style="border-top:1px solid #999;padding-top:8px;font-size:12px">
-          <div style="font-weight:700">ผู้จัดทำรายงาน</div>
+          <div style="font-weight:700">ผู้ตรวจสต็อก</div>
           <div style="color:#777;margin-top:16px">ลงชื่อ ................................................</div>
-          <div style="color:#777;margin-top:6px">(..........................................)</div>
-          <div style="color:#777;margin-top:6px">วันที่ ...............................</div>
+          <div style="color:#777;margin-top:6px">(${lastInspector})</div>
+          <div style="color:#777;margin-top:6px">วันที่ ${lastInspDate||'...............................'}</div>
         </div>
       </div>
     </div>
