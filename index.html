@@ -442,7 +442,13 @@ async function delInspector(i){
 async function setNote(fid,itemId,note){
   const cfg=FC(fid);const it=cfg.items.find(x=>x.id===itemId);
   if(it){it.note=note;}
-  await saveCfg();toast('บันทึกหมายเหตุแล้ว');
+  await saveCfg();
+  /* sync Sheet ทันที — ใช้ข้อมูลการตรวจล่าสุดของฟาร์มนั้น */
+  const latestInsp=latF(fid);
+  if(latestInsp){
+    pSh(latestInsp); /* ส่งไป Sheet พร้อมหมายเหตุใหม่ */
+  }
+  toast('บันทึกหมายเหตุแล้ว ✓');
 }
 function noteModal(fid,itemId){
   const cfg=FC(fid);const it=cfg.items.find(x=>x.id===itemId);
@@ -1270,9 +1276,78 @@ async function svGs(){gsUrl=(document.getElementById('gu').value||'').trim();awa
 async function tstGs(){const u=(document.getElementById('gu').value||'').trim();if(!u){toast('ใส่ลิงก์ก่อน');return}
   const p={sheetId:SID,farm:'(ทดสอบ)',date:beD(new Date().toISOString()),inspector:'ระบบ',ts:new Date().toISOString(),rows:[{category:'ทดสอบ',item:'MediTrack Connection Test',unit:'-',min:0,qty:1,exp:'-',status:'ทดสอบ'}]};
   try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});toast('ส่งทดสอบแล้ว — เปิดชีตตรวจสอบ')}catch(e){toast('ส่งไม่สำเร็จ')}}
-async function pSh(rec){if(!gsUrl)return false;const its=fItems(rec.farmId);
-  const p={sheetId:SID,farm:F(rec.farmId).name,date:beD(rec.date),inspector:rec.inspector,ts:new Date(rec.ts).toISOString(),rows:its.map(it=>{const line=(rec.lines||{})[it.id]||{};const stk=ls(line,it);return{category:CN(it.cat),item:it.name,unit:it.unit,min:it.min,qty:line.touched?lt(line):'',exp:it.exp&&nx(line)?xL(nx(line)):'—',status:SM[stk].l};})};
-  try{await fetch(gsUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});return true}catch(e){return false}}
+async function pShEmpty(fid){
+  /* เรียกเมื่อลบการตรวจล่าสุด — แจ้ง Sheet ว่าฟาร์มนี้ไม่มีข้อมูลแล้ว */
+  if(!gsUrl)return;
+  const p={
+    sheetId:SID||'',
+    farm:F(fid).name,
+    date:'—',
+    inspector:'—',
+    ts:new Date().toISOString(),
+    isEmpty:true,
+    rows:[{
+      category:'',item:'ยังไม่มีข้อมูลการตรวจ',
+      unit:'',min:'',qty:'',lotDetail:'',
+      nearestExp:'',daysLeft:'',needToOrder:'',
+      status:'ยังไม่ตรวจ',note:'',
+    }]
+  };
+  try{
+    await fetch(gsUrl,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(p)});
+  }catch(e){}
+}
+
+async function pSh(rec){
+  if(!gsUrl)return false;
+  const its=fItems(rec.farmId);
+  const cfg=FC(rec.farmId);
+  const p={
+    sheetId:SID,
+    farm:F(rec.farmId).name,
+    date:beD(rec.date),
+    inspector:rec.inspector,
+    ts:new Date(rec.ts).toISOString(),
+    rows:its.map(it=>{
+      const line=(rec.lines||{})[it.id]||{lots:[],touched:false};
+      const stk=ls(line,it);
+      const qty=line.touched?lt(line):0;
+      const need=Math.max(0,(it.min||0)-qty);
+      const cfgItem=cfg.items.find(x=>x.id===it.id);
+      const note=(cfgItem&&cfgItem.note)||'';
+      /* lot แยกรายการ เช่น "5 หลอด (06/2571), 3 หลอด (12/2572)" */
+      const lotDetail=(line.lots||[]).filter(l=>l.qty>0).map(l=>{
+        const expStr=l.exp?xL(l.exp):'';
+        return l.qty+' '+it.unit+(expStr?' ('+expStr+')':'');
+      }).join(', ')||'—';
+      /* วันหมดอายุที่ใกล้ที่สุด (เฉพาะที่ยังไม่หมด) */
+      const validLots=(line.lots||[]).filter(l=>l.exp&&daysTo(l.exp)>=0);
+      const nearestExp=validLots.length?xL(validLots.sort((a,b)=>daysTo(a.exp)-daysTo(b.exp))[0].exp):'—';
+      const daysLeft=validLots.length?daysTo(validLots.sort((a,b)=>daysTo(a.exp)-daysTo(b.exp))[0].exp):null;
+      return{
+        category:CN(it.cat),
+        item:it.name,
+        unit:it.unit,
+        min:it.min,
+        qty:line.touched?qty:'',
+        lotDetail,
+        nearestExp,
+        daysLeft:daysLeft!==null?daysLeft:'',
+        needToOrder:need>0?need:'',
+        status:SM[stk].l,
+        note,
+      };
+    })
+  };
+  try{
+    await fetch(gsUrl,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(p)});
+    return true;
+  }catch(e){return false;}
+}
 
 function editIns(){
   const insp=INSPS.find(i=>i.id===S.did);if(!insp)return;
@@ -1284,8 +1359,22 @@ function editIns(){
 async function delIns(){
   const insp=INSPS.find(i=>i.id===S.did);if(!insp)return;
   if(!confirm("ลบการตรวจวันที่ "+beD(insp.date)+" ?\nลบแล้วกู้คืนไม่ได้"))return;
-  const delId=S.did;INSPS=INSPS.filter(i=>i.id!==delId);
-  await saveIns();fbDeleteInsp(delId);toast("ลบการตรวจแล้ว");go("farm-hist",{fid:insp.farmId});
+  const delFid=insp.farmId;
+  const delId=S.did;
+  INSPS=INSPS.filter(i=>i.id!==delId);
+  await saveIns();
+  fbDeleteInsp(delId);
+  /* อัป Sheet รายฟาร์มด้วยข้อมูลล่าสุด (หลังลบแล้ว) */
+  const newLatest=latF(delFid);
+  if(newLatest){
+    /* ยังมีการตรวจอื่น → ส่งอันล่าสุด */
+    pSh(newLatest);
+  } else {
+    /* ไม่มีข้อมูลเหลือ → ส่ง signal ว่าฟาร์มนี้ไม่มีข้อมูล */
+    pShEmpty(delFid);
+  }
+  toast("ลบการตรวจแล้ว");
+  go("farm-hist",{fid:delFid});
 }
 
 /* ─── PDF: ภาพรวมทุกศูนย์ (Executive Report) ─── */
