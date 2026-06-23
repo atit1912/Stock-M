@@ -233,6 +233,7 @@ table.rep td.l{text-align:left}
   </nav>
 </div>
 <div class="toast" id="toast"></div>
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;align-items:flex-end;justify-content:center"></div>
 <div id="prt"></div>
 
 <script>
@@ -384,10 +385,16 @@ function showSyncOK() {
   setTimeout(hideSyncBar, 1500);
 }
 
+function cModal(){
+  const m=document.getElementById('modal');
+  if(m){m.style.display='none';m.innerHTML='';}
+}
+
 function editItem(id){
   const cfg=FC(S.fid);const it=cfg.items.find(x=>x.id===id);if(!it)return;
   const m=document.getElementById('modal');
-  m.innerHTML=`<div class="modal-bg" onclick="if(event.target===this)cModal()"><div class="modal">
+  m.style.display='flex';
+  m.innerHTML=`<div class="modal" style="width:100%;max-width:520px;background:var(--card);border-radius:18px 18px 0 0;padding:20px 18px 34px">
     <h3>✎ แก้ไขรายการ</h3>
     <label class="fld">ชื่อรายการ</label>
     <input type="text" id="ei_name" value="${it.name.replace(/"/g,'&quot;')}" style="margin-bottom:10px">
@@ -397,7 +404,7 @@ function editItem(id){
     <div style="display:flex;gap:8px">
       <button class="btn sec sm" style="flex:1" onclick="cModal()">ยกเลิก</button>
       <button class="btn prim sm" style="flex:1" onclick="saveEditItem('${id}')">บันทึก</button>
-    </div></div></div>`;
+    </div></div>`;
   m.style.display='block';
 }
 async function saveEditItem(id){
@@ -441,7 +448,8 @@ function noteModal(fid,itemId){
   const cfg=FC(fid);const it=cfg.items.find(x=>x.id===itemId);
   const cur=(it&&it.note)||'';
   const m=document.getElementById('modal');
-  m.innerHTML=`<div class="modal-bg" onclick="if(event.target===this)cModal()"><div class="modal">
+  m.style.display='flex';
+  m.innerHTML=`<div class="modal" style="width:100%;max-width:520px;background:var(--card);border-radius:18px 18px 0 0;padding:20px 18px 34px">
     <h3>📝 หมายเหตุ</h3>
     <div style="font-size:14px;font-weight:700;margin-bottom:10px">${it?it.name:''}</div>
     <label class="fld">หมายเหตุ / สถานะการดำเนินการ</label>
@@ -449,7 +457,7 @@ function noteModal(fid,itemId){
     <div style="display:flex;gap:8px">
       <button class="btn sec sm" style="flex:1" onclick="cModal()">ยกเลิก</button>
       <button class="btn prim sm" style="flex:1" onclick="setNote(${fid},'${itemId}',document.getElementById('noteInp').value.trim());cModal()">บันทึก</button>
-    </div></div></div>`;
+    </div></div>`;
   m.style.display='block';
 }
 
@@ -877,10 +885,10 @@ function ovRw(li,its){let r='';const qq=(S._ovQ||'').trim().toLowerCase();
       if(_m==='prob'&&(stk==='ok'||stk==='pending'))return;
       if(_m==='near'&&stk!=='near')return;
       if(_m==='expired'&&stk!=='expired')return;
-      if(_m==='below'&&stk!=='below')return;rows+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">${line.touched?lt(line)+' '+it.unit:'—'}${it.exp&&nx(line)?' · หมด '+xL(nx(line)):''} · ขั้นต่ำ ${it.min}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none">
+      if(_m==='below'&&stk!=='below')return;rows+=`<div class="irow" style="cursor:default"><div><div style="font-size:14px;font-weight:700">${it.name}</div><div style="font-size:12px;color:var(--hint);margin-top:2px">${line.touched?lt(line)+' '+it.unit:'—'}${it.exp&&nx(line)?' · หมด '+xL(nx(line)):''} · ขั้นต่ำ ${it.min}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:none;min-width:80px">
         <span class="chip ${sm.c}">${sm.l}</span>
-        ${(()=>{const note=FC(S.fid).items.find(x=>x.id===it.id)?.note;return note?`<span style="font-size:10px;color:var(--near);font-style:italic">${note}</span>`:''})()}
-        <button onclick="noteModal(${S.fid},'${it.id}')" style="background:none;border:none;color:var(--hint);font-size:11px;cursor:pointer;font-family:inherit;padding:0">📝 หมายเหตุ</button>
+        ${(()=>{const note=FC(S.fid).items.find(x=>x.id===it.id)?.note;return note?`<div style="font-size:10px;color:var(--near);font-style:italic;text-align:right;max-width:100px;white-space:normal">${note}</div>`:''})()}
+        <button onclick="noteModal(${S.fid},'${it.id}')" style="background:var(--card2);border:1px solid var(--line2);color:var(--mut);font-size:11px;cursor:pointer;font-family:inherit;padding:3px 8px;border-radius:6px;white-space:nowrap">📝 หมายเหตุ</button>
       </div></div>`;});if(rows)r+=`<div class="sec-h">${cat.name}</div>${rows}`;});
   return r||'<div class="empty">ไม่พบรายการ</div>';}
 
