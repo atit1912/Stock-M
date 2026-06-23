@@ -676,7 +676,7 @@ function bPr(li, s, acts, detail, its) {
         const stCol = {'expired':'#b0312a','out':'#b0312a','below':'#b85c00','near':'#b8860b','ok':'#1a7a4e','pending':'#888'}[stk]||'#111';
         const qty = line.touched?lt(line):0;
         const need = Math.max(0,(it.min||0)-qty);
-        const lotInfo = (line.lots||[]).filter(l=>l.exp).map(l=>`${l.qty}@${xL(l.exp)}`).join(', ')||'—';
+        const lotInfo = (line.lots||[]).filter(l=>l.exp).map(l=>`${l.qty} ${it.unit} (${xL(l.exp)})`).join(', ')||'—';
         return `<tr style="background:${i%2?'#fff':'#fafafa'}">
           <td style="text-align:left;padding:4px 7px">${it.name}</td>
           <td style="padding:4px 7px">${it.unit}</td>
