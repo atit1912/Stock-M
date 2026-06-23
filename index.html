@@ -154,7 +154,59 @@ table.rep td.l{text-align:left}
 .sw-wrap{position:relative;margin-bottom:12px}
 .sw-wrap .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--hint);font-size:16px;pointer-events:none}
 .sw-wrap input{padding-left:36px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyDh_vQnhcJy9-quddWcPy8Q-7xAyPHArBg",
+    authDomain: "meditrack-msbrc2.firebaseapp.com",
+    projectId: "meditrack-msbrc2",
+    storageBucket: "meditrack-msbrc2.firebasestorage.app",
+    messagingSenderId: "60072344567",
+    appId: "1:60072344567:web:5a0046fb2599c4a0f8ccf2"
+  };
+  try {
+    firebase.initializeApp(firebaseConfig);
+    window._fbDb = firebase.firestore();
+    window._fbReady = true;
+    console.log('[Firebase] ready');
+  } catch(e) {
+    console.warn('[Firebase] init error:', e.message);
+    window._fbReady = false;
+  }
+
+  window._fbStartListeners = function() {
+    if(!window._fbReady) return;
+    const db = window._fbDb;
+    /* Real-time: inspections */
+    db.collection('inspections').onSnapshot(snap => {
+      if(!window._appReady) return;
+      const newInsps = [];
+      snap.forEach(d => newInsps.push(d.data()));
+      newInsps.sort((a,b) => a.ts - b.ts);
+      if(JSON.stringify(newInsps) !== JSON.stringify(window.INSPS)) {
+        window.INSPS = newInsps;
+        INSPS = newInsps;
+        window._refreshUI && window._refreshUI();
+      }
+    }, err => console.warn('[Firebase] inspections listener:', err.message));
+
+    /* Real-time: farm_cfg */
+    db.collection('settings').doc('farm_cfg').onSnapshot(snap => {
+      if(!window._appReady || !snap.exists) return;
+      const cfg = snap.data().value;
+      if(cfg && JSON.stringify(cfg) !== JSON.stringify(window.FARM_CFG)) {
+        window.FARM_CFG = cfg;
+        FARM_CFG = cfg;
+        window._refreshUI && window._refreshUI();
+      }
+    }, err => console.warn('[Firebase] cfg listener:', err.message));
+  };
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -247,10 +299,98 @@ const _m={};
 async function sg(k){if(window.storage){try{const r=await window.storage.get(k);return r?r.value:null}catch(e){}}try{return localStorage.getItem(k)}catch(e){}return _m[k]??null}
 async function ss(k,v){if(window.storage){try{await window.storage.set(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){}  _m[k]=v}
 
+/* ═══════════════════════════════════════════
+   FIREBASE SYNC LAYER (compat SDK)
+═══════════════════════════════════════════ */
+
+async function fbGet(col, docId) {
+  try {
+    if(!window._fbReady) return null;
+    const snap = await window._fbDb.collection(col).doc(docId).get();
+    return snap.exists ? snap.data().value : null;
+  } catch(e) { console.warn('fbGet:', e.message); return null; }
+}
+
+async function fbSet(col, docId, value) {
+  try {
+    if(!window._fbReady) return;
+    await window._fbDb.collection(col).doc(docId).set({ value, updatedAt: Date.now() });
+  } catch(e) { console.warn('fbSet:', e.message); }
+}
+
+async function fbSaveInsp(rec) {
+  try {
+    if(!window._fbReady) return;
+    await window._fbDb.collection('inspections').doc(rec.id).set(rec);
+  } catch(e) { console.warn('fbSaveInsp:', e.message); }
+}
+
+async function fbDeleteInsp(id) {
+  try {
+    if(!window._fbReady) return;
+    await window._fbDb.collection('inspections').doc(id).delete();
+  } catch(e) { console.warn('fbDeleteInsp:', e.message); }
+}
+
+async function fbLoadAll() {
+  try {
+    if(!window._fbReady) { console.warn('[FB] not ready'); return false; }
+    showSyncBar('กำลังโหลดข้อมูลจาก Cloud...');
+    /* โหลด inspections */
+    const snap = await window._fbDb.collection('inspections').get();
+    if(!snap.empty) {
+      const cloudInsps = [];
+      snap.forEach(d => cloudInsps.push(d.data()));
+      cloudInsps.sort((a,b) => a.ts - b.ts);
+      INSPS = cloudInsps;
+      await ss('insp_v3', JSON.stringify(INSPS));
+    }
+    /* โหลด farm_cfg */
+    const cfgSnap = await window._fbDb.collection('settings').doc('farm_cfg').get();
+    if(cfgSnap.exists) {
+      const cfg = cfgSnap.data().value;
+      if(cfg) { FARM_CFG = cfg; await ss('farm_cfg_v3', JSON.stringify(FARM_CFG)); }
+    }
+    hideSyncBar();
+    return true;
+  } catch(e) {
+    console.warn('fbLoadAll:', e.message);
+    hideSyncBar();
+    return false;
+  }
+}
+
+/* Sync bar UI */
+function showSyncBar(msg) {
+  let el = document.getElementById('syncBar');
+  if(!el) {
+    el = document.createElement('div');
+    el.id = 'syncBar';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;background:#1c7a3e;color:#fff;font-size:12px;padding:5px 14px;text-align:center;font-family:Sarabun,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;max-width:520px;margin:0 auto';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<span style="animation:spin .8s linear infinite;display:inline-block">↻</span> ' + msg;
+  el.style.display = 'flex';
+}
+function hideSyncBar() {
+  const el = document.getElementById('syncBar');
+  if(el) el.style.display = 'none';
+}
+function showSyncOK() {
+  showSyncBar('✓ ซิงค์แล้ว');
+  setTimeout(hideSyncBar, 1500);
+}
+
+async function saveCfg(){
+  await ss('farm_cfg_v3',JSON.stringify(FARM_CFG));
+  window.FARM_CFG=FARM_CFG;
+  /* sync ไป Firebase ด้วย */
+  fbSet('settings','farm_cfg',JSON.parse(JSON.stringify(FARM_CFG)));
+}
 async function boot(){
+  /* 1. โหลดจาก localStorage ก่อน (เร็ว ไม่รอ network) */
   const ci=await sg('farm_cfg_v3');
   if(ci){try{FARM_CFG=JSON.parse(ci)||{}}catch(e){FARM_CFG={}}}
-  // init ฟาร์มที่ยังไม่มี config
   FARMS.forEach(f=>{if(!FARM_CFG[f.id])FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]}});
   for(const f of FARMS){
     if(!FARM_CFG[f.id]._fiMigrated){
@@ -261,14 +401,49 @@ async function boot(){
       FARM_CFG[f.id]._fiMigrated=true;
     }
   }
-  await saveCfg();
-  const ins=await sg('insp_v3');if(ins){try{INSPS=JSON.parse(ins)||[]}catch(e){INSPS=[]}}
+  const ins=await sg('insp_v3');
+  if(ins){try{INSPS=JSON.parse(ins)||[]}catch(e){INSPS=[]}}
   gsUrl=(await sg('gsheet_url'))||GSD;
   const n=new Date();S.rym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+
+  /* 2. แสดง UI จาก local data ก่อน */
+  window._appReady=true;
+  window.INSPS=INSPS;
+  window.FARM_CFG=FARM_CFG;
+  window._refreshUI=function(){
+    INSPS=window.INSPS;
+    FARM_CFG=window.FARM_CFG;
+    const v=S.view;
+    if(v==='home')rHome();
+    else if(v==='alerts')rAlerts();
+    else if(v==='farm')rFarm();
+    else if(v==='farm-report')rRep();
+    updBadges();
+    showSyncOK();
+  };
   go('home');
+
+  /* 3. โหลด Firebase ใน background (ไม่บล็อก UI) */
+  setTimeout(async()=>{
+    const ok=await fbLoadAll();
+    if(ok){
+      window.INSPS=INSPS;
+      window.FARM_CFG=FARM_CFG;
+      go(S.view,{fid:S.fid});
+      /* เริ่ม real-time listeners */
+      window._fbStartListeners && window._fbStartListeners();
+    }
+  },500);
 }
-async function saveCfg(){await ss('farm_cfg_v3',JSON.stringify(FARM_CFG))}
-async function saveIns(){await ss('insp_v3',JSON.stringify(INSPS))}
+
+async function saveIns(){
+  await ss('insp_v3',JSON.stringify(INSPS));
+  window.INSPS=INSPS;
+}
+async function saveInsRecord(rec){
+  /* บันทึกเฉพาะ record เดียวไป Firestore (เร็วกว่า save ทั้งหมด) */
+  await fbSaveInsp(rec);
+}
 
 /* ── HELPERS ── */
 function F(id){return FARMS.find(x=>x.id===id)||FARMS[0]}
@@ -568,6 +743,7 @@ async function svI(){
     INSPS.push(rec);
   }
   await saveIns();await saveCfg();
+  if(!S.editId)saveInsRecord(rec); /* sync new record ไป Firebase */
   S.draft=null;
   const sent=await pSh(rec);
   toast(sent?'บันทึกและส่งเข้า Google Sheet แล้ว ✓':'บันทึกในเครื่องแล้ว แต่ส่งเข้า Google Sheet ไม่สำเร็จ');
@@ -921,7 +1097,8 @@ function rSett(){
     <label class="fld">ลิงก์ Web App</label>
     <input type="text" id="gu" value="${gsUrl}" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:10px">
     <div class="s2" style="gap:8px"><button class="btn prim sm" style="flex:1" onclick="svGs()">บันทึก</button><button class="btn sec sm" style="flex:1" onclick="tstGs()">ทดสอบ</button></div>
-    <div style="font-size:12px;color:${gsUrl?'var(--ok)':'var(--hint)'};margin-top:8px">${gsUrl?'● เชื่อมต่อแล้ว':'○ ยังไม่ได้ตั้งค่า'}</div></div>
+    <div style="font-size:12px;color:${gsUrl?'var(--ok)':'var(--hint)'};margin-top:8px">${gsUrl?'● เชื่อมต่อแล้ว':'○ ยังไม่ได้ตั้งค่า'}</div>
+    <div style="font-size:11px;color:var(--ok);margin-top:6px">${window._fbReady?'🔥 Firebase: เชื่อมต่อแล้ว':'🔥 Firebase: กำลังเชื่อมต่อ...'}</div></div>
   <div class="card">
     <div style="font-size:15px;font-weight:700;margin-bottom:6px">🔔 Telegram (เร็วๆ นี้)</div>
     <div style="font-size:13px;color:var(--mut)">ระบบแจ้งเตือนอัตโนมัติผ่าน Telegram กำลังพัฒนา</div></div>
@@ -948,8 +1125,8 @@ function editIns(){
 async function delIns(){
   const insp=INSPS.find(i=>i.id===S.did);if(!insp)return;
   if(!confirm("ลบการตรวจวันที่ "+beD(insp.date)+" ?\nลบแล้วกู้คืนไม่ได้"))return;
-  INSPS=INSPS.filter(i=>i.id!==S.did);
-  await saveIns();toast("ลบการตรวจแล้ว");go("farm-hist",{fid:insp.farmId});
+  const delId=S.did;INSPS=INSPS.filter(i=>i.id!==delId);
+  await saveIns();fbDeleteInsp(delId);toast("ลบการตรวจแล้ว");go("farm-hist",{fid:insp.farmId});
 }
 
 /* ─── PDF: ภาพรวมทุกศูนย์ (Executive Report) ─── */
