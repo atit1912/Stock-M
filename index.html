@@ -859,7 +859,7 @@ async function svI(){
     INSPS.push(rec);
   }
   await saveIns();await saveCfg();
-  if(!S.editId)saveInsRecord(rec); /* sync new record ไป Firebase */
+  saveInsRecord(rec); /* sync ไป Firebase ทั้ง new และ edit mode */
   S.draft=null;
   const sent=await pSh(rec);
   toast(sent?'บันทึกและส่งเข้า Google Sheet แล้ว ✓':'บันทึกในเครื่องแล้ว แต่ส่งเข้า Google Sheet ไม่สำเร็จ');
@@ -1353,7 +1353,8 @@ function editIns(){
   const insp=INSPS.find(i=>i.id===S.did);if(!insp)return;
   S.editId=insp.id;S.fid=insp.farmId;
   S.draft={lines:JSON.parse(JSON.stringify(insp.lines))};
-  // ให้ทุก line ที่มีอยู่ถือว่า touched
+  // ให้ทุก line ที่มีอยู่ถือว่า touched จริงๆ
+  Object.values(S.draft.lines).forEach(l=>{if(l)l.touched=true;});
   go("inspect",{fid:insp.farmId});
 }
 async function delIns(){
