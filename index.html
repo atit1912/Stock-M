@@ -631,11 +631,14 @@ function cred(){return`<div class="cred">MediTrack v1.0 · <strong>${DEV.name}</
 function inspSel(cur){return`<select id="isel" style="margin-bottom:10px">${INSPECTORS.map(n=>`<option${n===cur?' selected':''}>${n}</option>`).join('')}</select>`}
 
 /* ── NAV ── */
-const ROOT=['home','alerts','settings'];
+const ROOT=['home','alerts','settings','pick-inspect','pick-report','dashboard'];
 function go(v,ex={}){
   kc();
-  if(ROOT.includes(v))S.prev=[];
-  else S.prev.push({view:S.view,fid:S.fid});
+  if(ROOT.includes(v)){
+    S.prev=[];
+    // ออกจาก inspect กลางคัน → clear draft เพื่อไม่ให้ค้างข้ามฟาร์ม
+    if(v!=='inspect'){S.draft=null;S.editId=null;}
+  }else S.prev.push({view:S.view,fid:S.fid});
   S.view=v;Object.assign(S,ex);
   const navHl={'pick-inspect':'pick-inspect','pick-report':'pick-report','farm-report':'pick-report','farm':'pick-inspect','inspect':'pick-inspect','farm-overview':'pick-inspect','inspect-history':'pick-inspect','farm-settings':'pick-inspect','dashboard':'dashboard'};
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===(navHl[v]||v)));
@@ -1081,12 +1084,15 @@ function rFarm(){
 }
 
 /* ── INSPECT ── */
-function nDraft(fid){const L={};fItems(fid).forEach(it=>L[it.id]={lots:[],touched:false});return{lines:L}}
+function nDraft(fid){const L={};fItems(fid).forEach(it=>L[it.id]={lots:[],touched:false});return{lines:L,farmId:fid}}
 function cpL(){const li=latF(S.fid);if(!li){toast('ยังไม่มีข้อมูลครั้งก่อน');return}
   fItems(S.fid).forEach(it=>{const p=(li.lines||{})[it.id];const d=S.draft.lines[it.id];if(p&&p.touched){d.lots=(p.lots||[]).map(l=>({qty:l.qty,exp:l.exp}));d.touched=true;}});
   rInsp();toast('คัดลอกจากครั้งก่อนแล้ว')}
 function rInsp(){
-  if(!S.draft){S.draft=nDraft(S.fid);S.editId=null;}
+  // reset draft ถ้าไม่มี หรือเป็นของฟาร์มอื่น (ป้องกัน draft ค้างข้ามฟาร์ม)
+  if(!S.draft||(!S.editId&&S.draft.farmId&&S.draft.farmId!==S.fid)){
+    S.draft=nDraft(S.fid);S.editId=null;
+  }
   const editBanner=S.editId?`<div style="background:var(--near-bg);border:1px solid var(--near-bd);color:var(--near);border-radius:10px;padding:9px 13px;margin-bottom:11px;font-size:13px;font-weight:600">✎ กำลังแก้ไขการตรวจเดิม — บันทึกแล้วจะทับข้อมูลเดิม</div>`:'';S.q='';
   const f=F(S.fid);const cfg=FC(S.fid);
   const its=fItems(S.fid);
