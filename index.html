@@ -623,7 +623,7 @@ function buildAlerts(){
   A.sort((a,b)=>a.sev-b.sev);return A;
 }
 function setTh(f){document.documentElement.style.setProperty('--fc',f.c);document.documentElement.style.setProperty('--fb',f.bg)}
-function rsTh(){document.documentElement.style.setProperty('--fc','#5fbf8e');document.documentElement.style.setProperty('--fb','#15251c')}
+function rsTh(){document.documentElement.style.removeProperty('--fc');document.documentElement.style.removeProperty('--fb')}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400)}
 function kc(){_chartObjs.forEach(c=>{try{c.destroy()}catch(e){}});_chartObjs=[]}
 function updB(){const n=buildAlerts().filter(a=>a.sev<=1).length;['abBdg','navBdg'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display=n?'':'none';if(n)e.textContent=n>99?'99+':n}})}
@@ -882,7 +882,10 @@ function calcStreak(fid){
   // นับ consecutive months ที่มีการตรวจ (ย้อนจากเดือนปัจจุบัน)
   const now=new Date();
   let streak=0;
-  for(let i=0;i<12;i++){
+  // ถ้าเดือนปัจจุบันยังไม่ตรวจ ให้เริ่มนับจากเดือนก่อนหน้า (ยังไม่ถือว่าขาด)
+  const curYm=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const startI=latFM(fid,curYm)?0:1;
+  for(let i=startI;i<12+startI;i++){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
     const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     if(latFM(fid,ym))streak++;
@@ -1052,7 +1055,7 @@ function rFarm(){
   const s=li?summ(li,f.id):{ok:0,near:0,below:0,expired:0,out:0,pending:its.length};
   const done=li?its.filter(it=>(li.lines||{})[it.id]?.touched).length:0;
   const prob=s.expired+s.out+s.below+s.near;
-  let h=`<div style="background:${f.bg};border:1px solid ${f.c}55;border-radius:var(--r);padding:13px 14px;margin-bottom:13px">
+  let h=`<div style="background:${f.c}1a;border:1px solid ${f.c}55;border-radius:var(--r);padding:13px 14px;margin-bottom:13px">
     <div class="s4">
       <div class="kpi k-ok" style="padding:10px 11px"><div class="top" style="color:var(--ok)"><span class="n" style="font-size:22px">${s.ok}</span></div><div class="l">ปกติ</div></div>
       <div class="kpi k-near" style="padding:10px 11px"><div class="top" style="color:var(--near)"><span class="n" style="font-size:22px">${s.near}</span></div><div class="l">ใกล้หมด</div></div>
@@ -1153,7 +1156,7 @@ async function svI(){
     INSPS.push(rec);
   }
   await saveIns();await saveCfg();
-  if(!S.editId)saveInsRecord(rec); /* sync new record ไป Firebase */
+  saveInsRecord(rec); /* sync ไป Firebase ทั้ง new และ edit mode */
   S.draft=null;
   const sent=await pSh(rec);
   toast(sent?'บันทึกและส่งเข้า Google Sheet แล้ว ✓':'บันทึกในเครื่องแล้ว แต่ส่งเข้า Google Sheet ไม่สำเร็จ');
@@ -1647,7 +1650,8 @@ function editIns(){
   const insp=INSPS.find(i=>i.id===S.did);if(!insp)return;
   S.editId=insp.id;S.fid=insp.farmId;
   S.draft={lines:JSON.parse(JSON.stringify(insp.lines))};
-  // ให้ทุก line ที่มีอยู่ถือว่า touched
+  // ให้ทุก line ที่มีข้อมูลอยู่ถือว่า touched จริงๆ
+  Object.values(S.draft.lines).forEach(l=>{if(l)l.touched=true;});
   go("inspect",{fid:insp.farmId});
 }
 async function delIns(){
