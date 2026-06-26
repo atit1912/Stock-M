@@ -280,6 +280,33 @@ const FARMS=[
   {id:4,name:'ศูนย์วิจัยหาดเจ้า',           sh:'หาดเจ้า',      c:'#ef9a4a',bg:'#2a1d10'},
   {id:5,name:'ศูนย์วิจัยเพชรบุรี',          sh:'เพชรบุรี',     c:'#5b73d8',bg:'#161a2e'},
 ];
+/* ── รายการสินค้าสำหรับสั่งของ (รหัส+ราคา) ── */
+const PRODUCTS=[
+  {code:'61000202', name:'TENSOPLASTIC 1X100',                price:80,    unit:'กล่อง'},
+  {code:'61001080', name:'FLANIL CREAM 30 GM BIOLAB',         price:22,    unit:'หลอด'},
+  {code:'61000864', name:'BETADINE HR 15 CC.',                price:49.5,  unit:'ขวด'},
+  {code:'61000022', name:'BETADINE SCRUB 500 ml',             price:210,   unit:'ขวด'},
+  {code:'61001086', name:'เกลือแร่-OREDA.R.O',                price:1.75,  unit:'ซอง'},
+  {code:'61000199', name:'SYSTRAL CRAM 25 gm',                price:80,    unit:'หลอด'},
+  {code:'61000062', name:'CPM 4 mg.',                         price:0.22,  unit:'เม็ด'},
+  {code:'61000039', name:'CADRAMIDE-V 60 cc',                 price:22,    unit:'ขวด'},
+  {code:'61000244', name:'M.STOMACHICA 60 cc',               price:10.75, unit:'ขวด'},
+  {code:'61000156', name:'PARACETAMOL 500 mg 10X50 (SARA)',   price:1.12,  unit:'เม็ด'},
+  {code:'61000068', name:'SILVERDERM CREAM 25 gm',            price:30.5,  unit:'หลอด'},
+  {code:'61000013', name:'ALUM MILK 240 ml-BIOLAB',           price:28.5,  unit:'ขวด'},
+  {code:'61001087', name:'แอมโมเนียหอม 15 ml อันอันโอสถ',     price:12,    unit:'ขวด'},
+  {code:'61000710', name:'70%ALCOHOL 60 ml-เสือดาว',         price:9,     unit:'ขวด'},
+  {code:'61000203', name:'TERAMYCIN OINTMENT 3.5 gm.-Pfizer', price:28,    unit:'หลอด'},
+  {code:'61000862', name:'OPSAR 75ML(6QZ)EYE WASH. PD',       price:26,    unit:'ขวด'},
+  {code:'61000149', name:'HISTA-OPH',                         price:25,    unit:'ขวด'},
+  {code:'61000836', name:'ชุดตรวจสารเสพติดแบบจุ่ม LUNGENE (1x40s)', price:800, unit:'กล่อง'},
+];
+// ราคาจริง (เช็ค override ก่อน)
+function prodPrice(code){return PRICE_OVERRIDE[code]!=null?PRICE_OVERRIDE[code]:(PRODUCTS.find(p=>p.code===code)||{}).price||0;}
+async function savePriceOverride(){
+  await ss('price_override_v1',JSON.stringify(PRICE_OVERRIDE));
+  if(window._fbReady){try{await window._fbDb.collection('settings').doc('price_override').set({data:JSON.stringify(PRICE_OVERRIDE)});}catch(e){}}
+}
 let INSPECTORS=['นายอธิศ ฉิมนันท์','นายกิตติ สุขมา'] /* โหลดจาก settings */;
 const CATS=[
   {id:'equip',  name:'อุปกรณ์ / เครื่องมือ'},
@@ -338,6 +365,7 @@ let FARM_CFG={};
 let INSPS=[];
 let ORDERS=[];  // ระบบสั่งยา/เวชภัณฑ์
 let ITEM_PHOTOS={};  // รูปรายการ {itemId:{shared:base64, farms:{fid:base64}}}
+let PRICE_OVERRIDE={};  // ราคาที่แก้เอง {code:price}
 let gsUrl=GSD;
 let S={view:'home',fid:null,draft:null,insp:'',rm:'month',rym:'',did:null,editId:null,prev:[],q:''};
 let _chartObjs=[];
@@ -409,6 +437,14 @@ async function fbLoadAll() {
         if(cloudPh&&typeof cloudPh==='object'){ITEM_PHOTOS=cloudPh;await ss('item_photos_v1',JSON.stringify(ITEM_PHOTOS));}
       }
     }catch(e){console.warn('fbPhotos load:',e.message);}
+    /* โหลด price_override */
+    try{
+      const povSnap=await window._fbDb.collection('settings').doc('price_override').get();
+      if(povSnap.exists&&povSnap.data().data){
+        const cloudPov=JSON.parse(povSnap.data().data);
+        if(cloudPov&&typeof cloudPov==='object'){PRICE_OVERRIDE=cloudPov;await ss('price_override_v1',JSON.stringify(PRICE_OVERRIDE));}
+      }
+    }catch(e){console.warn('fbPrice load:',e.message);}
     /* โหลด farm_cfg */
     const cfgSnap = await window._fbDb.collection('settings').doc('farm_cfg').get();
     if(cfgSnap.exists) {
@@ -580,6 +616,8 @@ async function boot(){
   if(ord){try{ORDERS=JSON.parse(ord)||[]}catch(e){ORDERS=[]}}
   const ph=await sg('item_photos_v1');
   if(ph){try{ITEM_PHOTOS=JSON.parse(ph)||{}}catch(e){ITEM_PHOTOS={}}}
+  const pov=await sg('price_override_v1');
+  if(pov){try{PRICE_OVERRIDE=JSON.parse(pov)||{}}catch(e){PRICE_OVERRIDE={}}}
   gsUrl=(await sg('gsheet_url'))||GSD;
   const n=new Date();S.rym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
 
@@ -1022,49 +1060,46 @@ function rOrders(){
   // ── modal เพิ่ม/แก้ไขรายการ ──
   window._showOrderModal=function(editId){
     const ex=editId?ORDERS.find(o=>o.id===editId):null;
-    // สร้าง option list: รายการยาของฟาร์ม + พิมพ์เอง
-    const itemOpts=items.map(it=>`<option value="${it.name}"${ex&&ex.itemName===it.name?' selected':''}>${it.name}</option>`).join('');
-    const isCustom=ex&&!items.find(it=>it.name===ex.itemName);
+    // option list จาก PRODUCTS (18 รายการ) เรียงตามชื่อไทย/ระบบ
+    const prodOpts=PRODUCTS.map(p=>{
+      const sel=ex&&ex.code===p.code?' selected':'';
+      return `<option value="${p.code}"${sel}>${p.name} · ${prodPrice(p.code)} บาท/${p.unit}</option>`;
+    }).join('');
     const modal=document.getElementById('modal');
     modal.style.display='flex';
+    modal.onclick=()=>{modal.style.display='none';};
     modal.innerHTML=`<div class="msheet" onclick="event.stopPropagation()">
-      <!-- Handle bar -->
-      <div style="width:40px;height:4px;background:var(--line2);border-radius:99px;margin:0 auto 18px"></div>
+      <div style="width:40px;height:4px;background:var(--line2);border-radius:99px;margin:0 auto 16px"></div>
+      <div class="msheet-title">${ex?'✎ แก้ไขรายการ':'📋 เพิ่มรายการสั่งของ'}</div>
 
-      <div class="msheet-title">
-        ${ex?'✎ แก้ไขรายการ':'📋 เพิ่มรายการสั่งของ'}
-      </div>
-
-      <!-- รายการยา -->
       <div style="margin-bottom:14px">
-        <label class="fld">รายการยา / เวชภัณฑ์</label>
-        <select id="oItemSel" class="inp" style="cursor:pointer" onchange="
-          const v=this.value;
-          document.getElementById('oCustomWrap').style.display=v==='__custom__'?'block':'none';
-          if(v!=='__custom__')document.getElementById('oItemName').value=v;
-        ">
-          <option value="">— เลือกจากรายการในระบบ —</option>
-          ${itemOpts}
-          <option value="__custom__"${isCustom?' selected':''}>✏️ พิมพ์ชื่อเอง...</option>
+        <label class="fld">เลือกสินค้า</label>
+        <select id="oProdSel" class="inp" style="cursor:pointer" onchange="window._onProdChange()">
+          <option value="">— เลือกสินค้าจากระบบ —</option>
+          ${prodOpts}
         </select>
-        <div id="oCustomWrap" style="display:${isCustom?'block':'none'};margin-top:8px">
-          <input id="oItemName" class="inp" placeholder="ระบุชื่อยา / เวชภัณฑ์" value="${ex&&isCustom?ex.itemName:''}">
-        </div>
       </div>
 
-      <!-- จำนวน + หน่วย -->
-      <div class="orow orow-3" style="margin-bottom:14px">
-        <div>
-          <label class="fld">จำนวน</label>
-          <input id="oQty" type="number" min="1" class="inp" placeholder="เช่น 50" value="${ex?ex.qty:''}">
+      <!-- ข้อมูลสินค้า (auto-fill, ราคาแก้ได้) -->
+      <div id="oProdInfo" style="display:${ex?'block':'none'};background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--hint);margin-bottom:8px">รหัส: <span id="oCodeShow" style="font-weight:700;color:var(--ink)">${ex?ex.code:''}</span></div>
+        <div class="orow orow-2" style="margin-bottom:10px">
+          <div>
+            <label class="fld">จำนวน</label>
+            <input id="oQty" type="number" min="1" class="inp" placeholder="0" value="${ex?ex.qty:''}" oninput="window._calcTotal()">
+          </div>
+          <div>
+            <label class="fld">ราคา/หน่วย (บาท)</label>
+            <input id="oPrice" type="number" min="0" step="0.01" class="inp" value="${ex?ex.price:''}" oninput="window._calcTotal()">
+          </div>
         </div>
-        <div>
-          <label class="fld">หน่วย</label>
-          <input id="oUnit" class="inp" placeholder="โดส / กล่อง" value="${ex?ex.unit:''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--fb);border-radius:9px">
+          <span style="font-size:13px;color:var(--fc);font-weight:600">ราคารวม</span>
+          <span id="oTotal" style="font-size:18px;font-weight:800;color:var(--fc)">0 บาท</span>
         </div>
+        <input type="hidden" id="oUnit" value="${ex?ex.unit:''}">
       </div>
 
-      <!-- วันที่ -->
       <div class="orow orow-2" style="margin-bottom:14px">
         <div>
           <label class="fld">วันที่สั่ง</label>
@@ -1076,7 +1111,6 @@ function rOrders(){
         </div>
       </div>
 
-      <!-- สถานะ — ปุ่มกด 3 ตัวชัดเจน -->
       <div style="margin-bottom:14px">
         <label class="fld" style="margin-bottom:8px">สถานะ</label>
         <div style="display:flex;gap:8px">
@@ -1084,54 +1118,75 @@ function rOrders(){
             <button type="button" onclick="document.querySelectorAll('.status-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('oStatus').value='${k}'"
               class="status-btn${(ex?ex.status===k:k==='pending')?' active':''}"
               style="flex:1;flex-direction:column;gap:4px;padding:10px 6px;text-align:center">
-              <span style="font-size:18px">${v.ic}</span>
-              <span style="font-size:11px">${v.label}</span>
+              <span style="font-size:18px">${v.ic}</span><span style="font-size:11px">${v.label}</span>
             </button>`).join('')}
         </div>
         <input type="hidden" id="oStatus" value="${ex?ex.status:'pending'}">
       </div>
 
-      <!-- หมายเหตุ -->
       <div style="margin-bottom:20px">
         <label class="fld">หมายเหตุ <span style="font-weight:400;color:var(--hint)">(ไม่บังคับ)</span></label>
-        <input id="oNote" class="inp" placeholder="เช่น ติดต่อผ่านนาย... / เลขที่ PO..." value="${ex?ex.note:''}">
+        <input id="oNote" class="inp" placeholder="เช่น เลขที่ PO..." value="${ex?ex.note:''}">
       </div>
 
-      <!-- ปุ่ม -->
       <div style="display:flex;gap:10px">
-        <button class="btn prim" style="flex:1;padding:14px;font-size:15px" onclick="window._saveOrderModal('${editId||''}')">
-          ${ex?'💾 บันทึกการแก้ไข':'✅ เพิ่มรายการ'}
-        </button>
-        <button class="btn sec" style="padding:14px 18px;font-size:15px" onclick="document.getElementById('modal').style.display='none'">
-          ยกเลิก
-        </button>
+        <button class="btn prim" style="flex:1;padding:14px;font-size:15px" onclick="window._saveOrderModal('${editId||''}')">${ex?'💾 บันทึก':'✅ เพิ่มรายการ'}</button>
+        <button class="btn sec" style="padding:14px 18px;font-size:15px" onclick="document.getElementById('modal').style.display='none'">ยกเลิก</button>
       </div>
     </div>`;
+    if(ex)setTimeout(window._calcTotal,30);
+  };
+
+  // เมื่อเลือกสินค้า → auto-fill ราคา/หน่วย
+  window._onProdChange=function(){
+    const code=document.getElementById('oProdSel').value;
+    const info=document.getElementById('oProdInfo');
+    if(!code){info.style.display='none';return;}
+    const p=PRODUCTS.find(x=>x.code===code);if(!p)return;
+    info.style.display='block';
+    document.getElementById('oCodeShow').textContent=p.code;
+    document.getElementById('oPrice').value=prodPrice(p.code);
+    document.getElementById('oUnit').value=p.unit;
+    window._calcTotal();
+  };
+
+  // คำนวณราคารวม
+  window._calcTotal=function(){
+    const qty=parseFloat(document.getElementById('oQty').value)||0;
+    const price=parseFloat(document.getElementById('oPrice').value)||0;
+    const total=qty*price;
+    const el=document.getElementById('oTotal');
+    if(el)el.textContent=total.toLocaleString('th-TH',{minimumFractionDigits:total%1?2:0,maximumFractionDigits:2})+' บาท';
   };
 
   window._saveOrderModal=function(editId){
-    const sel=document.getElementById('oItemSel');
-    const isCustom=sel.value==='__custom__';
-    const itemName=(isCustom?document.getElementById('oItemName').value:sel.value)||'';
-    if(!itemName.trim()){toast('กรุณาระบุชื่อรายการ');return;}
+    const code=document.getElementById('oProdSel').value;
+    if(!code){toast('กรุณาเลือกสินค้า');return;}
+    const p=PRODUCTS.find(x=>x.code===code)||{};
     const qty=document.getElementById('oQty').value||'';
-    const unit=document.getElementById('oUnit').value||'';
+    if(!qty||parseFloat(qty)<=0){toast('กรุณาระบุจำนวน');return;}
+    const price=parseFloat(document.getElementById('oPrice').value)||0;
+    const unit=document.getElementById('oUnit').value||p.unit||'';
     const orderDate=document.getElementById('oOrderDate').value||new Date().toISOString().slice(0,10);
     const expectedDate=document.getElementById('oExpDate').value||'';
     const status=document.getElementById('oStatus')?.value||'pending';
     const note=document.getElementById('oNote').value||'';
+    // บันทึกราคา override ถ้าต่างจากเดิม
+    if(price!==(PRODUCTS.find(x=>x.code===code)||{}).price){PRICE_OVERRIDE[code]=price;savePriceOverride();}
+    const data={itemName:p.name||code,code,qty,unit,price,orderDate,expectedDate,status,note};
     if(editId){
       const o=ORDERS.find(x=>x.id===editId);
-      if(o){Object.assign(o,{itemName,qty,unit,orderDate,expectedDate,status,note});
-        if(status==='received'&&!o.receivedAt)o.receivedAt=new Date().toISOString();}
+      if(o){Object.assign(o,data);if(status==='received'&&!o.receivedAt)o.receivedAt=new Date().toISOString();}
       saveOrders();
     }else{
-      addOrder(S.fid,itemName,qty,unit,orderDate,expectedDate,status,note);
+      const o={id:'o'+Date.now(),farmId:S.fid,...data,createdAt:new Date().toISOString()};
+      ORDERS.push(o);saveOrders();
     }
     document.getElementById('modal').style.display='none';
     toast(editId?'แก้ไขแล้ว ✓':'เพิ่มรายการแล้ว ✓');
     rOrders();
   };
+
 
   window._deleteOrder=function(oid){
     if(!confirm('ลบรายการนี้?'))return;
@@ -1144,10 +1199,26 @@ function rOrders(){
   };
 
   // ── render ──
+  // สรุปราคารวมที่ยังไม่ได้รับ (รอ+สั่งแล้ว)
+  const activeOrders=orders.filter(o=>o.status!=='received');
+  const grandTotal=activeOrders.reduce((s,o)=>s+(parseFloat(o.qty)||0)*(parseFloat(o.price)||0),0);
+
   let h=`<button onclick="window._showOrderModal('')"
-    style="width:100%;margin-bottom:16px;padding:15px;border-radius:14px;border:2px dashed var(--fc);background:var(--fb);color:var(--fc);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px">
+    style="width:100%;margin-bottom:12px;padding:15px;border-radius:14px;border:2px dashed var(--fc);background:var(--fb);color:var(--fc);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px">
     <span style="font-size:20px">+</span> เพิ่มรายการสั่งของ
   </button>`;
+
+  if(activeOrders.length){
+    h+=`<div style="display:flex;gap:8px;margin-bottom:14px">
+      <div style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px">
+        <div style="font-size:11px;color:var(--mut);margin-bottom:2px">ยอดรวมที่ต้องสั่ง (${activeOrders.length} รายการ)</div>
+        <div style="font-size:20px;font-weight:800;color:var(--fc)">${grandTotal.toLocaleString('th-TH',{minimumFractionDigits:grandTotal%1?2:0,maximumFractionDigits:2})} บาท</div>
+      </div>
+      <button onclick="window._printOrders()" style="flex:none;background:var(--fb);border:1px solid var(--fc);border-radius:12px;padding:0 16px;color:var(--fc);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">
+        <span style="font-size:18px">📄</span>PDF
+      </button>
+    </div>`;
+  }
 
   if(!orders.length){
     h+=`<div style="text-align:center;padding:40px 20px">
@@ -1177,8 +1248,12 @@ function rOrders(){
             <div style="display:flex;align-items:flex-start;gap:10px">
               <div style="flex:1;min-width:0">
                 <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;line-height:1.3">${o.itemName}</div>
-                ${o.qty?`<div style="display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--line2);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--mut);margin-bottom:6px">
-                  <span style="font-weight:700;color:var(--ink)">${o.qty}</span> ${o.unit}</div>`:''}
+                ${o.code?`<div style="font-size:10.5px;color:var(--hint);margin-bottom:4px">รหัส ${o.code}</div>`:''}
+                ${o.qty?`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                  <span style="display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--line2);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--mut)"><span style="font-weight:700;color:var(--ink)">${o.qty}</span> ${o.unit}</span>
+                  ${o.price?`<span style="font-size:11px;color:var(--mut)">× ${parseFloat(o.price).toLocaleString('th-TH')} บาท</span>`:''}
+                  ${o.price&&o.qty?`<span style="font-size:12px;font-weight:700;color:var(--fc)">= ${((parseFloat(o.qty)||0)*(parseFloat(o.price)||0)).toLocaleString('th-TH',{minimumFractionDigits:((parseFloat(o.qty)||0)*(parseFloat(o.price)||0))%1?2:0,maximumFractionDigits:2})} บาท</span>`:''}
+                </div>`:''}
                 <div style="font-size:11.5px;color:var(--hint);display:flex;flex-wrap:wrap;gap:8px">
                   ${orderD?`<span>📅 สั่ง ${orderD}</span>`:''}
                   ${expD?`<span>📦 คาดได้ ${expD}</span>`:''}
@@ -1312,6 +1387,88 @@ function pickItemPhoto(itemId,scope){
   };
   inp.click();
 }
+
+
+/* ── PDF ใบสั่งของ ── */
+window._printOrders=function(){
+  const f=F(S.fid);
+  const orders=ordersForFarm(S.fid).filter(o=>o.status!=='received')
+    .sort((a,b)=>new Date(a.orderDate)-new Date(b.orderDate));
+  if(!orders.length){toast('ไม่มีรายการที่ต้องสั่ง');return;}
+
+  const STX={pending:'รอดำเนินการ',ordered:'สั่งแล้ว'};
+  let rows='';let grand=0;
+  orders.forEach((o,i)=>{
+    const qty=parseFloat(o.qty)||0, price=parseFloat(o.price)||0, total=qty*price;
+    grand+=total;
+    rows+=`<tr>
+      <td style="padding:6px 8px;border:1px solid #ccc;text-align:center">${i+1}</td>
+      <td style="padding:6px 8px;border:1px solid #ccc;text-align:center">${o.code||'-'}</td>
+      <td style="padding:6px 8px;border:1px solid #ccc">${o.itemName}</td>
+      <td style="padding:6px 8px;border:1px solid #ccc;text-align:center">${o.qty||'-'}</td>
+      <td style="padding:6px 8px;border:1px solid #ccc;text-align:center">${o.unit||'-'}</td>
+      <td style="padding:6px 8px;border:1px solid #ccc;text-align:right">${price.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
+      <td style="padding:6px 8px;border:1px solid #ccc;text-align:right;font-weight:700">${total.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
+    </tr>`;
+  });
+
+  const today=new Date();
+  const dateStr=today.getDate()+' '+['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][today.getMonth()]+' '+(today.getFullYear()+543);
+
+  const pr=document.getElementById('prt');
+  pr.innerHTML=`<div style="font-family:'Sarabun',Arial,sans-serif;color:#111;padding:0;max-width:780px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:14px;padding-bottom:12px;border-bottom:4px solid #1c7a3e;margin-bottom:16px">
+      <img src="${LSRC}" style="width:56px;height:56px;object-fit:contain;flex:none">
+      <div style="flex:1">
+        <div style="font-size:9.5px;color:#888;letter-spacing:.8px;font-weight:600">MSBRC-2 · MediTrack</div>
+        <div style="font-size:20px;font-weight:800;color:#1c7a3e;line-height:1.2">ใบสั่งยาและเวชภัณฑ์</div>
+        <div style="font-size:13px;color:#333;margin-top:2px">${f.name}</div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:#666">
+        <div>วันที่ออกเอกสาร</div>
+        <div style="font-weight:700;color:#111;font-size:13px">${dateStr}</div>
+      </div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:14px">
+      <thead>
+        <tr style="background:#1c7a3e;color:#fff">
+          <th style="padding:7px 8px;border:1px solid #1c7a3e;width:32px">#</th>
+          <th style="padding:7px 8px;border:1px solid #1c7a3e">รหัสสินค้า</th>
+          <th style="padding:7px 8px;border:1px solid #1c7a3e;text-align:left">ชื่อสินค้า</th>
+          <th style="padding:7px 8px;border:1px solid #1c7a3e">จำนวน</th>
+          <th style="padding:7px 8px;border:1px solid #1c7a3e">หน่วย</th>
+          <th style="padding:7px 8px;border:1px solid #1c7a3e">ราคา/หน่วย</th>
+          <th style="padding:7px 8px;border:1px solid #1c7a3e">รวม (บาท)</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:#eaf5ee">
+          <td colspan="6" style="padding:9px 12px;border:1px solid #ccc;text-align:right;font-weight:800;font-size:14px">ยอดรวมทั้งสิ้น</td>
+          <td style="padding:9px 12px;border:1px solid #ccc;text-align:right;font-weight:800;font-size:15px;color:#1c7a3e">${grand.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div style="display:flex;justify-content:space-between;margin-top:40px;font-size:12px;color:#444">
+      <div style="text-align:center;width:45%">
+        <div style="border-top:1px solid #999;padding-top:6px;margin-top:30px">ผู้สั่ง / ผู้รับผิดชอบ</div>
+        <div style="margin-top:4px;color:#888">(${FC(S.fid).resp||'____________________'})</div>
+      </div>
+      <div style="text-align:center;width:45%">
+        <div style="border-top:1px solid #999;padding-top:6px;margin-top:30px">ผู้อนุมัติ</div>
+        <div style="margin-top:4px;color:#888">(____________________)</div>
+      </div>
+    </div>
+  </div>`;
+
+  pr.style.display='block';
+  const _hide=()=>{pr.style.display='none';window.onafterprint=null;};
+  window.onafterprint=_hide;
+  window.print();
+  setTimeout(_hide,2000);
+};
 
 
 /* ── HOME ── */
