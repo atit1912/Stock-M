@@ -288,34 +288,43 @@ const CATS=[
   {id:'oral',   name:'ยารับประทาน'},
 ];
 const STD_ITEMS=[
-  {id:'a', name:'กรรไกร',                               cat:'equip',   unit:'อัน',  min:1,exp:false},
-  {id:'b', name:'แก้วยาน้ำ และแก้วยาเม็ด',               cat:'equip',   unit:'ชุด',  min:1,exp:false},
-  {id:'c', name:'เข็มกลัด',                              cat:'equip',   unit:'อัน',  min:2,exp:false},
-  {id:'d', name:'ถ้วยน้ำ',                               cat:'equip',   unit:'ใบ',   min:1,exp:false},
-  {id:'e', name:'ที่ป้ายยา',                             cat:'equip',   unit:'อัน',  min:1,exp:false},
-  {id:'f', name:'ปรอทวัดไข้',                            cat:'equip',   unit:'อัน',  min:1,exp:false},
-  {id:'g', name:'ปากคีบปลายทู่',                         cat:'equip',   unit:'อัน',  min:1,exp:false},
-  {id:'j', name:'สายยางรัดห้ามเลือด',                    cat:'equip',   unit:'เส้น', min:1,exp:false},
-  {id:'l', name:'หลอดหยดยา',                             cat:'equip',   unit:'อัน',  min:1,exp:false},
-  {id:'z', name:'ถ้วยล้างตา',                            cat:'equip',   unit:'ใบ',   min:1,exp:false},
-  {id:'h', name:'ผ้าพันยืด',                             cat:'consum',  unit:'ม้วน', min:2,exp:false},
-  {id:'k', name:'สำลี ผ้าก๊อซ ผ้าพันแผล พลาสเตอร์',      cat:'consum',  unit:'ชุด',  min:1,exp:false},
-  {id:'i', name:'ขี้ผึ้งป้ายตา',                         cat:'external',unit:'หลอด', min:1,exp:true},
-  {id:'m', name:'ขี้ผึ้งแก้ปวดบวม',                      cat:'external',unit:'หลอด', min:1,exp:true},
-  {id:'n', name:'ทิงเจอร์ไอโอดีน / โพวิโดน-ไอโอดีน',    cat:'external',unit:'ขวด',  min:1,exp:true},
-  {id:'o', name:'น้ำยาโพวิโดน-ไอโอดีน ชนิดฟอกแผล',      cat:'external',unit:'ขวด',  min:1,exp:true},
-  {id:'q', name:'ยาแก้ผดผื่น (ไม่ติดเชื้อ)',             cat:'external',unit:'หลอด', min:1,exp:true},
-  {id:'s', name:'ยาทาแก้ผดผื่นคัน',                      cat:'external',unit:'หลอด', min:1,exp:true},
-  {id:'v', name:'ยารักษาแผลน้ำร้อนลวก',                  cat:'external',unit:'หลอด', min:1,exp:true},
-  {id:'x', name:'เหล้าแอมโมเนียหอม',                     cat:'external',unit:'ขวด',  min:1,exp:true},
-  {id:'y', name:'แอลกอฮอล์เช็ดแผล',                      cat:'external',unit:'ขวด',  min:1,exp:true},
-  {id:'aa',name:'น้ำกรดบอริคล้างตา',                     cat:'external',unit:'ขวด',  min:1,exp:true},
-  {id:'ab',name:'ยาหยอดตา',                              cat:'external',unit:'ขวด',  min:1,exp:true},
-  {id:'p', name:'ผงน้ำตาลเกลือแร่',                      cat:'oral',    unit:'ซอง',  min:5,exp:true},
-  {id:'r', name:'ยาแก้แพ้',                              cat:'oral',    unit:'แผง',  min:1,exp:true},
-  {id:'t', name:'ยาธาตุน้ำแดง',                          cat:'oral',    unit:'ขวด',  min:1,exp:true},
-  {id:'u', name:'ยาบรรเทาปวดลดไข้',                      cat:'oral',    unit:'แผง',  min:2,exp:true},
-  {id:'w', name:'ยาลดกรดในกระเพาะอาหาร',                 cat:'oral',    unit:'แผง',  min:1,exp:true},
+  /* ── อุปกรณ์ (ไม่หมดอายุ) ── */
+  {id:'a',  name:'กรรไกร',                                    cat:'equip',   unit:'อัน',   min:1, exp:false},
+  {id:'b',  name:'แก้วยาน้ำ และแก้วยาเม็ด',                   cat:'equip',   unit:'ชุด',   min:1, exp:false},
+  {id:'c',  name:'เข็มกลัด',                                   cat:'equip',   unit:'อัน',   min:2, exp:false},
+  {id:'d',  name:'ถ้วยน้ำ',                                    cat:'equip',   unit:'ใบ',    min:1, exp:false},
+  {id:'e',  name:'ที่ป้ายยา',                                  cat:'equip',   unit:'อัน',   min:1, exp:false},
+  {id:'f',  name:'ปรอทวัดไข้',                                 cat:'equip',   unit:'อัน',   min:1, exp:false},
+  {id:'g',  name:'ปากคีบปลายทู่',                              cat:'equip',   unit:'อัน',   min:1, exp:false},
+  {id:'j',  name:'สายยางรัดห้ามเลือด',                         cat:'equip',   unit:'เส้น',  min:1, exp:false},
+  {id:'l',  name:'หลอดหยดยา',                                  cat:'equip',   unit:'อัน',   min:1, exp:false},
+  {id:'z',  name:'ถ้วยล้างตา',                                 cat:'equip',   unit:'ใบ',    min:1, exp:false},
+  /* ── วัสดุสิ้นเปลือง (ไม่หมดอายุ) ── */
+  {id:'h',  name:'ผ้าพันยืด',                                  cat:'consum',  unit:'ม้วน',  min:2, exp:false},
+  {id:'h2', name:'ผ้าสามเหลี่ยม',                              cat:'consum',  unit:'ผืน',   min:1, exp:false},
+  {id:'k1', name:'สำลี',                                       cat:'consum',  unit:'ก้อน',  min:2, exp:false},
+  {id:'k2', name:'ผ้าก๊อซ',                                    cat:'consum',  unit:'แผ่น',  min:5, exp:false},
+  {id:'k3', name:'ผ้าพันแผล',                                  cat:'consum',  unit:'ม้วน',  min:2, exp:false},
+  {id:'k4', name:'ปลาสเตอร์ปิดแผล',                            cat:'consum',  unit:'กล่อง', min:1, exp:false},
+  {id:'k5', name:'ชุดทำแผล',                                   cat:'consum',  unit:'ชุด',   min:1, exp:false},
+  /* ── ยาทาภายนอก / ของเหลว (หมดอายุ) ── */
+  {id:'i',  name:'ขี้ผึ้งป้ายตา',                              cat:'external',unit:'หลอด',  min:1, exp:true},
+  {id:'m',  name:'ขี้ผึ้งแก้ปวดบวม',                           cat:'external',unit:'หลอด',  min:1, exp:true},
+  {id:'n',  name:'ทิงเจอร์ไอโอดีน หรือโพวิโดน-ไอโอดีน',       cat:'external',unit:'ขวด',   min:1, exp:true},
+  {id:'o',  name:'น้ำยาโพวิโดน-ไอโอดีน ชนิดฟอกแผล',           cat:'external',unit:'ขวด',   min:1, exp:true},
+  {id:'q',  name:'ยาแก้ผดผื่นที่ไม่ได้มาจากการติดเชื้อ',       cat:'external',unit:'หลอด',  min:1, exp:true},
+  {id:'s',  name:'ยาทาแก้ผดผื่นคัน',                           cat:'external',unit:'หลอด',  min:1, exp:true},
+  {id:'v',  name:'ยารักษาแผลน้ำร้อนลวก',                       cat:'external',unit:'หลอด',  min:1, exp:true},
+  {id:'x',  name:'เหล้าแอมโมเนียหอม',                          cat:'external',unit:'ขวด',   min:1, exp:true},
+  {id:'y',  name:'แอลกอฮอล์เช็ดแผล',                           cat:'external',unit:'ขวด',   min:1, exp:true},
+  {id:'aa', name:'น้ำกรดบอริคล้างตา',                          cat:'external',unit:'ขวด',   min:1, exp:true},
+  {id:'ab', name:'ยาหยอดตา',                                   cat:'external',unit:'ขวด',   min:1, exp:true},
+  /* ── ยารับประทาน (หมดอายุ) ── */
+  {id:'p',  name:'ผงน้ำตาลเกลือแร่',                           cat:'oral',    unit:'ซอง',   min:5, exp:true},
+  {id:'r',  name:'ยาแก้แพ้',                                   cat:'oral',    unit:'แผง',   min:1, exp:true},
+  {id:'t',  name:'ยาธาตุน้ำแดง',                               cat:'oral',    unit:'ขวด',   min:1, exp:true},
+  {id:'u',  name:'ยาบรรเทาปวดลดไข้',                           cat:'oral',    unit:'แผง',   min:2, exp:true},
+  {id:'w',  name:'ยาลดกรดในกระเพาะอาหาร',                      cat:'oral',    unit:'แผง',   min:1, exp:true},
 ];
 
 const NEAR_DAYS=90, STALE=30;
@@ -527,7 +536,17 @@ async function boot(){
   if(inspList){try{const arr=JSON.parse(inspList);if(arr&&arr.length)INSPECTORS=arr;}catch(e){}}
   const ci=await sg('farm_cfg_v3');
   if(ci){try{FARM_CFG=JSON.parse(ci)||{}}catch(e){FARM_CFG={}}}
-  FARMS.forEach(f=>{if(!FARM_CFG[f.id])FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]}});
+  FARMS.forEach(f=>{
+    if(!FARM_CFG[f.id]){
+      FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]};
+    } else {
+      // เพิ่มรายการใหม่ที่ยังไม่มีใน FARM_CFG (รายการใหม่จาก STD_ITEMS)
+      const existIds=new Set(FARM_CFG[f.id].items.map(x=>x.id));
+      STD_ITEMS.forEach(si=>{
+        if(!existIds.has(si.id)) FARM_CFG[f.id].items.push({...si});
+      });
+    }
+  });
   for(const f of FARMS){
     if(!FARM_CFG[f.id]._fiMigrated){
       const oldItems=await sg('fi_'+f.id);
