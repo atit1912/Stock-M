@@ -954,16 +954,6 @@ function rHome(){
     +'</div></div></div></div>';
 
 
-  if(streakFarms>0||staleFarms>0){
-    let sb='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
-    if(streakFarms>0)sb+='<div style="flex:1;min-width:120px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:10px;padding:9px 12px">'
-      +'<div style="font-size:10px;color:var(--ok)">🔥 ตรวจต่อเนื่อง ≥3 เดือน</div>'
-      +'<div style="font-size:18px;font-weight:800;color:var(--ok);line-height:1.3">'+streakFarms+' ศูนย์</div></div>';
-    if(staleFarms>0)sb+='<div style="flex:1;min-width:120px;background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:10px;padding:9px 12px">'
-      +'<div style="font-size:10px;color:var(--bad)">⚠ ขาดตรวจเกิน '+STALE+' วัน</div>'
-      +'<div style="font-size:18px;font-weight:800;color:var(--bad);line-height:1.3">'+staleFarms+' ศูนย์</div></div>';
-    sb+='</div>';h+=sb;
-  }
   h+='<div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:8px">ทางลัด</div>'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px">'
     +'<button onclick="go(\'pick-inspect\')" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 4px 10px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:22px">📦</span><span style="font-size:10.5px;font-weight:700;color:var(--ink)">ตรวจนับ</span></button>'
@@ -991,6 +981,16 @@ function rHome(){
   const noCheckFarms=FARMS.filter(f=>!latF(f.id)).length;
   const streakFarms=FARMS.filter(f=>calcStreak(f.id).streak>=3).length;
   const staleFarms=FARMS.filter(f=>{const st=calcStreak(f.id);return st.daysSinceLast!==null&&st.daysSinceLast>STALE;}).length;
+  if(streakFarms>0||staleFarms>0){
+    let sb='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
+    if(streakFarms>0)sb+='<div style="flex:1;min-width:120px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:10px;padding:9px 12px">'
+      +'<div style="font-size:10px;color:var(--ok)">🔥 ตรวจต่อเนื่อง ≥3 เดือน</div>'
+      +'<div style="font-size:18px;font-weight:800;color:var(--ok);line-height:1.3">'+streakFarms+' ศูนย์</div></div>';
+    if(staleFarms>0)sb+='<div style="flex:1;min-width:120px;background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:10px;padding:9px 12px">'
+      +'<div style="font-size:10px;color:var(--bad)">⚠ ขาดตรวจเกิน '+STALE+' วัน</div>'
+      +'<div style="font-size:18px;font-weight:800;color:var(--bad);line-height:1.3">'+staleFarms+' ศูนย์</div></div>';
+    sb+='</div>';h+=sb;
+  }
   h+='<div class="row" style="margin-bottom:'+(warnFarms||noCheckFarms?'6':'8')+'px">'
     +'<span style="font-size:11.5px;font-weight:700;color:var(--mut)">สถานะศูนย์ ('+FARMS.length+')</span>'
     +(warnFarms?'<span style="font-size:10.5px;font-weight:700;color:var(--near);background:var(--near-bg);border:1px solid var(--near-bd);border-radius:99px;padding:2px 9px">⚠ '+warnFarms+' ศูนย์มีรายการแจ้งเตือน</span>':'')
