@@ -404,7 +404,19 @@ async function fbLoadAll() {
     const cfgSnap = await window._fbDb.collection('settings').doc('farm_cfg').get();
     if(cfgSnap.exists) {
       const cfg = cfgSnap.data().value;
-      if(cfg) { FARM_CFG = cfg; await ss('farm_cfg_v3', JSON.stringify(FARM_CFG)); }
+      if(cfg) {
+        FARM_CFG = cfg;
+        /* sync รายการใหม่จาก STD_ITEMS เข้าไป (Firestore อาจมีรายการเก่า) */
+        FARMS.forEach(f=>{
+          if(!FARM_CFG[f.id]){FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]};return;}
+          if(!FARM_CFG[f.id].items)FARM_CFG[f.id].items=[];
+          const existIds=new Set(FARM_CFG[f.id].items.map(x=>x.id));
+          STD_ITEMS.forEach(si=>{if(!existIds.has(si.id))FARM_CFG[f.id].items.push({...si});});
+        });
+        await ss('farm_cfg_v3', JSON.stringify(FARM_CFG));
+        /* เขียนกลับ Firestore ให้รายการครบ 33 */
+        try{await window._fbDb.collection('settings').doc('farm_cfg').set({value:FARM_CFG});}catch(e){}
+      }
     }
     hideSyncBar();
     return true;
