@@ -168,7 +168,7 @@ table.rep td.l{text-align:left}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   html,body{background:#fff!important;margin:0!important;padding:0!important;height:auto!important;overflow:visible!important}
   .app,.scr,.bnav,.ab,nav,#toast,.modal-bg{display:none!important}
-  #prt{display:block!important;position:static!important;background:#fff!important;color:#111!important;width:100%!important}
+  @page{margin:14mm 10mm}#prt{display:block!important;position:static!important;background:#fff!important;color:#111!important;width:100%!important}
   #prt>div{margin:0 auto!important;width:100%!important;max-width:210mm!important}
   @page{size:A4;margin:0}
 }
@@ -1400,82 +1400,91 @@ window._printOrders=function(){
   orders.forEach((o,i)=>{
     const qty=parseFloat(o.qty)||0,price=parseFloat(o.price)||0,total=qty*price;
     grand+=total;
-    const bg=i%2===0?'#fff':'#f7fbf8';
+    const bg=i%2===0?'#ffffff':'#f4faf6';
     rows+=`<tr style="background:${bg}">
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;text-align:center;color:#666;font-size:11px">${i+1}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;text-align:center;font-size:11px;color:#444;font-family:monospace">${o.code||'-'}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;font-size:12.5px;font-weight:600">${o.itemName}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;text-align:center;font-size:13px;font-weight:700">${o.qty||'-'}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;text-align:center;font-size:11px;color:#555">${o.unit||'-'}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;text-align:right;font-size:11.5px;color:#555">${price.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #e0ede5;text-align:right;font-size:13px;font-weight:700;color:#1c7a3e">${total.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;text-align:center;color:#999;font-size:11px">${i+1}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;text-align:center;font-size:11px;color:#555;font-family:monospace;letter-spacing:.5px">${o.code||'-'}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;font-size:13px;font-weight:600;color:#111">${o.itemName}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;text-align:center;font-size:14px;font-weight:700;color:#111">${o.qty||'-'}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;text-align:center;font-size:11.5px;color:#666">${o.unit||'-'}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;text-align:right;font-size:12px;color:#666">${price.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e8f0ea;text-align:right;font-size:13px;font-weight:700;color:#1a7a40">${total.toLocaleString('th-TH',{minimumFractionDigits:2})}</td>
     </tr>`;
   });
 
   const today=new Date();
   const M=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-  const dateStr='วันที่ '+today.getDate()+' '+M[today.getMonth()]+' พ.ศ. '+(today.getFullYear()+543);
-  const docNo='MED-'+String(today.getFullYear()).slice(-2)+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  const dateStr=today.getDate()+' '+M[today.getMonth()]+' พ.ศ. '+(today.getFullYear()+543);
+  const mm=String(today.getMonth()+1).padStart(2,'0');
+  const dd=String(today.getDate()).padStart(2,'0');
+  const docNo='MED-'+String(today.getFullYear()).slice(-2)+mm+'-'+dd;
   const orderer=FC(S.fid).resp||INSPECTORS[0]||'';
 
   const pr=document.getElementById('prt');
-  pr.innerHTML=`<div style="font-family:'Sarabun',Arial,sans-serif;color:#111;max-width:740px;margin:0 auto;padding:0 4px">
+  pr.innerHTML=`<div style="font-family:'Sarabun',Arial,sans-serif;color:#111;max-width:680px;margin:0 auto;padding:40px 48px;box-sizing:border-box">
 
-    <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:16px;border-bottom:3px solid #1c7a3e;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:14px">
-        <img src="${LSRC}" style="width:64px;height:64px;object-fit:contain;flex:none">
+    <!-- ══ Header ══ -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;padding-bottom:18px;border-bottom:3px solid #1a7a40">
+
+      <!-- ซ้าย: logo + ชื่อ -->
+      <div style="display:flex;align-items:center;gap:16px">
+        <img src="${LSRC}" style="width:60px;height:60px;object-fit:contain;flex:none">
         <div>
-          <div style="font-size:22px;font-weight:800;color:#1c7a3e;letter-spacing:-.3px">ใบสั่งยาและเวชภัณฑ์</div>
-          <div style="font-size:13px;color:#333;margin-top:3px;font-weight:600">${f.name}</div>
-          <div style="font-size:11px;color:#888;margin-top:1px">ศูนย์วิจัยสัตว์น้ำ MSBRC-2 · CPF</div>
+          <div style="font-size:22px;font-weight:800;color:#1a7a40;line-height:1.1;letter-spacing:-.2px">ใบสั่งยาและเวชภัณฑ์</div>
+          <div style="font-size:13.5px;font-weight:700;color:#222;margin-top:4px">${f.name}</div>
+          <div style="font-size:11px;color:#999;margin-top:2px">ศูนย์วิจัยสัตว์น้ำ MSBRC-2 · CPF</div>
         </div>
       </div>
-      <div style="text-align:right;padding-top:4px">
-        <div style="font-size:11px;color:#888">เลขที่เอกสาร</div>
-        <div style="font-size:13px;font-weight:700;color:#111;font-family:monospace">${docNo}</div>
-        <div style="font-size:11px;color:#888;margin-top:6px">${dateStr}</div>
-        <div style="margin-top:4px;font-size:11px;color:#333">ผู้สั่ง: <strong>${orderer}</strong></div>
+
+      <!-- ขวา: เลขเอกสาร + วันที่ + ผู้สั่ง -->
+      <div style="text-align:right;padding-top:2px">
+        <div style="font-size:10px;color:#aaa;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">เลขที่เอกสาร</div>
+        <div style="font-size:15px;font-weight:800;color:#111;font-family:monospace;letter-spacing:.5px">${docNo}</div>
+        <div style="font-size:11.5px;color:#666;margin-top:8px">${dateStr}</div>
+        <div style="font-size:11.5px;color:#333;margin-top:3px">ผู้สั่ง: <strong>${orderer}</strong></div>
       </div>
     </div>
 
-    <!-- Table -->
-    <table style="width:100%;border-collapse:collapse;font-family:'Sarabun',Arial,sans-serif">
+    <!-- ══ Table ══ -->
+    <table style="width:100%;border-collapse:collapse;font-family:'Sarabun',Arial,sans-serif;margin-bottom:0">
       <thead>
-        <tr style="background:#1c7a3e">
-          <th style="padding:9px 10px;color:#fff;font-size:11px;font-weight:700;text-align:center;width:28px">#</th>
-          <th style="padding:9px 10px;color:#fff;font-size:11px;font-weight:700;text-align:center">รหัสสินค้า</th>
-          <th style="padding:9px 10px;color:#fff;font-size:12px;font-weight:700;text-align:left">ชื่อสินค้า</th>
-          <th style="padding:9px 10px;color:#fff;font-size:11px;font-weight:700;text-align:center">จำนวน</th>
-          <th style="padding:9px 10px;color:#fff;font-size:11px;font-weight:700;text-align:center">หน่วย</th>
-          <th style="padding:9px 10px;color:#fff;font-size:11px;font-weight:700;text-align:right">ราคา/หน่วย</th>
-          <th style="padding:9px 10px;color:#fff;font-size:11px;font-weight:700;text-align:right">รวม (บาท)</th>
+        <tr style="background:#1a7a40">
+          <th style="padding:10px 12px;color:#fff;font-size:11px;text-align:center;width:30px;border-radius:0">#</th>
+          <th style="padding:10px 12px;color:#fff;font-size:11px;text-align:center">รหัสสินค้า</th>
+          <th style="padding:10px 12px;color:#fff;font-size:12px;text-align:left">ชื่อสินค้า</th>
+          <th style="padding:10px 12px;color:#fff;font-size:11px;text-align:center">จำนวน</th>
+          <th style="padding:10px 12px;color:#fff;font-size:11px;text-align:center">หน่วย</th>
+          <th style="padding:10px 12px;color:#fff;font-size:11px;text-align:right">ราคา/หน่วย</th>
+          <th style="padding:10px 12px;color:#fff;font-size:11px;text-align:right">รวม (บาท)</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
-      <tfoot>
-        <tr>
-          <td colspan="6" style="padding:11px 14px;text-align:right;font-weight:800;font-size:14px;border-top:2px solid #1c7a3e;color:#111">ยอดรวมทั้งสิ้น</td>
-          <td style="padding:11px 14px;text-align:right;font-weight:800;font-size:16px;color:#1c7a3e;border-top:2px solid #1c7a3e">${grand.toLocaleString('th-TH',{minimumFractionDigits:2})} บาท</td>
-        </tr>
-      </tfoot>
     </table>
 
-    <!-- Footer: ผู้สั่งคนเดียว -->
-    <div style="margin-top:32px;display:flex;align-items:flex-end;justify-content:flex-end">
-      <div style="text-align:center;min-width:220px">
-        <div style="font-size:12px;color:#555;margin-bottom:28px">ลงชื่อผู้สั่ง</div>
-        <div style="border-top:1px solid #aaa;padding-top:6px">
-          <div style="font-size:12px;font-weight:700">${orderer}</div>
+    <!-- ยอดรวม -->
+    <div style="display:flex;justify-content:flex-end;margin-top:0;border-top:2px solid #1a7a40;padding-top:14px;margin-bottom:32px">
+      <div style="text-align:right">
+        <span style="font-size:13px;color:#555;margin-right:24px">ยอดรวมทั้งสิ้น</span>
+        <span style="font-size:18px;font-weight:800;color:#1a7a40">${grand.toLocaleString('th-TH',{minimumFractionDigits:2})} บาท</span>
+      </div>
+    </div>
+
+    <!-- ══ ลายเซ็น ══ -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:28px">
+      <div style="text-align:center;min-width:200px">
+        <div style="font-size:11.5px;color:#888;margin-bottom:36px">ลงชื่อผู้สั่ง</div>
+        <div style="border-top:1px solid #bbb;padding-top:8px">
+          <div style="font-size:13px;font-weight:700;color:#111">${orderer}</div>
           <div style="font-size:10.5px;color:#888;margin-top:2px">ผู้สั่งยาและเวชภัณฑ์</div>
         </div>
       </div>
     </div>
 
-    <!-- หมายเหตุ -->
-    <div style="margin-top:20px;padding:10px 14px;background:#f7fbf8;border-left:3px solid #1c7a3e;border-radius:0 6px 6px 0">
-      <div style="font-size:10.5px;color:#555">หมายเหตุ: เอกสารนี้ออกโดยระบบ MediTrack · กรุณาตรวจสอบความถูกต้องก่อนดำเนินการจัดซื้อ</div>
+    <!-- ══ หมายเหตุ ══ -->
+    <div style="padding:10px 16px;background:#f4faf6;border-left:4px solid #1a7a40;border-radius:0 6px 6px 0">
+      <div style="font-size:10.5px;color:#666;line-height:1.6">หมายเหตุ: เอกสารนี้ออกโดยระบบ MediTrack · กรุณาตรวจสอบความถูกต้องก่อนดำเนินการจัดซื้อ</div>
     </div>
+
   </div>`;
 
   pr.style.display='block';
@@ -1484,7 +1493,6 @@ window._printOrders=function(){
   window.print();
   setTimeout(_hide,2000);
 };
-
 
 /* ── HOME ── */
 function rHome(){
