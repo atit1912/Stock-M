@@ -539,12 +539,6 @@ async function boot(){
   FARMS.forEach(f=>{
     if(!FARM_CFG[f.id]){
       FARM_CFG[f.id]={items:STD_ITEMS.map(x=>({...x})),resp:'',inspector:INSPECTORS[0]};
-    } else {
-      // เพิ่มรายการใหม่ที่ยังไม่มีใน FARM_CFG (รายการใหม่จาก STD_ITEMS)
-      const existIds=new Set(FARM_CFG[f.id].items.map(x=>x.id));
-      STD_ITEMS.forEach(si=>{
-        if(!existIds.has(si.id)) FARM_CFG[f.id].items.push({...si});
-      });
     }
   });
   for(const f of FARMS){
@@ -555,6 +549,9 @@ async function boot(){
       if(oldResp&&!FARM_CFG[f.id].resp)FARM_CFG[f.id].resp=oldResp;
       FARM_CFG[f.id]._fiMigrated=true;
     }
+    // sync รายการใหม่จาก STD_ITEMS เสมอ (ทั้ง migrated และยังไม่ migrate)
+    const existIds=new Set(FARM_CFG[f.id].items.map(x=>x.id));
+    STD_ITEMS.forEach(si=>{if(!existIds.has(si.id))FARM_CFG[f.id].items.push({...si});});
   }
   const ins=await sg('insp_v3');
   if(ins){try{INSPS=JSON.parse(ins)||[]}catch(e){INSPS=[]}}
