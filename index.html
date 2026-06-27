@@ -92,6 +92,9 @@ select:focus,input:focus{outline:none;border-color:var(--fc);box-shadow:0 0 0 3p
 .stepper{display:flex;align-items:center;gap:8px}
 .stepper button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line2);background:var(--card2);font-size:21px;cursor:pointer;color:var(--ink);flex:none;font-family:inherit}
 .qty{min-width:30px;text-align:center;font-size:20px;font-weight:700}
+.qty-input{width:52px;text-align:center;font-size:18px;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--line2);border-radius:9px;padding:6px 4px;font-family:inherit;-moz-appearance:textfield;outline:none}
+.qty-input:focus{border-color:var(--fc);box-shadow:0 0 0 2px var(--fc)33}
+.qty-input::-webkit-inner-spin-button,.qty-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .lot{display:flex;align-items:center;gap:7px;margin-top:9px}
 .lot input[type=month]{flex:1;padding:8px 10px;font-size:14px}
 .lot .rm{width:34px;height:34px;border-radius:8px;border:1px solid var(--line2);background:var(--card2);color:var(--bad);font-size:15px;cursor:pointer;flex:none;font-family:inherit}
@@ -500,20 +503,29 @@ function cModal(){
 
 function editItem(id){
   const cfg=FC(S.fid);const it=cfg.items.find(x=>x.id===id);if(!it)return;
-  const m=document.getElementById('modal');
-  m.style.display='flex';
-  m.innerHTML=`<div class="modal" style="width:100%;max-width:520px;background:var(--card);border-radius:18px 18px 0 0;padding:20px 18px 34px">
-    <h3>✎ แก้ไขรายการ</h3>
-    <label class="fld">ชื่อรายการ</label>
-    <input type="text" id="ei_name" value="${it.name.replace(/"/g,'&quot;')}" style="margin-bottom:10px">
-    <label class="fld">หน่วย</label>
-    <input type="text" id="ei_unit" value="${it.unit}" style="margin-bottom:12px">
-    <div style="font-size:12px;color:var(--mut);margin-bottom:12px">การแก้ไขจะบันทึกเฉพาะศูนย์นี้</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn sec sm" style="flex:1" onclick="cModal()">ยกเลิก</button>
-      <button class="btn prim sm" style="flex:1" onclick="saveEditItem('${id}')">บันทึก</button>
-    </div></div>`;
-  m.style.display='block';
+  const modal=document.getElementById('modal');
+  modal.onclick=e=>{if(e.target===modal)modal.style.display='none';};
+  modal.innerHTML=`<div class="msheet" onclick="event.stopPropagation()">
+    <div style="width:40px;height:4px;background:var(--line2);border-radius:99px;margin:0 auto 18px"></div>
+    <div class="msheet-title">✎ แก้ไขรายการ</div>
+    <div style="margin-bottom:14px">
+      <label class="fld">ชื่อรายการ</label>
+      <input type="text" id="ei_name" class="inp" value="${it.name.replace(/"/g,'&quot;')}" placeholder="ชื่อรายการ" autocomplete="off">
+    </div>
+    <div style="margin-bottom:18px">
+      <label class="fld">หน่วย</label>
+      <input type="text" id="ei_unit" class="inp" value="${it.unit}" placeholder="เช่น อัน, ขวด, กล่อง" autocomplete="off">
+    </div>
+    <div style="font-size:12px;color:var(--mut);margin-bottom:16px;padding:9px 12px;background:var(--card2);border-radius:9px;border-left:3px solid var(--fc)">
+      📌 การแก้ไขจะบันทึกเฉพาะ${FC(S.fid).name||'ศูนย์นี้'}เท่านั้น
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn sec" style="flex:1;padding:13px" onclick="document.getElementById('modal').style.display='none'">ยกเลิก</button>
+      <button class="btn prim" style="flex:1;padding:13px" onclick="saveEditItem('${id}')">💾 บันทึก</button>
+    </div>
+  </div>`;
+  modal.style.display='flex';
+  setTimeout(()=>{const el=document.getElementById('ei_name');if(el){el.focus();el.select();}},100);
 }
 async function saveEditItem(id){
   const name=(document.getElementById('ei_name').value||'').trim();
@@ -1494,6 +1506,123 @@ window._printOrders=function(){
   setTimeout(_hide,2000);
 };
 
+/* ── PDF สรุปช่วงเวลา ── */
+window._printRangeReport=function(rangeFrom,rangeTo){
+  const f=F(S.fid);
+  const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const MF=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  function ymToDate(ym){const[y,m2]=ym.split('-').map(Number);return new Date(y,m2-1,1);}
+  function ymLabel(ym){const d=ymToDate(ym);return M[d.getMonth()]+' '+(d.getFullYear()+543-2500);}
+
+  const fromD=ymToDate(rangeFrom),toD=ymToDate(rangeTo);
+  const rangeMonths=[];
+  let cur=new Date(fromD);
+  while(cur<=toD){
+    const ym=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0');
+    const insp=latFM(S.fid,ym);
+    rangeMonths.push({ym,label:M[cur.getMonth()]+' '+(cur.getFullYear()+543-2500),insp,sv:insp?summ(insp,S.fid):null});
+    cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);
+  }
+
+  const checked=rangeMonths.filter(m=>m.sv);
+  const totOk=checked.reduce((s,m)=>s+m.sv.ok,0);
+  const totWarn=checked.reduce((s,m)=>s+m.sv.near+m.sv.below,0);
+  const totBad=checked.reduce((s,m)=>s+m.sv.expired+m.sv.out,0);
+
+  let rows='';
+  rangeMonths.slice().reverse().forEach(({label,insp,sv},i)=>{
+    const bg=i%2===0?'#fff':'#f4faf6';
+    if(!sv){
+      rows+=`<tr style="background:${bg}"><td style="padding:8px 12px;border-bottom:1px solid #e0ede5;font-weight:600;color:#999">${label}</td><td colspan="5" style="padding:8px 12px;border-bottom:1px solid #e0ede5;color:#bbb;font-size:12px;text-align:center">ไม่มีข้อมูลการตรวจ</td></tr>`;
+      return;
+    }
+    const prob=sv.expired+sv.out+sv.below+sv.near;
+    rows+=`<tr style="background:${bg}">
+      <td style="padding:8px 12px;border-bottom:1px solid #e0ede5;font-weight:700">${label}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e0ede5;text-align:center;font-size:12px;color:#666">${insp.inspector}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e0ede5;text-align:center;font-weight:700;color:#1a7a40">${sv.ok}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e0ede5;text-align:center;font-weight:${sv.near?'700':'400'};color:${sv.near?'#b08000':'#bbb'}">${sv.near||'—'}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e0ede5;text-align:center;font-weight:${sv.below?'700':'400'};color:${sv.below?'#a05000':'#bbb'}">${sv.below||'—'}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e0ede5;text-align:center;font-weight:${prob?'700':'400'};color:${prob?'#c0302a':'#bbb'}">${(sv.expired+sv.out)||'—'}</td>
+    </tr>`;
+  });
+
+  // summary row
+  rows+=`<tr style="background:#e8f5ec">
+    <td style="padding:9px 12px;border-top:2px solid #1a7a40;font-weight:800">รวม ${checked.length} เดือน</td>
+    <td style="padding:9px 12px;border-top:2px solid #1a7a40;text-align:center;color:#666;font-size:12px">—</td>
+    <td style="padding:9px 12px;border-top:2px solid #1a7a40;text-align:center;font-weight:800;color:#1a7a40">${totOk}</td>
+    <td style="padding:9px 12px;border-top:2px solid #1a7a40;text-align:center;font-weight:800;color:#b08000">${totWarn||'—'}</td>
+    <td style="padding:9px 12px;border-top:2px solid #1a7a40;text-align:center;font-weight:800;color:#a05000">—</td>
+    <td style="padding:9px 12px;border-top:2px solid #1a7a40;text-align:center;font-weight:800;color:#c0302a">${totBad||'—'}</td>
+  </tr>`;
+
+  const today=new Date();
+  const printDate=today.getDate()+' '+MF[today.getMonth()]+' พ.ศ. '+(today.getFullYear()+543);
+
+  const pr=document.getElementById('prt');
+  pr.innerHTML=`<div style="font-family:'Sarabun',Arial,sans-serif;color:#111;max-width:680px;margin:0 auto;padding:36px 44px">
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:3px solid #1a7a40;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="${LSRC}" style="width:56px;height:56px;object-fit:contain;flex:none">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:#1a7a40">รายงานสรุปการตรวจนับ</div>
+          <div style="font-size:13.5px;font-weight:700;color:#222;margin-top:3px">${f.name}</div>
+          <div style="font-size:11px;color:#999;margin-top:1px">ศูนย์วิจัยสัตว์น้ำ MSBRC-2 · CPF</div>
+        </div>
+      </div>
+      <div style="text-align:right;padding-top:2px">
+        <div style="font-size:11px;color:#aaa">ช่วงเวลา</div>
+        <div style="font-size:14px;font-weight:800;color:#111">${ymLabel(rangeFrom)} — ${ymLabel(rangeTo)}</div>
+        <div style="font-size:11px;color:#666;margin-top:6px">พิมพ์: ${printDate}</div>
+      </div>
+    </div>
+
+    <!-- KPI summary -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div style="background:#f4faf6;border:1px solid #c0e0cc;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">เดือนที่ตรวจ</div>
+        <div style="font-size:20px;font-weight:800;color:#1a7a40">${checked.length}<span style="font-size:12px;color:#888">/${rangeMonths.length}</span></div>
+      </div>
+      <div style="background:#f4faf6;border:1px solid #c0e0cc;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">รวมปกติ</div>
+        <div style="font-size:20px;font-weight:800;color:#1a7a40">${totOk}</div>
+      </div>
+      <div style="background:#fffbf0;border:1px solid #e0cc80;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">รวมเตือน</div>
+        <div style="font-size:20px;font-weight:800;color:#b08000">${totWarn||0}</div>
+      </div>
+      <div style="background:#fff4f4;border:1px solid #e0a0a0;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">รวมหมด/หมดอายุ</div>
+        <div style="font-size:20px;font-weight:800;color:#c0302a">${totBad||0}</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <table style="width:100%;border-collapse:collapse;font-family:'Sarabun',Arial,sans-serif">
+      <thead>
+        <tr style="background:#1a7a40">
+          <th style="padding:9px 12px;color:#fff;text-align:left;font-size:12px">เดือน</th>
+          <th style="padding:9px 12px;color:#fff;text-align:center;font-size:12px">ผู้ตรวจ</th>
+          <th style="padding:9px 12px;color:#fff;text-align:center;font-size:12px">✓ ปกติ</th>
+          <th style="padding:9px 12px;color:#fff;text-align:center;font-size:12px">⚠ ใกล้หมด</th>
+          <th style="padding:9px 12px;color:#fff;text-align:center;font-size:12px">↓ ต่ำเกณฑ์</th>
+          <th style="padding:9px 12px;color:#fff;text-align:center;font-size:12px">✕ หมด/อายุ</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+
+  pr.style.display='block';
+  const _hide=()=>{pr.style.display='none';window.onafterprint=null;};
+  window.onafterprint=_hide;
+  window.print();
+  setTimeout(_hide,2000);
+};
+
+
 /* ── HOME ── */
 function rHome(){
   const k=allKPI();
@@ -1714,7 +1843,7 @@ function iH(it){
     body=`<div class="row" style="margin-top:11px;gap:8px"><button class="addlot" style="flex:1" onclick="fLot('${it.id}')">＋ ระบุจำนวน</button><button class="nostock" onclick="mNone('${it.id}')">ไม่มีของ</button></div>`;
   }else{
     const lots=(line.lots||[]).map((l,i)=>`<div class="lot">
-      <div class="stepper"><button onclick="cQ('${it.id}',${i},-1)">−</button><span class="qty" id="q${it.id}_${i}">${parseInt(l.qty)||0}</span><button onclick="cQ('${it.id}',${i},1)">＋</button></div>
+      <div class="stepper"><button onclick="cQ('${it.id}',${i},-1)">−</button><input type="number" id="q${it.id}_${i}" class="qty-input" value="${parseInt(l.qty)||0}" min="0" oninput="cQI('${it.id}',${i},this)" onfocus="this.select()"><button onclick="cQ('${it.id}',${i},1)">＋</button></div>
       ${it.exp?`<input type="date" value="${l.exp&&l.exp.length>7?l.exp:l.exp?l.exp+'-01':''}" onchange="sE('${it.id}',${i},this.value)" style="flex:1;padding:8px 10px;font-size:13px">`:`<input type="date" value="${l.exp&&l.exp.length>7?l.exp:l.exp?l.exp+'-01':''}" placeholder="วันหมดอายุ (ไม่บังคับ)" onchange="sE('${it.id}',${i},this.value)" style="flex:1;padding:8px 10px;font-size:13px;color:var(--hint)">`}
       <button class="rm" onclick="rL('${it.id}',${i})">✕</button></div>`).join('');
     body=`${lots||`<div style="font-size:13px;color:var(--hint);margin-top:8px">บันทึกว่าไม่มีของ</div>`}
@@ -1735,7 +1864,8 @@ function fLot(id){if(!S.draft.lines[id])S.draft.lines[id]={lots:[],touched:false
 function mNone(id){S.draft.lines[id]={lots:[],touched:true};rC(id)}
 function aL(id){if(!S.draft.lines[id])S.draft.lines[id]={lots:[],touched:true};S.draft.lines[id].lots.push({qty:1,exp:''});S.draft.lines[id].touched=true;rC(id)}
 function rL(id,i){S.draft.lines[id].lots.splice(i,1);rC(id)}
-function cQ(id,i,d){const l=S.draft.lines[id]?.lots[i];if(!l)return;l.qty=Math.max(0,(parseInt(l.qty)||0)+d);S.draft.lines[id].touched=true;const el=document.getElementById('q'+id+'_'+i);if(el)el.textContent=l.qty;rfC(id)}
+function cQ(id,i,d){const l=S.draft.lines[id]?.lots[i];if(!l)return;l.qty=Math.max(0,(parseInt(l.qty)||0)+d);S.draft.lines[id].touched=true;const el=document.getElementById('q'+id+'_'+i);if(el){el.value=l.qty;}rfC(id)}
+function cQI(id,i,el){const l=S.draft.lines[id]?.lots[i];if(!l)return;const v=parseInt(el.value);l.qty=isNaN(v)||v<0?0:v;S.draft.lines[id].touched=true;rfC(id);}
 function sE(id,i,v){if(S.draft.lines[id]?.lots[i])S.draft.lines[id].lots[i].exp=v;S.draft.lines[id].touched=true;rfC(id)}
 function upP(){const its=fItems(S.fid);let d=0;its.forEach(it=>{if(S.draft?.lines[it.id]?.touched)d++;});const pct=its.length?Math.round(d/its.length*100):0;const pt=document.getElementById('pt');const pb=document.getElementById('pb');const pp=document.getElementById('ppct');if(pt)pt.textContent=d+' / '+its.length+' รายการ';if(pb)pb.style.width=pct+'%';if(pp)pp.textContent=pct+'%'}
 async function svI(){
@@ -2054,15 +2184,23 @@ function csvX(li,its){
 }
 
 /* ── HISTORY ── */
-function rHist(tab){
+function rHist(tab,rangeFrom,rangeTo){
   tab=tab||'list';
   const f=F(S.fid);
   const list=INSPS.filter(i=>i.farmId===S.fid).sort((a,b)=>b.ts-a.ts);
 
-  // tabs
+  // คำนวณ default range (เดือนนี้ย้อนหลัง 6 เดือน)
+  const now=new Date();
+  const defaultTo=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const def6=new Date(now.getFullYear(),now.getMonth()-5,1);
+  const defaultFrom=def6.getFullYear()+'-'+String(def6.getMonth()+1).padStart(2,'0');
+  rangeFrom=rangeFrom||defaultFrom;
+  rangeTo=rangeTo||defaultTo;
+
   const tabs=`<div class="seg" style="margin-bottom:12px">
     <button class="${tab==='list'?'on':''}" onclick="rHist('list')">📋 รายการ (${list.length})</button>
     <button class="${tab==='monthly'?'on':''}" onclick="rHist('monthly')">📊 รายเดือน</button>
+    <button class="${tab==='range'?'on':''}" onclick="rHist('range')">📈 สรุปช่วงเวลา</button>
   </div>`;
 
   if(!list.length){
@@ -2070,7 +2208,6 @@ function rHist(tab){
   }
 
   if(tab==='list'){
-    // ── รายการเดิม ──
     document.getElementById('scr').innerHTML=tabs+
       list.map(insp=>{
         const sv=summ(insp,S.fid);const prob=sv.expired+sv.out+sv.below+sv.near;
@@ -2085,101 +2222,215 @@ function rHist(tab){
     return;
   }
 
-  // ── รายเดือน ──
-  // สร้าง 12 เดือนย้อนหลัง
-  const now=new Date();
-  const months=[];
-  for(let i=11;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const label=M[d.getMonth()]+' '+(d.getFullYear()+543-2500);
-    const insp=latFM(S.fid,ym);
-    months.push({ym,label,insp});
-  }
-
-  // SVG mini line chart (ok/warn/bad)
-  const hasData=months.some(m=>m.insp);
-  let chartHtml='';
-  if(hasData){
-    const W=300,H=70,PL=6,PR=6,PT=8,PB=16;
-    const cW=W-PL-PR,cH=H-PT-PB;
-    const n=months.length;
-    const okD=months.map(m=>m.insp?summ(m.insp,S.fid).ok:null);
-    const warnD=months.map(m=>m.insp?summ(m.insp,S.fid).near+summ(m.insp,S.fid).below:null);
-    const badD=months.map(m=>m.insp?summ(m.insp,S.fid).expired+summ(m.insp,S.fid).out:null);
-    const allVals=[...okD,...warnD,...badD].filter(v=>v!=null);
-    const maxV=Math.max(...allVals,1);
-
-    function mkLine(data,color){
-      const pts=data.map((v,i)=>{
-        if(v==null)return null;
-        return[PL+i*(cW/(n-1)),PT+cH*(1-v/maxV)];
-      });
-      let d='';
-      pts.forEach(p=>{if(!p)return;d+=(d?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1);});
-      let dots='';
-      pts.forEach((p,i)=>{if(!p)return;dots+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5" fill="${color}" stroke="var(--card)" stroke-width="1.2"/>`;});
-      return(d?`<path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`:'')+''+dots;
+  if(tab==='monthly'){
+    const now2=new Date();
+    const months=[];
+    for(let i=11;i>=0;i--){
+      const d=new Date(now2.getFullYear(),now2.getMonth()-i,1);
+      const ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const label=M[d.getMonth()]+' '+(d.getFullYear()+543-2500);
+      const insp=latFM(S.fid,ym);
+      months.push({ym,label,insp});
     }
-    // x labels ทุก 3 เดือน
-    let xlbls='';
-    months.forEach((m,i)=>{
-      if(i%3!==0&&i!==n-1)return;
-      xlbls+=`<text x="${(PL+i*(cW/(n-1))).toFixed(1)}" y="${H-2}" text-anchor="middle" font-size="8" fill="var(--hint)" font-family="Sarabun,sans-serif">${m.label.split(' ')[0]}</text>`;
-    });
-    chartHtml=`<div class="card" style="padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:8px">สถานะรายการยา (12 เดือน)</div>
-      <svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">
-        <line x1="${PL}" y1="${PT+cH}" x2="${W-PR}" y2="${PT+cH}" stroke="var(--line)" stroke-width="1"/>
-        ${mkLine(okD,'var(--ok)')}
-        ${mkLine(warnD,'var(--near)')}
-        ${mkLine(badD,'var(--bad)')}
-        ${xlbls}
-      </svg>
-      <div style="display:flex;gap:10px;margin-top:4px">
-        <span style="font-size:10px;color:var(--ok)">■ ปกติ</span>
-        <span style="font-size:10px;color:var(--near)">■ ใกล้หมด/ต่ำเกณฑ์</span>
-        <span style="font-size:10px;color:var(--bad)">■ หมด/หมดอายุ</span>
-      </div>
-    </div>`;
-  }
-
-  // รายการรายเดือน
-  let monthRows='';
-  months.slice().reverse().forEach(({label,insp,ym})=>{
-    if(!insp){
-      monthRows+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)">
-        <div><div style="font-size:13px;font-weight:700;color:var(--hint)">${label}</div></div>
-        <span style="font-size:11px;color:var(--hint)">ไม่มีข้อมูล</span>
-      </div>`;
-      return;
-    }
-    const sv=summ(insp,S.fid);
-    const prob=sv.expired+sv.out+sv.below+sv.near;
-    monthRows+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="S.did='${insp.id}';rHD()">
-      <div>
-        <div style="font-size:13px;font-weight:700">${label}</div>
-        <div style="font-size:11px;color:var(--hint);margin-top:2px">
-          ผู้ตรวจ: ${insp.inspector} · ${beD(insp.date)}
+    const hasData=months.some(m=>m.insp);
+    let chartHtml='';
+    if(hasData){
+      const W=300,H=70,PL=6,PR=6,PT=8,PB=16;
+      const cW=W-PL-PR,cH=H-PT-PB;
+      const n=months.length;
+      const okD=months.map(m=>m.insp?summ(m.insp,S.fid).ok:null);
+      const warnD=months.map(m=>m.insp?summ(m.insp,S.fid).near+summ(m.insp,S.fid).below:null);
+      const badD=months.map(m=>m.insp?summ(m.insp,S.fid).expired+summ(m.insp,S.fid).out:null);
+      const allVals=[...okD,...warnD,...badD].filter(v=>v!=null);
+      const maxV=Math.max(...allVals,1);
+      function mkLine(data,color){
+        const pts=data.map((v,i)=>{if(v==null)return null;return[PL+i*(cW/(n-1)),PT+cH*(1-v/maxV)];});
+        let d='';pts.forEach(p=>{if(!p)return;d+=(d?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1);});
+        let dots='';pts.forEach((p,i)=>{if(!p)return;dots+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5" fill="${color}" stroke="var(--card)" stroke-width="1.2"/>`;});
+        return(d?`<path d="${d}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`:'')+''+dots;
+      }
+      let xlbls='';
+      months.forEach((m,i)=>{if(i%3!==0&&i!==n-1)return;xlbls+=`<text x="${(PL+i*(cW/(n-1))).toFixed(1)}" y="${H-2}" text-anchor="middle" font-size="8" fill="var(--hint)" font-family="Sarabun,sans-serif">${m.label.split(' ')[0]}</text>`;});
+      chartHtml=`<div class="card" style="padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:8px">สถานะรายการยา (12 เดือน)</div>
+        <svg width="100%" viewBox="0 0 ${W} ${H}" style="overflow:visible">
+          <line x1="${PL}" y1="${PT+cH}" x2="${W-PR}" y2="${PT+cH}" stroke="var(--line)" stroke-width="1"/>
+          ${mkLine(okD,'var(--ok)')}${mkLine(warnD,'var(--near)')}${mkLine(badD,'var(--bad)')}${xlbls}
+        </svg>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <span style="font-size:10px;color:var(--ok)">■ ปกติ</span>
+          <span style="font-size:10px;color:var(--near)">■ ใกล้หมด/ต่ำเกณฑ์</span>
+          <span style="font-size:10px;color:var(--bad)">■ หมด/หมดอายุ</span>
         </div>
+      </div>`;
+    }
+    let monthRows='';
+    months.slice().reverse().forEach(({label,insp,ym})=>{
+      if(!insp){monthRows+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><div><div style="font-size:13px;font-weight:700;color:var(--hint)">${label}</div></div><span style="font-size:11px;color:var(--hint)">ไม่มีข้อมูล</span></div>`;return;}
+      const sv=summ(insp,S.fid);const prob=sv.expired+sv.out+sv.below+sv.near;
+      monthRows+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="S.did='${insp.id}';rHD()">
+        <div><div style="font-size:13px;font-weight:700">${label}</div>
+        <div style="font-size:11px;color:var(--hint);margin-top:2px">ผู้ตรวจ: ${insp.inspector} · ${beD(insp.date)}</div>
         <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
           <span style="font-size:10px;color:var(--ok)">✓ ปกติ ${sv.ok}</span>
-          ${sv.near?`<span style="font-size:10px;color:var(--near)">⚠ ใกล้หมด ${sv.near}</span>`:''}
-          ${sv.below?`<span style="font-size:10px;color:var(--below)">↓ ต่ำ ${sv.below}</span>`:''}
-          ${(sv.expired+sv.out)?`<span style="font-size:10px;color:var(--bad)">✕ หมด ${sv.expired+sv.out}</span>`:''}
+          ${sv.near?`<span style="font-size:10px;color:var(--near)">⚠ ${sv.near}</span>`:''}
+          ${sv.below?`<span style="font-size:10px;color:var(--below)">↓ ${sv.below}</span>`:''}
+          ${(sv.expired+sv.out)?`<span style="font-size:10px;color:var(--bad)">✕ ${sv.expired+sv.out}</span>`:''}
+        </div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="chip ${prob?'c-bad':'c-ok'}">${prob?prob+' รายการ':'ครบถ้วน'}</span>
+          <span style="color:var(--hint);font-size:12px">›</span>
+        </div>
+      </div>`;
+    });
+    document.getElementById('scr').innerHTML=tabs+chartHtml+`<div class="card" style="padding:4px 14px">${monthRows}</div>`+cred();
+    return;
+  }
+
+  // ════════════════════════════════════════════
+  // TAB: สรุปช่วงเวลา (range)
+  // ════════════════════════════════════════════
+  if(tab==='range'){
+    // date range picker
+    const pickerHtml=`<div class="card" style="padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--mut);margin-bottom:10px">เลือกช่วงเวลา</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label class="fld">ตั้งแต่</label>
+          <input type="month" id="rFrom" class="inp" value="${rangeFrom}" style="font-size:14px">
+        </div>
+        <div>
+          <label class="fld">ถึง</label>
+          <input type="month" id="rTo" class="inp" value="${rangeTo}" style="font-size:14px">
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-        <span class="chip ${prob?'c-bad':'c-ok'}">${prob?prob+' รายการ':'ครบถ้วน'}</span>
-        <span style="color:var(--hint);font-size:12px">›</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button onclick="rHist('range',getRelYm(-2),getRelYm(0))" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);cursor:pointer;font-family:inherit">3 เดือน</button>
+        <button onclick="rHist('range',getRelYm(-5),getRelYm(0))" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);cursor:pointer;font-family:inherit">6 เดือน</button>
+        <button onclick="rHist('range',getRelYm(-11),getRelYm(0))" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);cursor:pointer;font-family:inherit">12 เดือน</button>
+        <button onclick="rHist('range',getYearFrom(),getRelYm(0))" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);cursor:pointer;font-family:inherit">ปีนี้</button>
+        <button onclick="rHist('range',getLastYearFrom(),getLastYearTo())" style="font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);cursor:pointer;font-family:inherit">ปีก่อน</button>
+      </div>
+      <button onclick="rHist('range',document.getElementById('rFrom').value,document.getElementById('rTo').value)"
+        class="btn prim" style="width:100%;padding:11px">🔍 ดูรายงาน</button>
+    </div>`;
+
+    // สร้าง range ของเดือน
+    function ymToDate(ym){const [y,m]=ym.split('-').map(Number);return new Date(y,m-1,1);}
+    const fromD=ymToDate(rangeFrom), toD=ymToDate(rangeTo);
+    if(fromD>toD){document.getElementById('scr').innerHTML=tabs+pickerHtml+'<div class="empty">กรุณาเลือกช่วงเวลาที่ถูกต้อง</div>'+cred();return;}
+
+    const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const rangeMonths=[];
+    let cur=new Date(fromD);
+    while(cur<=toD){
+      const ym=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0');
+      const label=M[cur.getMonth()]+' '+(cur.getFullYear()+543-2500);
+      const insp=latFM(S.fid,ym);
+      rangeMonths.push({ym,label,insp,sv:insp?summ(insp,S.fid):null});
+      cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);
+    }
+
+    const totalMonths=rangeMonths.length;
+    const checkedMonths=rangeMonths.filter(m=>m.insp).length;
+    const unchecked=totalMonths-checkedMonths;
+    // รวม KPI ทั้งช่วง (เฉลี่ยเดือนที่มีข้อมูล)
+    const totOk=rangeMonths.filter(m=>m.sv).reduce((s,m)=>s+m.sv.ok,0);
+    const totWarn=rangeMonths.filter(m=>m.sv).reduce((s,m)=>s+m.sv.near+m.sv.below,0);
+    const totBad=rangeMonths.filter(m=>m.sv).reduce((s,m)=>s+m.sv.expired+m.sv.out,0);
+    const avgOk=checkedMonths?Math.round(totOk/checkedMonths):0;
+    const worstMonth=rangeMonths.filter(m=>m.sv).sort((a,b)=>(b.sv.expired+b.sv.out+b.sv.near+b.sv.below)-(a.sv.expired+a.sv.out+a.sv.near+a.sv.below))[0];
+    const bestMonth=rangeMonths.filter(m=>m.sv).sort((a,b)=>(a.sv.expired+a.sv.out+a.sv.near+a.sv.below)-(b.sv.expired+b.sv.out+b.sv.near+b.sv.below))[0];
+
+    // KPI summary bar
+    let summaryHtml=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px">
+      <div class="card" style="padding:11px 13px;text-align:center">
+        <div style="font-size:10px;color:var(--mut)">เดือนที่ตรวจ</div>
+        <div style="font-size:22px;font-weight:800;color:var(--ink)">${checkedMonths}<span style="font-size:13px;color:var(--mut)">/${totalMonths}</span></div>
+        ${unchecked?`<div style="font-size:10px;color:var(--near)">ขาด ${unchecked} เดือน</div>`:'<div style="font-size:10px;color:var(--ok)">ครบทุกเดือน ✓</div>'}
+      </div>
+      <div class="card" style="padding:11px 13px;text-align:center">
+        <div style="font-size:10px;color:var(--mut)">รายการปกติ (เฉลี่ย/เดือน)</div>
+        <div style="font-size:22px;font-weight:800;color:var(--ok)">${avgOk}</div>
+        <div style="font-size:10px;color:var(--mut)">รายการ</div>
+      </div>
+      <div class="card" style="padding:11px 13px;text-align:center">
+        <div style="font-size:10px;color:var(--near)">⚠ รวมรายการเตือน</div>
+        <div style="font-size:22px;font-weight:800;color:var(--near)">${totWarn}</div>
+        <div style="font-size:10px;color:var(--mut)">ตลอด ${checkedMonths} เดือน</div>
+      </div>
+      <div class="card" style="padding:11px 13px;text-align:center">
+        <div style="font-size:10px;color:var(--bad)">✕ รวมหมด/หมดอายุ</div>
+        <div style="font-size:22px;font-weight:800;color:var(--bad)">${totBad}</div>
+        <div style="font-size:10px;color:var(--mut)">ตลอด ${checkedMonths} เดือน</div>
       </div>
     </div>`;
-  });
 
-  document.getElementById('scr').innerHTML=tabs+chartHtml+
-    `<div class="card" style="padding:4px 14px">${monthRows}</div>`+cred();
+    if(worstMonth||bestMonth){
+      summaryHtml+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        ${bestMonth?`<div class="card" style="padding:10px 12px;border-left:3px solid var(--ok)">
+          <div style="font-size:10px;color:var(--ok);font-weight:700">🏆 เดือนดีที่สุด</div>
+          <div style="font-size:13px;font-weight:700;margin-top:3px">${bestMonth.label}</div>
+          <div style="font-size:11px;color:var(--mut)">ปกติ ${bestMonth.sv.ok} รายการ</div>
+        </div>`:''}
+        ${worstMonth?`<div class="card" style="padding:10px 12px;border-left:3px solid var(--bad)">
+          <div style="font-size:10px;color:var(--bad);font-weight:700">⚠ เดือนมีปัญหามากสุด</div>
+          <div style="font-size:13px;font-weight:700;margin-top:3px">${worstMonth.label}</div>
+          <div style="font-size:11px;color:var(--mut)">เตือน ${worstMonth.sv.near+worstMonth.sv.below} · หมด ${worstMonth.sv.expired+worstMonth.sv.out}</div>
+        </div>`:''}
+      </div>`;
+    }
+
+    // ตารางแต่ละเดือน
+    let tableRows='';
+    rangeMonths.slice().reverse().forEach(({label,insp,sv,ym})=>{
+      if(!sv){
+        tableRows+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)">
+          <div style="font-size:13px;font-weight:700;color:var(--hint)">${label}</div>
+          <span style="font-size:11px;color:var(--hint)">ไม่มีข้อมูล</span>
+        </div>`;
+        return;
+      }
+      const prob=sv.expired+sv.out+sv.below+sv.near;
+      tableRows+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="S.did='${insp.id}';rHD()">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700">${label}</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:1px">ผู้ตรวจ: ${insp.inspector}</div>
+          <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--ok)">✓ ${sv.ok}</span>
+            ${sv.near?`<span style="font-size:11px;color:var(--near)">⚠ ${sv.near}</span>`:''}
+            ${sv.below?`<span style="font-size:11px;color:var(--below)">↓ ${sv.below}</span>`:''}
+            ${(sv.expired+sv.out)?`<span style="font-size:11px;color:var(--bad)">✕ ${sv.expired+sv.out}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="chip ${prob?'c-bad':'c-ok'}">${prob?prob+' รายการ':'ครบถ้วน'}</span>
+          <span style="color:var(--hint)">›</span>
+        </div>
+      </div>`;
+    });
+
+    // ปุ่ม PDF
+    const pdfBtn=checkedMonths?`<button onclick="window._printRangeReport('${rangeFrom}','${rangeTo}')"
+      class="btn sec" style="width:100%;padding:12px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+      📄 ออก PDF สรุปช่วงเวลานี้
+    </button>`:'';
+
+    document.getElementById('scr').innerHTML=tabs+pickerHtml+
+      (checkedMonths?`<div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:8px">${f.name} · ${M[(ymToDate(rangeFrom).getMonth())]+' '+(ymToDate(rangeFrom).getFullYear()+543-2500)} — ${M[(ymToDate(rangeTo).getMonth())]+' '+(ymToDate(rangeTo).getFullYear()+543-2500)}</div>`:'')
+      +summaryHtml+pdfBtn
+      +`<div class="card" style="padding:4px 14px">${tableRows}</div>`+cred();
+  }
 }
+
+// helper: relative year-month
+function getRelYm(offset){const d=new Date();return new Date(d.getFullYear(),d.getMonth()+offset,1).getFullYear()+'-'+String(new Date(d.getFullYear(),d.getMonth()+offset,1).getMonth()+1).padStart(2,'0');}
+function getYearFrom(){return new Date().getFullYear()+'-01';}
+function getLastYearFrom(){return (new Date().getFullYear()-1)+'-01';}
+function getLastYearTo(){return (new Date().getFullYear()-1)+'-12';}
+
+
 function rHD(){
   const insp=INSPS.find(i=>i.id===S.did);if(!insp){rHist();return}
   const s=summ(insp,S.fid);const f=F(S.fid);const its=fItems(S.fid);
