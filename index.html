@@ -277,12 +277,13 @@ const LSRC='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFB
 const DEV={name:'Atit Chimnan',role:'System Developer & Designer'};
 
 const FARMS=[
-  {id:1,name:'ศูนย์วิจัยไร่สาม',          sh:'ไร่สาม',        c:'#3f9bdb',bg:'#13212e'},
-  {id:2,name:'ศูนย์วิจัยหัวกุญแจ',         sh:'หัวกุญแจ',     c:'#7bc24a',bg:'#18230f'},
-  {id:3,name:'ศูนย์ปรับปรุงพันธุ์สัตว์น้ำหาดเจ้า',sh:'ปรับปรุงพันธุ์',c:'#e06aa0',bg:'#2a141f'},
-  {id:4,name:'ศูนย์วิจัยหาดเจ้า',           sh:'หาดเจ้า',      c:'#ef9a4a',bg:'#2a1d10'},
-  {id:5,name:'ศูนย์วิจัยเพชรบุรี',          sh:'เพชรบุรี',     c:'#5b73d8',bg:'#161a2e'},
+  {id:1,name:'ศูนย์วิจัยไร่สาม',          sh:'ไร่สาม',        c:'#3f9bdb',bg:'#13212e',code:'RS'},
+  {id:2,name:'ศูนย์วิจัยหัวกุญแจ',         sh:'หัวกุญแจ',     c:'#7bc24a',bg:'#18230f',code:'HKJ'},
+  {id:3,name:'ศูนย์ปรับปรุงพันธุ์สัตว์น้ำหาดเจ้า',sh:'ปรับปรุงพันธุ์',c:'#e06aa0',bg:'#2a141f',code:'CAA'},
+  {id:4,name:'ศูนย์วิจัยหาดเจ้า',           sh:'หาดเจ้า',      c:'#ef9a4a',bg:'#2a1d10',code:'HJ'},
+  {id:5,name:'ศูนย์วิจัยเพชรบุรี',          sh:'เพชรบุรี',     c:'#5b73d8',bg:'#161a2e',code:'PB'},
 ];
+let DOC_COUNTERS={};  // {RS_2026:3, HKJ_2026:1, ...}
 /* ── รายการสินค้าสำหรับสั่งของ (รหัส+ราคา) ── */
 const PRODUCTS=[
   {code:'61000202', name:'TENSOPLASTIC 1X100',                price:80,    unit:'กล่อง'},
@@ -448,6 +449,14 @@ async function fbLoadAll() {
         if(cloudPov&&typeof cloudPov==='object'){PRICE_OVERRIDE=cloudPov;await ss('price_override_v1',JSON.stringify(PRICE_OVERRIDE));}
       }
     }catch(e){console.warn('fbPrice load:',e.message);}
+    /* โหลด doc_counters */
+    try{
+      const dcSnap=await window._fbDb.collection('settings').doc('doc_counters').get();
+      if(dcSnap.exists&&dcSnap.data().data){
+        const cloudDc=JSON.parse(dcSnap.data().data);
+        if(cloudDc&&typeof cloudDc==='object'){DOC_COUNTERS=cloudDc;await ss('doc_counters_v1',JSON.stringify(DOC_COUNTERS));}
+      }
+    }catch(e){console.warn('fbDocCounters:',e.message);}
     /* โหลด farm_cfg */
     const cfgSnap = await window._fbDb.collection('settings').doc('farm_cfg').get();
     if(cfgSnap.exists) {
@@ -630,6 +639,8 @@ async function boot(){
   if(ph){try{ITEM_PHOTOS=JSON.parse(ph)||{}}catch(e){ITEM_PHOTOS={}}}
   const pov=await sg('price_override_v1');
   if(pov){try{PRICE_OVERRIDE=JSON.parse(pov)||{}}catch(e){PRICE_OVERRIDE={}}}
+  const dc=await sg('doc_counters_v1');
+  if(dc){try{DOC_COUNTERS=JSON.parse(dc)||{}}catch(e){DOC_COUNTERS={}}}
   gsUrl=(await sg('gsheet_url'))||GSD;
   const n=new Date();S.rym=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
 
@@ -1402,7 +1413,7 @@ function pickItemPhoto(itemId,scope){
 
 
 /* ── PDF ใบสั่งของ ── */
-window._printOrders=function(){
+window._printOrders=async function(){
   const f=F(S.fid);
   const orders=ordersForFarm(S.fid).filter(o=>o.status!=='received')
     .sort((a,b)=>new Date(a.orderDate)-new Date(b.orderDate));
@@ -1427,9 +1438,7 @@ window._printOrders=function(){
   const today=new Date();
   const M=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
   const dateStr=today.getDate()+' '+M[today.getMonth()]+' พ.ศ. '+(today.getFullYear()+543);
-  const mm=String(today.getMonth()+1).padStart(2,'0');
-  const dd=String(today.getDate()).padStart(2,'0');
-  const docNo='MED-'+String(today.getFullYear()).slice(-2)+mm+'-'+dd;
+  const docNo=await genDocNo(S.fid);  // MT-RS-2026-001
   const orderer=FC(S.fid).resp||INSPECTORS[0]||'';
 
   const pr=document.getElementById('prt');
@@ -1444,7 +1453,7 @@ window._printOrders=function(){
         <div>
           <div style="font-size:22px;font-weight:800;color:#1a7a40;line-height:1.1;letter-spacing:-.2px">ใบสั่งยาและเวชภัณฑ์</div>
           <div style="font-size:13.5px;font-weight:700;color:#222;margin-top:4px">${f.name}</div>
-          <div style="font-size:11px;color:#999;margin-top:2px">ศูนย์วิจัยสัตว์น้ำ MSBRC-2 · CPF</div>
+          <div style="font-size:11px;color:#999;margin-top:2px">ธุรกิจพันธุ์กุ้งทะเล 2</div>
         </div>
       </div>
 
@@ -1507,7 +1516,7 @@ window._printOrders=function(){
 };
 
 /* ── PDF สรุปช่วงเวลา ── */
-window._printRangeReport=function(rangeFrom,rangeTo){
+window._printRangeReport=async function(rangeFrom,rangeTo){
   const f=F(S.fid);
   const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   const MF=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
@@ -1559,6 +1568,7 @@ window._printRangeReport=function(rangeFrom,rangeTo){
 
   const today=new Date();
   const printDate=today.getDate()+' '+MF[today.getMonth()]+' พ.ศ. '+(today.getFullYear()+543);
+  const rangeDocNo=await genDocNo(S.fid);  // MT-RS-2026-002
 
   const pr=document.getElementById('prt');
   pr.innerHTML=`<div style="font-family:'Sarabun',Arial,sans-serif;color:#111;max-width:680px;margin:0 auto;padding:36px 44px">
@@ -1569,13 +1579,15 @@ window._printRangeReport=function(rangeFrom,rangeTo){
         <div>
           <div style="font-size:20px;font-weight:800;color:#1a7a40">รายงานสรุปการตรวจนับ</div>
           <div style="font-size:13.5px;font-weight:700;color:#222;margin-top:3px">${f.name}</div>
-          <div style="font-size:11px;color:#999;margin-top:1px">ศูนย์วิจัยสัตว์น้ำ MSBRC-2 · CPF</div>
+          <div style="font-size:11px;color:#999;margin-top:1px">ธุรกิจพันธุ์กุ้งทะเล 2</div>
         </div>
       </div>
       <div style="text-align:right;padding-top:2px">
-        <div style="font-size:11px;color:#aaa">ช่วงเวลา</div>
-        <div style="font-size:14px;font-weight:800;color:#111">${ymLabel(rangeFrom)} — ${ymLabel(rangeTo)}</div>
-        <div style="font-size:11px;color:#666;margin-top:6px">พิมพ์: ${printDate}</div>
+        <div style="font-size:10px;color:#aaa;letter-spacing:.5px">เลขที่เอกสาร</div>
+        <div style="font-size:15px;font-weight:800;color:#111;font-family:monospace;letter-spacing:.5px">${rangeDocNo}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:6px">ช่วงเวลา</div>
+        <div style="font-size:13px;font-weight:700;color:#333">${ymLabel(rangeFrom)} — ${ymLabel(rangeTo)}</div>
+        <div style="font-size:11px;color:#666;margin-top:4px">พิมพ์: ${printDate}</div>
       </div>
     </div>
 
@@ -1621,6 +1633,31 @@ window._printRangeReport=function(rangeFrom,rangeTo){
   window.print();
   setTimeout(_hide,2000);
 };
+
+
+/* ── Document Number Generator ── */
+async function genDocNo(fid){
+  const f=FARMS.find(x=>x.id===fid)||{code:'XX'};
+  const year=new Date().getFullYear();
+  const key=f.code+'_'+year;
+  DOC_COUNTERS[key]=(DOC_COUNTERS[key]||0)+1;
+  const seq=String(DOC_COUNTERS[key]).padStart(3,'0');
+  // บันทึก counter
+  await ss('doc_counters_v1',JSON.stringify(DOC_COUNTERS));
+  if(window._fbReady){
+    try{await window._fbDb.collection('settings').doc('doc_counters').set({data:JSON.stringify(DOC_COUNTERS)});}
+    catch(e){console.warn('docCounters save:',e.message);}
+  }
+  return `MT-${f.code}-${year}-${seq}`;
+}
+// peek (ดูเลขถัดไปโดยไม่ increment — สำหรับ preview)
+function peekDocNo(fid){
+  const f=FARMS.find(x=>x.id===fid)||{code:'XX'};
+  const year=new Date().getFullYear();
+  const key=f.code+'_'+year;
+  const next=(DOC_COUNTERS[key]||0)+1;
+  return `MT-${f.code}-${year}-${String(next).padStart(3,'0')}`;
+}
 
 
 /* ── HOME ── */
